@@ -2654,7 +2654,11 @@ document.addEventListener('click', (e) => {
     pDrop.classList.remove('open');
   }
 });
-
+// ─── GUIDES TOGGLE ───
+function toggleGuides() {
+  const d = document.getElementById('guides-dropdown');
+  if (d) d.classList.toggle('open');
+}
 // ─── LOGOUT ───
 function doLogout() {
   // 1. Stop background timers
@@ -2673,6 +2677,8 @@ function doLogout() {
   // 4. Redirect to login
   window.location.href = 'isc_auth.html';
 }
+
+
 </script>
 </body>
 </html>
