@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recursion — ISC Computer Science Topic 3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Fira+Code:wght@400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+   --bg: #0f1117;
+    --bg2: #161820;
+    --bg3: #1e2030;
+    --card: #1a1d2e;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #01030b;
+    --text2: #9ea3bb;
+    --text3: #6b7094;
+  --ink:     #fb858b;
+  --rust:    #c0392b;
+  --rust2:   #e74c3c;
+  --forest:  #27ae60;
+  --forest2: #2ecc71;
+  --ocean:   #2980b9;
+  --ocean2:  #3498db;
+  --gold:    #d4800a;
+  --gold2:   #f39c12;
+  --plum:    #8e44ad;
+  --plum2:   #9b59b6;
+  --mono:    'Fira Code', monospace;
+  --serif:   'Playfair Display', serif;
+  --sans:    'DM Sans', sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.75;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:200;background:rgba(250,248,245,0.97);backdrop-filter:blur(12px);border-bottom:2px solid var(--ink);display:flex;align-items:center;overflow-x:auto;padding:0 2rem;}
+.nav-logo{font-family:var(--serif);font-size:17px;font-weight:900;color:var(--ink);white-space:nowrap;padding:0.85rem 1.25rem 0.85rem 0;margin-right:0.5rem;border-right:2px solid var(--border2);}
+.nav a{padding:0.85rem 1.1rem;font-size:12px;font-weight:600;color:var(--text3);text-decoration:none;white-space:nowrap;border-bottom:3px solid transparent;transition:all 0.2s;letter-spacing:0.05em;text-transform:uppercase;}
+.nav a:hover{color:var(--ink);}
+.nav a.active{color:var(--rust);border-bottom-color:var(--rust);}
+
+/* HERO */
+.hero{padding:5rem 2rem 4rem;position:relative;overflow:hidden;border-bottom:2px solid var(--ink);}
+.hero-bg{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,0,0,0.04) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,0,0,0.03) 40px);}
+.hero-content{position:relative;max-width:860px;margin:0 auto;}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:var(--bg);padding:5px 14px;border-radius:2px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5rem;}
+.hero h1{font-family:var(--serif);font-size:clamp(3rem,8vw,6.5rem);font-weight:900;line-height:0.95;letter-spacing:-0.02em;margin-bottom:1rem;color:var(--ink);}
+.hero h1 .accent{color:var(--rust);display:block;}
+.hero-sub{color:var(--text2);font-size:1.05rem;max-width:520px;margin-bottom:2rem;font-style:italic;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{background:transparent;border:1.5px solid var(--border2);padding:5px 14px;border-radius:2px;font-size:11.5px;color:var(--text2);font-family:var(--mono);}
+
+/* LAYOUT */
+.page{max-width:980px;margin:0 auto;}
+.section{padding:3.5rem 2rem;border-bottom:1.5px solid var(--border2);}
+
+/* SECTION HEADER */
+.sec-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:2rem;}
+.sec-num{font-family:var(--mono);font-size:11px;color:var(--rust);background:rgba(192,57,43,0.08);border:1.5px solid rgba(192,57,43,0.2);padding:4px 10px;border-radius:2px;font-weight:600;letter-spacing:0.08em;flex-shrink:0;margin-top:6px;}
+.sec-title{font-family:var(--serif);font-size:2rem;font-weight:900;line-height:1.1;color:var(--ink);}
+.sec-sub{color:var(--text3);font-size:0.85rem;margin-top:4px;font-family:var(--mono);}
+
+.sub{font-family:var(--serif);font-size:1.25rem;font-weight:700;margin:2rem 0 0.9rem;color:var(--ink);border-bottom:1.5px solid var(--border2);padding-bottom:0.5rem;}
+
+/* CARDS */
+.card{background:var(--card);border:1.5px solid var(--border2);border-radius:4px;padding:1.4rem;margin-bottom:1rem;}
+.card h3{font-family:var(--serif);font-size:1.05rem;font-weight:700;margin-bottom:0.75rem;color:var(--ink);}
+.card p,.card li{color:var(--text2);font-size:0.9rem;line-height:1.7;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+@media(max-width:680px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+/* CODE BLOCKS */
+.code-block{background:var(--bg3);color:#f8f8f8;border-radius:4px;padding:1.25rem 1.5rem;font-family:var(--mono);font-size:0.84rem;line-height:1.8;margin:0.75rem 0;overflow-x:auto;position:relative;}
+.code-block .kw{color:#e07070;}     /* keyword */
+.code-block .fn{color:#7ec8e3;}     /* function */
+.code-block .cm{color:#7a7060;font-style:italic;} /* comment */
+.code-block .nm{color:#f0c070;}     /* number/literal */
+.code-block .str{color:#90c060;}    /* string/return */
+.code-block .ln{color:#554e45;user-select:none;margin-right:16px;} /* line num */
+.code-block .hl{background:rgba(255,200,100,0.12);display:block;margin:0 -1.5rem;padding:0 1.5rem;} /* highlight */
+.code-label{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+
+/* CALL STACK */
+.stack-container{display:flex;flex-direction:column;align-items:center;gap:0;margin:1rem 0;}
+.stack-frame{background:var(--card);border:1.5px solid var(--border2);border-radius:4px;padding:0.65rem 1.2rem;width:100%;max-width:480px;display:flex;justify-content:space-between;align-items:center;position:relative;transition:all 0.3s;}
+.stack-frame.active{border-color:var(--rust);background:rgba(192,57,43,0.04);}
+.stack-frame.returning{border-color:var(--forest);background:rgba(39,174,96,0.04);}
+.sf-name{font-family:var(--mono);font-size:0.84rem;color:var(--ink);font-weight:600;}
+.sf-val{font-family:var(--mono);font-size:0.84rem;color:var(--rust);}
+.sf-state{font-size:11px;color:var(--text3);font-family:var(--mono);}
+.stack-arrow{color:var(--text3);font-size:0.9rem;margin:3px 0;}
+
+/* NOTE BOXES */
+.note-box{border-radius:4px;padding:1rem 1.25rem;margin:1rem 0;border-left:4px solid;}
+.note-box.info{background:rgba(41,128,185,0.05);border-left-color:var(--ocean);}
+.note-box.warn{background:rgba(212,128,10,0.05);border-left-color:var(--gold);}
+.note-box.success{background:rgba(39,174,96,0.05);border-left-color:var(--forest);}
+.note-box.danger{background:rgba(192,57,43,0.05);border-left-color:var(--rust);}
+.note-title{font-size:12px;font-weight:600;font-family:var(--mono);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px;}
+.note-box.info .note-title{color:var(--ocean);}
+.note-box.warn .note-title{color:var(--gold);}
+.note-box.success .note-title{color:var(--forest);}
+.note-box.danger .note-title{color:var(--rust);}
+.note-box p,.note-box li{color:var(--text2);font-size:0.88rem;line-height:1.6;}
+.note-box ul{padding-left:1.2rem;}
+
+/* RECURSION TREE */
+.tree-wrap{background:var(--bg2);border:1.5px solid var(--border2);border-radius:4px;padding:1.25rem;overflow-x:auto;margin:1rem 0;}
+.tree-wrap pre{font-family:var(--mono);font-size:0.82rem;color:var(--ink);line-height:1.7;white-space:pre;}
+
+/* FORMULA */
+.formula{background:var(--bg2);border:1.5px solid var(--border2);border-left:4px solid var(--plum);border-radius:4px;padding:0.75rem 1.1rem;font-family:var(--mono);font-size:0.85rem;color:var(--ink);margin:0.5rem 0;overflow-x:auto;line-height:1.75;}
+.formula .eq{color:var(--plum);}
+.formula .lbl{color:var(--text3);font-size:0.76rem;margin-bottom:3px;}
+
+/* INTERACTIVE SECTIONS */
+.sim-box{background:var(--bg2);border:1.5px solid var(--border2);border-radius:4px;padding:1.5rem;margin:1rem 0;}
+.sim-title{font-family:var(--serif);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:1rem;}
+.control-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:1rem;}
+.num-inp{padding:7px 12px;border:1.5px solid var(--border2);border-radius:4px;font-family:var(--mono);font-size:14px;background:var(--card);color:var(--ink);width:90px;}
+.run-btn{padding:8px 20px;background:var(--ink);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:0.04em;transition:opacity 0.2s;}
+.run-btn:hover{opacity:0.8;}
+.run-btn.rust{background:var(--rust);}
+.run-btn.forest{background:var(--forest);}
+.run-btn.ocean{background:var(--ocean);}
+.trace-output{background:var(--bg3);color:#f8f5f0;border-radius:4px;padding:1rem 1.25rem;font-family:var(--mono);font-size:0.82rem;line-height:1.8;min-height:80px;white-space:pre-wrap;word-break:break-all;margin-top:0.75rem;max-height:340px;overflow-y:auto;}
+.trace-output .call{color:#7ec8e3;}
+.trace-output .ret{color:#90c060;}
+.trace-output .base{color:#f0c070;}
+.trace-output .indent{color:#554e45;}
+
+/* HANOI */
+.hanoi-box{background:var(--bg2);border:1.5px solid var(--border2);border-radius:4px;padding:1.5rem;margin:1rem 0;}
+.hanoi-pegs{display:flex;justify-content:space-around;align-items:flex-end;height:200px;margin-bottom:1rem;position:relative;}
+.peg{display:flex;flex-direction:column-reverse;align-items:center;flex:1;position:relative;}
+.peg-rod{width:6px;height:160px;background:var(--ink);border-radius:3px;position:absolute;bottom:0;}
+.peg-base{width:90%;height:10px;background:var(--ink);border-radius:3px;flex-shrink:0;}
+.peg-label{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:8px;text-align:center;}
+.disk{border-radius:4px;height:22px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:600;color:#fff;margin-bottom:3px;z-index:1;transition:all 0.4s ease;position:relative;}
+.move-log{background:var(--bg3);color:#f8f5f0;border-radius:4px;padding:0.9rem 1.1rem;font-family:var(--mono);font-size:0.79rem;line-height:1.7;max-height:200px;overflow-y:auto;margin-top:0.75rem;}
+.hanoi-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1rem;}
+.step-btn{padding:7px 16px;background:transparent;border:1.5px solid var(--border2);border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink);transition:all 0.2s;}
+.step-btn:hover:not(:disabled){background:var(--ink);color:var(--bg);}
+.step-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.move-count{font-family:var(--mono);font-size:12px;color:var(--text3);}
+
+/* TABLES */
+.tt-wrap{overflow-x:auto;margin:0.75rem 0;}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.83rem;}
+th{background:var(--ink);color:var(--bg);font-weight:600;padding:9px 12px;text-align:center;border:1.5px solid var(--ink);}
+td{padding:7px 12px;text-align:center;border:1.5px solid var(--border);color:var(--ink);}
+tr:nth-child(even) td{background:var(--bg2);}
+.hl-row td{background:rgba(192,57,43,0.06)!important;font-weight:600;}
+
+/* QUIZ */
+.quiz-card{background:var(--card);border:1.5px solid var(--border2);border-radius:4px;padding:1.4rem;margin:1.25rem 0;}
+.quiz-q{font-size:0.95rem;font-weight:600;margin-bottom:1rem;color:var(--ink);font-family:var(--serif);}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;}
+.qopt{padding:9px 14px;background:var(--bg2);border:1.5px solid var(--border);border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:0.83rem;transition:all 0.2s;color:var(--text2);text-align:left;}
+.qopt:hover{border-color:var(--ink);color:var(--ink);}
+.qopt.correct{background:rgba(39,174,96,0.08);border-color:var(--forest);color:var(--forest);}
+.qopt.wrong{background:rgba(192,57,43,0.08);border-color:var(--rust);color:var(--rust);}
+.quiz-exp{background:var(--bg2);border-radius:4px;padding:0.75rem 1rem;font-size:0.87rem;color:var(--text2);margin-top:0.75rem;display:none;border-left:3px solid var(--ink);}
+.score-bar{background:var(--bg2);border:1.5px solid var(--border2);border-radius:4px;padding:0.9rem 1.25rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.score-val{font-family:var(--serif);font-weight:900;font-size:1.5rem;color:var(--rust);}
+
+/* CHEAT */
+.cheat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem;margin:1rem 0;}
+.cheat-item{background:var(--card);border:1.5px solid var(--border);border-radius:4px;padding:0.85rem 1rem;}
+.cheat-name{font-size:10px;color:var(--rust);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);margin-bottom:5px;}
+.cheat-eq{font-family:var(--mono);font-size:0.8rem;color:var(--ink);margin-bottom:2px;}
+.cheat-sub{font-size:11px;color:var(--text3);font-family:var(--sans);}
+
+ul.list{list-style:none;padding:0;}
+ul.list li{padding:4px 0 4px 1.4rem;position:relative;color:var(--text2);font-size:0.9rem;}
+ul.list li::before{content:'→';position:absolute;left:0;color:var(--rust);font-size:0.8rem;}
+
+footer{text-align:center;padding:2rem;color:var(--text3);font-size:0.8rem;border-top:2px solid var(--ink);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">ISC · CS</div>
+  <a href="#concept" class="active">Concept</a>
+  <a href="#factorial">Factorial</a>
+  <a href="#gcd">GCD</a>
+  <a href="#bsearch">Binary Search</a>
+  <a href="#base-conv">Base Conv.</a>
+  <a href="#hanoi">Tower of Hanoi</a>
+  <a href="#trace">Call Tracer</a>
+  <a href="#quiz">Quiz</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-tag">📐 ISC CS · Topic 3</div>
+    <h1>Recur<span class="accent">sion</span></h1>
+    <p class="hero-sub">The art of solving a problem by solving a smaller version of the same problem — until the answer is obvious.</p>
+    <div class="hero-chips">
+      <div class="chip">Concept & Base Case</div>
+      <div class="chip">Factorial</div>
+      <div class="chip">GCD</div>
+      <div class="chip">Binary Search</div>
+      <div class="chip">Base Conversion</div>
+      <div class="chip">Tower of Hanoi</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 1 — CONCEPT -->
+<!-- ════════════════════════════════════════════════ -->
+<section class="section" id="concept">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 3A</div>
+    <div>
+      <div class="sec-title">What is Recursion?</div>
+      <div class="sec-sub">concept · base case · call stack · infinite recursion</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1.5rem;font-size:0.95rem;">Recursion is a programming technique where a <strong style="color:var(--ink);">method calls itself</strong> to solve a problem by breaking it down into smaller sub-problems of the <em>same type</em>, until it reaches a trivially simple case (the <strong style="color:var(--rust);">base case</strong>).</p>
+
+  <div class="grid3" style="margin-bottom:1rem;">
+    <div class="card" style="border-top:3px solid var(--rust);">
+      <h3>Recursive Case</h3>
+      <p>The general rule — the function calls <em>itself</em> with a <strong>smaller/simpler input</strong>. Progress toward the base case must be guaranteed.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--forest);">
+      <h3>Base Case ⭐</h3>
+      <p>The <strong>simplest input</strong> where the answer is known directly — NO recursive call. Without this, recursion never stops (infinite loop / stack overflow).</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--ocean);">
+      <h3>Return &amp; Combine</h3>
+      <p>Each recursive call returns a value. The caller combines these returned values to build the final answer.</p>
+    </div>
+  </div>
+
+  <div class="note-box warn">
+    <div class="note-title">⭐ The Golden Rule of Recursion</div>
+    <p>Every recursive method <strong>MUST</strong> have at least one base case. Without a base case, the method will call itself indefinitely, causing a <strong>StackOverflowError</strong> (infinite recursion). Always identify the base case first before writing any recursive method.</p>
+  </div>
+
+  <div class="sub">Structure of Every Recursive Method</div>
+  <div class="code-label">Java — General Template</div>
+  <div class="code-block">
+<span class="kw">returnType</span> <span class="fn">recursiveMethod</span>(<span class="kw">parameters</span>) {
+    <span class="cm">// ── STEP 1: Base Case ─────────────────────────────</span>
+    <span class="kw">if</span> (simplest condition) {
+        <span class="str">return</span> known_answer;   <span class="cm">// NO recursive call here</span>
+    }
+
+    <span class="cm">// ── STEP 2: Recursive Case ────────────────────────</span>
+    <span class="cm">// Reduce problem toward base case</span>
+    <span class="str">return</span> combine( <span class="fn">recursiveMethod</span>(smaller_input) );
+}</div>
+
+  <div class="sub">The Call Stack — How Recursion Works Internally</div>
+  <p style="color:var(--text2);margin-bottom:1rem;font-size:0.9rem;">Each call to a method pushes a new <strong>stack frame</strong> onto the call stack. The frame stores local variables and where to return when done. Frames are popped (removed) as each call returns.</p>
+
+  <div class="grid2">
+    <div>
+      <p style="font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:8px;">CALLING PHASE (frames pushed) →</p>
+      <div class="stack-container">
+        <div class="stack-frame active"><span class="sf-name">factorial(4)</span><span class="sf-state">waiting...</span></div>
+        <div class="stack-arrow">▼</div>
+        <div class="stack-frame active"><span class="sf-name">factorial(3)</span><span class="sf-state">waiting...</span></div>
+        <div class="stack-arrow">▼</div>
+        <div class="stack-frame active"><span class="sf-name">factorial(2)</span><span class="sf-state">waiting...</span></div>
+        <div class="stack-arrow">▼</div>
+        <div class="stack-frame active"><span class="sf-name">factorial(1)</span><span class="sf-state">waiting...</span></div>
+        <div class="stack-arrow">▼</div>
+        <div class="stack-frame" style="border-color:var(--forest);background:rgba(39,174,96,0.06);"><span class="sf-name">factorial(0)</span><span class="sf-val">returns 1 🏁</span></div>
+      </div>
+    </div>
+    <div>
+      <p style="font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:8px;">RETURNING PHASE (frames popped) ←</p>
+      <div class="stack-container">
+        <div class="stack-frame returning"><span class="sf-name">factorial(4)</span><span class="sf-val">= 4×6 = 24</span></div>
+        <div class="stack-arrow">▲</div>
+        <div class="stack-frame returning"><span class="sf-name">factorial(3)</span><span class="sf-val">= 3×2 = 6</span></div>
+        <div class="stack-arrow">▲</div>
+        <div class="stack-frame returning"><span class="sf-name">factorial(2)</span><span class="sf-val">= 2×1 = 2</span></div>
+        <div class="stack-arrow">▲</div>
+        <div class="stack-frame returning"><span class="sf-name">factorial(1)</span><span class="sf-val">= 1×1 = 1</span></div>
+        <div class="stack-arrow">▲</div>
+        <div class="stack-frame" style="border-color:var(--forest);background:rgba(39,174,96,0.06);"><span class="sf-name">factorial(0)</span><span class="sf-val">= 1 (base)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">Recursion vs Iteration</div>
+  <div class="tt-wrap">
+    <table>
+      <tr><th>Property</th><th>Recursion</th><th>Iteration</th></tr>
+      <tr><td>Mechanism</td><td>Function calls itself</td><td>Loop (for/while)</td></tr>
+      <tr><td>Termination</td><td>Base case</td><td>Loop condition</td></tr>
+      <tr><td>Memory</td><td>Stack frame per call (more)</td><td>Constant extra memory</td></tr>
+      <tr><td>Code clarity</td><td>Often elegant/compact</td><td>Can be more verbose</td></tr>
+      <tr><td>Best for</td><td>Trees, divide-&-conquer, Hanoi</td><td>Simple loops, counters</td></tr>
+      <tr><td>Risk</td><td>Stack overflow if no base case</td><td>Infinite loop</td></tr>
+    </table>
+  </div>
+
+  <div class="note-box danger">
+    <div class="note-title">❌ Infinite Recursion — Never Do This</div>
+    <div class="code-block" style="margin-top:0.5rem;">
+<span class="kw">int</span> <span class="fn">bad</span>(<span class="kw">int</span> n) {
+    <span class="str">return</span> <span class="fn">bad</span>(n - <span class="nm">1</span>);  <span class="cm">// No base case! → StackOverflowError</span>
+}</div>
+    <p style="margin-top:0.5rem;">No base case means the method calls itself forever. Java will throw a <strong>StackOverflowError</strong> when the call stack runs out of memory.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 2 — FACTORIAL -->
+<!-- ════════════════════════════════════════════════ -->
+<section class="section" id="factorial">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 3B</div>
+    <div>
+      <div class="sec-title">Factorial</div>
+      <div class="sec-sub">n! = n × (n−1)! — the classic recursion example</div>
+    </div>
+  </div>
+
+  <div class="sub">Mathematical Definition (Recursive Equation)</div>
+  <div class="formula">
+    <div class="lbl">Recursive definition of factorial:</div>
+    <div class="eq">0! = 1                     ← Base Case</div>
+    <div class="eq">n! = n × (n−1)!            ← Recursive Case (for n > 0)</div>
+  </div>
+
+  <div class="sub">Trace: factorial(4)</div>
+  <div class="tree-wrap">
+    <pre>
+  factorial(4)
+  = 4 × factorial(3)
+        = 3 × factorial(2)
+              = 2 × factorial(1)
+                    = 1 × factorial(0)
+                                = 1          ← BASE CASE returns 1
+                    = 1 × 1 = 1              ← factorial(1) returns 1
+              = 2 × 1 = 2                    ← factorial(2) returns 2
+        = 3 × 2 = 6                          ← factorial(3) returns 6
+  = 4 × 6 = 24                              ← factorial(4) returns 24
+    </pre>
+  </div>
+
+  <div class="sub">Java Implementation</div>
+  <div class="code-label">Recursive factorial — Java</div>
+  <div class="code-block">
+<span class="kw">static long</span> <span class="fn">factorial</span>(<span class="kw">int</span> n) {
+    <span class="cm">// Base Case: 0! = 1, 1! = 1</span>
+    <span class="kw">if</span> (n == <span class="nm">0</span> || n == <span class="nm">1</span>)
+        <span class="str">return</span> <span class="nm">1</span>;
+
+    <span class="cm">// Recursive Case: n! = n × (n-1)!</span>
+    <span class="str">return</span> n * <span class="fn">factorial</span>(n - <span class="nm">1</span>);
+}</div>
+
+  <div class="grid2" style="margin-top:1rem;">
+    <div class="note-box info">
+      <div class="note-title">Base Case(s)</div>
+      <p>n = 0 → return 1<br>n = 1 → return 1<br>(Both are needed since 0! = 1 and 1! = 1)</p>
+    </div>
+    <div class="note-box success">
+      <div class="note-title">Recursive Case</div>
+      <p>n > 1 → return n * factorial(n − 1)<br>Each call reduces n by 1, guaranteed to reach base case.</p>
+    </div>
+  </div>
+
+  <div class="sub">Factorial Values Table</div>
+  <div class="tt-wrap">
+    <table>
+      <tr><th>n</th><th>n!</th><th>Recursive call</th></tr>
+      <tr><td>0</td><td>1</td><td>Base case</td></tr>
+      <tr><td>1</td><td>1</td><td>1 × 0! = 1×1</td></tr>
+      <tr><td>2</td><td>2</td><td>2 × 1! = 2×1</td></tr>
+      <tr><td>3</td><td>6</td><td>3 × 2! = 3×2</td></tr>
+      <tr><td>4</td><td>24</td><td>4 × 3! = 4×6</td></tr>
+      <tr><td>5</td><td>120</td><td>5 × 4! = 5×24</td></tr>
+      <tr><td>6</td><td>720</td><td>6 × 5! = 6×120</td></tr>
+      <tr class="hl-row"><td>10</td><td>3,628,800</td><td>10 × 9!</td></tr>
+    </table>
+  </div>
+
+  <!-- INTERACTIVE FACTORIAL -->
+  <div class="sim-box">
+    <div class="sim-title">Interactive Factorial Tracer</div>
+    <div class="control-row">
+      <label style="font-family:var(--mono);font-size:13px;color:var(--text2);">n =</label>
+      <input type="number" class="num-inp" id="fact-n" value="5" min="0" max="12">
+      <button class="run-btn rust" onclick="runFactorial()">Trace factorial(n)</button>
+    </div>
+    <div class="trace-output" id="fact-trace">Click the button to see the recursive trace...</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 3 — GCD -->
+<!-- ════════════════════════════════════════════════ -->
+<section class="section" id="gcd">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 3C</div>
+    <div>
+      <div class="sec-title">GCD — Euclid's Algorithm</div>
+      <div class="sec-sub">Greatest Common Divisor using the Euclidean method</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1rem;font-size:0.9rem;">The GCD (Greatest Common Divisor) of two integers is the largest positive integer that divides both without remainder. Euclid's algorithm computes it elegantly using recursion.</p>
+
+  <div class="sub">The Euclidean Recursive Equation</div>
+  <div class="formula">
+    <div class="eq">gcd(a, 0) = a                   ← Base Case (when b = 0)</div>
+    <div class="eq">gcd(a, b) = gcd(b, a mod b)     ← Recursive Case</div>
+  </div>
+
+  <div class="note-box info">
+    <div class="note-title">Why does this work?</div>
+    <p>The key insight: any divisor of both a and b also divides (a mod b). So gcd(a, b) = gcd(b, a mod b). Eventually b becomes 0, and gcd(a, 0) = a since a divides itself and divides 0. The value of b strictly decreases with each step (a mod b &lt; b always), guaranteeing termination.</p>
+  </div>
+
+  <div class="sub">Trace: gcd(48, 18)</div>
+  <div class="tree-wrap">
+    <pre>
+  gcd(48, 18)
+  → 48 mod 18 = 12  →  gcd(18, 12)
+                        → 18 mod 12 = 6   →  gcd(12, 6)
+                                              → 12 mod 6 = 0   →  gcd(6, 0)
+                                                                    → b=0, return 6  ← BASE CASE
+                                              ← return 6
+                        ← return 6
+  ← return 6
+
+  ∴ GCD(48, 18) = 6 ✓  (verify: 48÷6=8 ✓, 18÷6=3 ✓)
+    </pre>
+  </div>
+
+  <div class="sub">Java Implementation</div>
+  <div class="code-label">Recursive GCD — Java (Euclid's Algorithm)</div>
+  <div class="code-block">
+<span class="kw">static int</span> <span class="fn">gcd</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+    <span class="cm">// Base Case: gcd(a, 0) = a</span>
+    <span class="kw">if</span> (b == <span class="nm">0</span>)
+        <span class="str">return</span> a;
+
+    <span class="cm">// Recursive Case: gcd(a, b) = gcd(b, a % b)</span>
+    <span class="str">return</span> <span class="fn">gcd</span>(b, a % b);
+}</div>
+
+  <!-- INTERACTIVE GCD -->
+  <div class="sim-box">
+    <div class="sim-title">Interactive GCD Tracer</div>
+    <div class="control-row">
+      <label style="font-family:var(--mono);font-size:13px;color:var(--text2);">a =</label>
+      <input type="number" class="num-inp" id="gcd-a" value="48" min="1" max="999">
+      <label style="font-family:var(--mono);font-size:13px;color:var(--text2);">b =</label>
+      <input type="number" class="num-inp" id="gcd-b" value="18" min="0" max="999">
+      <button class="run-btn forest" onclick="runGCD()">Trace gcd(a, b)</button>
+    </div>
+    <div class="trace-output" id="gcd-trace">Click the button to see the recursive trace...</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 4 — BINARY SEARCH -->
+<!-- ════════════════════════════════════════════════ -->
+<section class="section" id="bsearch">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 3D</div>
+    <div>
+      <div class="sec-title">Binary Search</div>
+      <div class="sec-sub">Divide and conquer — O(log n) search in sorted array</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1rem;font-size:0.9rem;">Binary search finds a target element in a <strong>sorted array</strong> by repeatedly halving the search space. Each recursive call searches <em>half</em> the remaining elements — making it O(log n).</p>
+
+  <div class="sub">Algorithm Logic (Recursive Equation)</div>
+  <div class="formula">
+    <div class="eq">binarySearch(arr, low, high, key):</div>
+    <div class="eq">  if low &gt; high   → return -1        ← Base Case: NOT FOUND</div>
+    <div class="eq">  mid = (low+high) / 2</div>
+    <div class="eq">  if arr[mid] == key → return mid     ← Base Case: FOUND</div>
+    <div class="eq">  if key &lt; arr[mid]  → search left half  (low to mid-1)</div>
+    <div class="eq">  if key &gt; arr[mid]  → search right half (mid+1 to high)</div>
+  </div>
+
+  <div class="sub">Trace: Search for key=23 in sorted array</div>
+  <div class="card">
+    <p style="font-family:var(--mono);font-size:12px;margin-bottom:0.75rem;color:var(--text3);">Array: [5, 10, 15, 20, 23, 30, 42, 55, 60]  &nbsp; (indices 0–8)</p>
+    <div class="tree-wrap" style="margin:0;">
+      <pre>
+Call 1: low=0, high=8, mid=4 → arr[4]=23 → FOUND! return 4 ← BASE CASE
+
+  (Lucky! Found in first call. Let's trace searching for 42:)
+
+Call 1: low=0,  high=8,  mid=4  → arr[4]=23 < 42 → search RIGHT
+Call 2: low=5,  high=8,  mid=6  → arr[6]=42 == 42 → FOUND! return 6 ← BASE CASE
+
+  (Now trace for 10:)
+
+Call 1: low=0,  high=8,  mid=4  → arr[4]=23 > 10 → search LEFT
+Call 2: low=0,  high=3,  mid=1  → arr[1]=10 == 10 → FOUND! return 1 ← BASE CASE
+
+  (Trace for 99 — not in array:)
+
+Call 1: low=0,  high=8,  mid=4  → arr[4]=23 < 99 → search RIGHT
+Call 2: low=5,  high=8,  mid=6  → arr[6]=42 < 99 → search RIGHT
+Call 3: low=7,  high=8,  mid=7  → arr[7]=55 < 99 → search RIGHT
+Call 4: low=8,  high=8,  mid=8  → arr[8]=60 < 99 → search RIGHT
+Call 5: low=9,  high=8  → low > high → return -1 ← BASE CASE (NOT FOUND)
+      </pre>
+    </div>
+  </div>
+
+  <div class="sub">Java Implementation</div>
+  <div class="code-label">Recursive Binary Search — Java</div>
+  <div class="code-block">
+<span class="kw">static int</span> <span class="fn">binarySearch</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> low, <span class="kw">int</span> high, <span class="kw">int</span> key) {
+    <span class="cm">// Base Case 1: Search space exhausted — not found</span>
+    <span class="kw">if</span> (low > high)
+        <span class="str">return</span> <span class="nm">-1</span>;
+
+    <span class="kw">int</span> mid = (low + high) / <span class="nm">2</span>;
+
+    <span class="cm">// Base Case 2: Key found at mid</span>
+    <span class="kw">if</span> (arr[mid] == key)
+        <span class="str">return</span> mid;
+
+    <span class="cm">// Recursive Case 1: Key in left half</span>
+    <span class="kw">if</span> (key < arr[mid])
+        <span class="str">return</span> <span class="fn">binarySearch</span>(arr, low, mid - <span class="nm">1</span>, key);
+
+    <span class="cm">// Recursive Case 2: Key in right half</span>
+    <span class="str">return</span> <span class="fn">binarySearch</span>(arr, mid + <span class="nm">1</span>, high, key);
+}
+
+<span class="cm">// Calling it:</span>
+<span class="kw">int</span>[] arr = {<span class="nm">5, 10, 15, 20, 23, 30, 42, 55, 60</span>};
+<span class="kw">int</span> pos = <span class="fn">binarySearch</span>(arr, <span class="nm">0</span>, arr.length - <span class="nm">1</span>, <span class="nm">42</span>);
+<span class="cm">// pos = 6</span></div>
+
+  <div class="grid2" style="margin-top:1rem;">
+    <div class="note-box warn">
+      <div class="note-title">⚠ Prerequisite</div>
+      <p>Array MUST be sorted in ascending order. Binary search does NOT work on unsorted arrays.</p>
+    </div>
+    <div class="note-box success">
+      <div class="note-title">✅ Efficiency</div>
+      <p>With each call, the search space is halved. So at most ⌈log₂ n⌉ + 1 calls. For n=1000, only ~10 calls!</p>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE BINARY SEARCH -->
+  <div class="sim-box">
+    <div class="sim-title">Interactive Binary Search Tracer</div>
+    <div class="control-row">
+      <label style="font-family:var(--mono);font-size:13px;color:var(--text2);">Array (sorted, comma-separated):</label>
+      <input type="text" style="padding:7px 12px;border:1.5px solid var(--border2);border-radius:4px;font-family:var(--mono);font-size:12px;background:var(--card);color:var(--ink);flex:1;min-width:200px;" id="bs-arr" value="5,10,15,20,23,30,42,55,60">
+    </div>
+    <div class="control-row">
+      <label style="font-family:var(--mono);font-size:13px;color:var(--text2);">Search for key =</label>
+      <input type="number" class="num-inp" id="bs-key" value="42">
+      <button class="run-btn ocean" onclick="runBinarySearch()">Trace Search</button>
+    </div>
+    <div class="trace-output" id="bs-trace">Click the button to see the recursive trace...</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 5 — BASE CONVERSION -->
+<!-- ════════════════════════════════════════════════ -->
+<section class="section" id="base-conv">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 3E</div>
+    <div>
+      <div class="sec-title">Base Conversion</div>
+      <div class="sec-sub">Converting decimal → any base using recursion</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1rem;font-size:0.9rem;">Recursion provides an elegant way to convert a decimal number to any other base (binary, octal, hexadecimal, etc.). The key insight: digits are extracted in reverse order through repeated division — recursion naturally reverses them!</p>
+
+  <div class="sub">The Recursive Idea</div>
+  <div class="formula">
+    <div class="eq">convert(n, base):</div>
+    <div class="eq">  if n == 0  → print nothing         ← Base Case</div>
+    <div class="eq">  else:  convert(n / base, base)     ← Print higher digits FIRST</div>
+    <div class="eq">         print (n % base)             ← Then print this digit</div>
+  </div>
+
+  <div class="note-box info">
+    <div class="note-title">Why recursion is perfect here</div>
+    <p>When converting decimal to binary, we divide by 2 and collect remainders. But the remainders must be printed in <em>reverse</em> (last remainder = most significant bit). Recursion handles this naturally — it goes deep first (smaller numbers), then prints on the way back up.</p>
+  </div>
+
+  <div class="sub">Trace: convert(13, 2) → binary</div>
+  <div class="tree-wrap">
+    <pre>
+  convert(13, 2):
+    13 != 0 → call convert(13/2=6, 2)
+      convert(6, 2):
+        6 != 0 → call convert(6/2=3, 2)
+          convert(3, 2):
+            3 != 0 → call convert(3/2=1, 2)
+              convert(1, 2):
+                1 != 0 → call convert(1/2=0, 2)
+                  convert(0, 2):
+                    n==0 → BASE CASE: return (print nothing)
+                ← back: print 1%2 = 1  → output so far: "1"
+              ← back: print 3%2 = 1    → output so far: "11"
+            ← back: print 6%2 = 0      → output so far: "110"
+          ← back: print 13%2 = 1       → output so far: "1101"
+
+  Result: 13 in binary = 1101 ✓  (verify: 8+4+0+1 = 13 ✓)
+    </pre>
+  </div>
+
+  <div class="sub">Java Implementation</div>
+  <div class="code-label">Recursive Base Conversion — Java</div>
+  <div class="code-block">
+<span class="kw">static</span> <span class="fn">void</span> <span class="fn">convertToBase</span>(<span class="kw">int</span> n, <span class="kw">int</span> base) {
+    <span class="kw">String</span> digits = <span class="str">"0123456789ABCDEF"</span>;  <span class="cm">// for hex support</span>
+
+    <span class="cm">// Base Case: nothing left to convert</span>
+    <span class="kw">if</span> (n == <span class="nm">0</span>)
+        <span class="str">return</span>;
+
+    <span class="cm">// Recursive Call: convert the quotient FIRST (higher digits)</span>
+    <span class="fn">convertToBase</span>(n / base, base);
+
+    <span class="cm">// Print current digit AFTER recursive call (reversal magic!)</span>
+    System.out.<span class="fn">print</span>(digits.charAt(n % base));
+}
+
+<span class="cm">// Usage examples:</span>
+<span class="fn">convertToBase</span>(<span class="nm">13</span>,  <span class="nm">2</span>);   <span class="cm">// → 1101  (binary)</span>
+<span class="fn">convertToBase</span>(<span class="nm">255</span>, <span class="nm">16</span>);  <span class="cm">// → FF    (hexadecimal)</span>
+<span class="fn">convertToBase</span>(<span class="nm">64</span>,  <span class="nm">8</span>);   <span class="cm">// → 100  (octal)</span></div>
+
+  <div class="sub">Conversion Examples Table</div>
+  <div class="tt-wrap">
+    <table>
+      <tr><th>Decimal</th><th>Binary (base 2)</th><th>Octal (base 8)</th><th>Hex (base 16)</th></tr>
+      <tr><td>5</td><td>101</td><td>5</td><td>5</td></tr>
+      <tr><td>10</td><td>1010</td><td>12</td><td>A</td></tr>
+      <tr><td>13</td><td>1101</td><td>15</td><td>D</td></tr>
+      <tr><td>16</td><td>10000</td><td>20</td><td>10</td></tr>
+      <tr><td>25</td><td>11001</td><td>31</td><td>19</td></tr>
+      <tr class="hl-row"><td>255</td><td>11111111</td><td>377</td><td>FF</td></tr>
+    </table>
+  </div>
+
+  <!-- INTERACTIVE BASE CONVERTER -->
+  <div class="sim-box">
+    <div class="sim-title">Interactive Base Conversion Tracer</div>
+    <div class="control-row">
+      <label style="font-family:var(--mono);font-size:13px;color:var(--text2);">Decimal =</label>
+      <input type="number" class="num-inp" id="bc-n" value="13" min="1" max="255">
+      <label style="font-family:var(--mono);font-size:13px;color:var(--text2);">Base =</label>
+      <input type="number" class="num-inp" id="bc-base" value="2" min="2" max="16">
+      <button class="run-btn" onclick="runBaseConv()" style="background:var(--plum);">Convert</button>
+    </div>
+    <div class="trace-output" id="bc-trace">Click Convert to see the recursive trace...</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 6 — TOWER OF HANOI -->
+<!-- ════════════════════════════════════════════════ -->
+<section class="section" id="hanoi">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 3F</div>
+    <div>
+      <div class="sec-title">Tower of Hanoi</div>
+      <div class="sec-sub">The crown jewel of recursion — elegant simplicity over complex iteration</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1rem;font-size:0.9rem;">The Tower of Hanoi is the most celebrated example of recursion. A problem that seems impossibly complex has a <em>breathtakingly simple</em> recursive solution — 3 lines of meaningful code!</p>
+
+  <div class="sub">The Problem</div>
+  <div class="card">
+    <h3>Rules</h3>
+    <ul class="list">
+      <li>There are 3 pegs: <strong>Source (A)</strong>, <strong>Auxiliary (B)</strong>, <strong>Destination (C)</strong></li>
+      <li>There are n disks of different sizes stacked on peg A (largest at bottom)</li>
+      <li>Move ALL disks from peg A to peg C</li>
+      <li><strong>You can only move ONE disk at a time</strong></li>
+      <li><strong>You can NEVER place a larger disk on top of a smaller disk</strong></li>
+    </ul>
+  </div>
+
+  <div class="sub">The Recursive Insight</div>
+  <div class="note-box success">
+    <div class="note-title">💡 The Elegant Observation</div>
+    <p>To move n disks from A to C:<br>
+    1. Move the top (n−1) disks from A to B (using C as auxiliary)<br>
+    2. Move the largest disk from A to C (just one move!)<br>
+    3. Move the (n−1) disks from B to C (using A as auxiliary)<br><br>
+    <strong>This is exact recursion!</strong> Steps 1 and 3 are the same problem with n−1 disks. Step 2 is the base case when n=1 (just move the single disk directly).</p>
+  </div>
+
+  <div class="formula">
+    <div class="eq">hanoi(n, source, dest, aux):</div>
+    <div class="eq">  if n == 1  → move disk 1 from source to dest  ← Base Case</div>
+    <div class="eq">  else:</div>
+    <div class="eq">    hanoi(n-1, source, aux, dest)  ← Move n-1 disks to auxiliary</div>
+    <div class="eq">    move disk n from source to dest ← Move largest disk</div>
+    <div class="eq">    hanoi(n-1, aux, dest, source)  ← Move n-1 disks from aux to dest</div>
+  </div>
+
+  <div class="sub">Java Implementation</div>
+  <div class="code-label">Tower of Hanoi — Java (5 lines!)</div>
+  <div class="code-block">
+<span class="kw">static void</span> <span class="fn">hanoi</span>(<span class="kw">int</span> n, <span class="kw">char</span> source, <span class="kw">char</span> dest, <span class="kw">char</span> aux) {
+    <span class="cm">// Base Case: only 1 disk — just move it directly</span>
+    <span class="kw">if</span> (n == <span class="nm">1</span>) {
+        System.out.<span class="fn">println</span>(<span class="str">"Move disk 1 from "</span> + source + <span class="str">" to "</span> + dest);
+        <span class="str">return</span>;
+    }
+
+    <span class="cm">// Step 1: Move top (n-1) disks from source to aux (using dest)</span>
+    <span class="fn">hanoi</span>(n - <span class="nm">1</span>, source, aux, dest);
+
+    <span class="cm">// Step 2: Move the largest disk from source to dest</span>
+    System.out.<span class="fn">println</span>(<span class="str">"Move disk "</span> + n + <span class="str">" from "</span> + source + <span class="str">" to "</span> + dest);
+
+    <span class="cm">// Step 3: Move (n-1) disks from aux to dest (using source)</span>
+    <span class="fn">hanoi</span>(n - <span class="nm">1</span>, aux, dest, source);
+}
+
+<span class="cm">// Calling it for 3 disks:</span>
+<span class="fn">hanoi</span>(<span class="nm">3</span>, <span class="str">'A'</span>, <span class="str">'C'</span>, <span class="str">'B'</span>);</div>
+
+  <div class="sub">Trace: hanoi(3, A, C, B)</div>
+  <div class="tree-wrap">
+    <pre>
+hanoi(3, A, C, B):
+  Step 1: hanoi(2, A, B, C)          ← move top 2 disks A→B
+    Step 1a: hanoi(1, A, C, B)
+      → Move disk 1 from A to C      [Move 1]
+    Step 2a: Move disk 2 from A to B [Move 2]
+    Step 3a: hanoi(1, C, B, A)
+      → Move disk 1 from C to B      [Move 3]
+
+  Step 2: Move disk 3 from A to C    [Move 4]  ← the largest disk
+
+  Step 3: hanoi(2, B, C, A)          ← move top 2 disks B→C
+    Step 1b: hanoi(1, B, A, C)
+      → Move disk 1 from B to A      [Move 5]
+    Step 2b: Move disk 2 from B to C [Move 6]
+    Step 3b: hanoi(1, A, C, B)
+      → Move disk 1 from A to C      [Move 7]
+
+Total moves for n=3: 7 moves  (= 2³ - 1 = 7 ✓)
+    </pre>
+  </div>
+
+  <div class="sub">Number of Moves</div>
+  <div class="formula">
+    <div class="eq">T(1) = 1                    ← Base case: 1 move</div>
+    <div class="eq">T(n) = 2·T(n-1) + 1         ← Recursive case</div>
+    <div class="eq">T(n) = 2ⁿ - 1              ← Closed form solution</div>
+  </div>
+  <div class="tt-wrap">
+    <table>
+      <tr><th>n disks</th><th>Moves = 2ⁿ − 1</th><th>If 1 move/sec</th></tr>
+      <tr><td>1</td><td>1</td><td>1 second</td></tr>
+      <tr><td>2</td><td>3</td><td>3 seconds</td></tr>
+      <tr><td>3</td><td>7</td><td>7 seconds</td></tr>
+      <tr><td>4</td><td>15</td><td>15 seconds</td></tr>
+      <tr><td>10</td><td>1,023</td><td>~17 minutes</td></tr>
+      <tr class="hl-row"><td>64</td><td>18,446,744,073,709,551,615</td><td>~585 billion years!</td></tr>
+    </table>
+  </div>
+
+  <!-- INTERACTIVE HANOI VISUALIZER -->
+  <div class="hanoi-box">
+    <div class="sim-title">Interactive Tower of Hanoi Visualizer</div>
+    <div class="hanoi-controls">
+      <label style="font-family:var(--mono);font-size:13px;color:var(--text2);">Disks:</label>
+      <input type="number" class="num-inp" id="hanoi-n" value="3" min="1" max="6" style="width:70px;">
+      <button class="step-btn" onclick="initHanoi()">Reset</button>
+      <button class="step-btn" id="hanoi-prev" onclick="hanoiStep(-1)" disabled>◀ Prev</button>
+      <button class="step-btn" id="hanoi-next" onclick="hanoiStep(1)">Next ▶</button>
+      <button class="step-btn" onclick="hanoiAuto()" id="auto-btn">▶▶ Auto</button>
+      <span class="move-count" id="hanoi-counter">Move: 0 / 0</span>
+    </div>
+    <div class="hanoi-pegs" id="hanoi-display"></div>
+    <div class="move-log" id="hanoi-log">Press Reset then step through the moves...</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 7 — LIVE CALL TRACER -->
+<!-- ════════════════════════════════════════════════ -->
+<section class="section" id="trace">
+  <div class="sec-head">
+    <div class="sec-num">TOOL</div>
+    <div>
+      <div class="sec-title">Live Call Tracer</div>
+      <div class="sec-sub">See exactly how any recursion unwinds — step by step</div>
+    </div>
+  </div>
+
+  <div class="note-box info">
+    <div class="note-title">How to Read Recursive Traces</div>
+    <p>
+      <strong>Calling phase</strong>: Method calls are made, parameters change, stack grows<br>
+      <strong>Returning phase</strong>: Results are computed and returned, stack shrinks<br>
+      Indentation shows depth — deeper = further down the call stack
+    </p>
+  </div>
+
+  <div class="sub">All Algorithms — Side by Side Complexity</div>
+  <div class="tt-wrap">
+    <table>
+      <tr><th>Algorithm</th><th>Base Case(s)</th><th>Recursive Case</th><th>Time Complexity</th><th>Calls for n=5</th></tr>
+      <tr><td>Factorial</td><td>n = 0 or 1</td><td>n * fact(n-1)</td><td>O(n)</td><td>5</td></tr>
+      <tr><td>GCD(a,b)</td><td>b = 0</td><td>gcd(b, a%b)</td><td>O(log min(a,b))</td><td>varies</td></tr>
+      <tr><td>Binary Search</td><td>low>high OR found</td><td>search half</td><td>O(log n)</td><td>~3</td></tr>
+      <tr><td>Base Conversion</td><td>n = 0</td><td>conv(n/base)</td><td>O(log n)</td><td>varies</td></tr>
+      <tr class="hl-row"><td>Tower of Hanoi</td><td>n = 1</td><td>2 × hanoi(n-1)</td><td>O(2ⁿ)</td><td>31</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 8 — QUIZ -->
+<!-- ════════════════════════════════════════════════ -->
+<section class="section" id="quiz">
+  <div class="sec-head">
+    <div class="sec-num">PRACTICE</div>
+    <div>
+      <div class="sec-title">Quick Quiz</div>
+      <div class="sec-sub">ISC exam-style questions on Recursion</div>
+    </div>
+  </div>
+
+  <div class="score-bar">
+    <span style="color:var(--text2);">Score</span>
+    <span class="score-val" id="quiz-score">0 / 0</span>
+  </div>
+
+  <div class="quiz-card" id="q1">
+    <div class="quiz-q">Q1. What is the output of: factorial(5)?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ans('q1',this,'w')">60</button>
+      <button class="qopt" onclick="ans('q1',this,'c')">120</button>
+      <button class="qopt" onclick="ans('q1',this,'w')">24</button>
+      <button class="qopt" onclick="ans('q1',this,'w')">100</button>
+    </div>
+    <div class="quiz-exp" id="q1-exp">5! = 5×4×3×2×1 = 120. Trace: fact(5)=5×fact(4)=5×24=120. fact(4)=4×6=24, fact(3)=3×2=6, fact(2)=2×1=2, fact(1)=1 (base case).</div>
+  </div>
+
+  <div class="quiz-card" id="q2">
+    <div class="quiz-q">Q2. What is the base case for GCD using Euclid's algorithm?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ans('q2',this,'w')">a == b, return a</button>
+      <button class="qopt" onclick="ans('q2',this,'c')">b == 0, return a</button>
+      <button class="qopt" onclick="ans('q2',this,'w')">a == 1, return 1</button>
+      <button class="qopt" onclick="ans('q2',this,'w')">a == 0, return b</button>
+    </div>
+    <div class="quiz-exp" id="q2-exp">gcd(a, 0) = a. When b becomes 0, the GCD is a. This is because gcd(a, b) = gcd(b, a%b), and a%0 is undefined — we stop when b=0 and return a.</div>
+  </div>
+
+  <div class="quiz-card" id="q3">
+    <div class="quiz-q">Q3. How many moves does Tower of Hanoi need for n = 4 disks?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ans('q3',this,'w')">8</button>
+      <button class="qopt" onclick="ans('q3',this,'w')">12</button>
+      <button class="qopt" onclick="ans('q3',this,'c')">15</button>
+      <button class="qopt" onclick="ans('q3',this,'w')">16</button>
+    </div>
+    <div class="quiz-exp" id="q3-exp">Moves = 2ⁿ - 1 = 2⁴ - 1 = 16 - 1 = 15. For n=1: 1 move. For n=2: 3. For n=3: 7. For n=4: 15.</div>
+  </div>
+
+  <div class="quiz-card" id="q4">
+    <div class="quiz-q">Q4. What happens if a recursive method has no base case?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ans('q4',this,'w')">It returns 0 by default</button>
+      <button class="qopt" onclick="ans('q4',this,'w')">It terminates normally after the first call</button>
+      <button class="qopt" onclick="ans('q4',this,'c')">It results in infinite recursion and a StackOverflowError</button>
+      <button class="qopt" onclick="ans('q4',this,'w')">It becomes an iterative loop</button>
+    </div>
+    <div class="quiz-exp" id="q4-exp">Without a base case, the method calls itself indefinitely. Each call adds a new frame to the call stack. When the stack runs out of memory, Java throws a StackOverflowError. Always define a base case!</div>
+  </div>
+
+  <div class="quiz-card" id="q5">
+    <div class="quiz-q">Q5. In recursive binary search, what are the TWO base cases?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ans('q5',this,'w')">n==0 and n==1</button>
+      <button class="qopt" onclick="ans('q5',this,'c')">low &gt; high (not found) and arr[mid]==key (found)</button>
+      <button class="qopt" onclick="ans('q5',this,'w')">low==0 and high==length-1</button>
+      <button class="qopt" onclick="ans('q5',this,'w')">arr[0]==key and arr[n-1]==key</button>
+    </div>
+    <div class="quiz-exp" id="q5-exp">Binary search has two base cases: (1) low &gt; high — search space empty, element not found, return -1. (2) arr[mid] == key — element found, return mid. The recursive cases search the left or right half.</div>
+  </div>
+
+  <div class="quiz-card" id="q6">
+    <div class="quiz-q">Q6. What is gcd(36, 24) using Euclid's algorithm?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ans('q6',this,'w')">6</button>
+      <button class="qopt" onclick="ans('q6',this,'c')">12</button>
+      <button class="qopt" onclick="ans('q6',this,'w')">4</button>
+      <button class="qopt" onclick="ans('q6',this,'w')">18</button>
+    </div>
+    <div class="quiz-exp" id="q6-exp">gcd(36,24): 36%24=12 → gcd(24,12): 24%12=0 → gcd(12,0): b=0, return 12. So GCD=12. Verify: 36÷12=3 ✓, 24÷12=2 ✓.</div>
+  </div>
+
+  <div class="quiz-card" id="q7">
+    <div class="quiz-q">Q7. In recursive base conversion of 13 to binary, in what order are the digits printed?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ans('q7',this,'w')">Least significant bit first (1, 0, 1, 1)</button>
+      <button class="qopt" onclick="ans('q7',this,'c')">Most significant bit first (1, 1, 0, 1)</button>
+      <button class="qopt" onclick="ans('q7',this,'w')">All digits printed at once</button>
+      <button class="qopt" onclick="ans('q7',this,'w')">Printed randomly</button>
+    </div>
+    <div class="quiz-exp" id="q7-exp">The recursive call goes deep first (smaller quotients), then prints on the way back. This means the most significant bit (from the deepest call) is printed first. So 13 → 1101 (MSB to LSB). This is the beauty of the recursive approach — it reverses the natural bottom-up order of division.</div>
+  </div>
+
+  <div style="text-align:center;margin-top:1.5rem;">
+    <button onclick="resetQuiz()" style="background:var(--ink);color:var(--bg);border:none;padding:10px 28px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:0.04em;">Reset Quiz</button>
+  </div>
+</section>
+
+<!-- CHEAT SHEET -->
+<section class="section" style="padding-bottom:1.5rem;">
+  <div class="sec-head">
+    <div class="sec-num">QUICK REF</div>
+    <div>
+      <div class="sec-title">Master Cheat Sheet</div>
+      <div class="sec-sub">All recursion patterns — memorise before March 27</div>
+    </div>
+  </div>
+
+  <div class="cheat-grid">
+    <div class="cheat-item"><div class="cheat-name">Factorial — Base</div><div class="cheat-eq">n==0 || n==1 → return 1</div><div class="cheat-sub">0! = 1, 1! = 1</div></div>
+    <div class="cheat-item"><div class="cheat-name">Factorial — Recursive</div><div class="cheat-eq">return n * factorial(n-1)</div><div class="cheat-sub">n! = n × (n−1)!</div></div>
+    <div class="cheat-item"><div class="cheat-name">GCD — Base</div><div class="cheat-eq">b==0 → return a</div><div class="cheat-sub">gcd(a, 0) = a</div></div>
+    <div class="cheat-item"><div class="cheat-name">GCD — Recursive</div><div class="cheat-eq">return gcd(b, a%b)</div><div class="cheat-sub">Euclid's algorithm</div></div>
+    <div class="cheat-item"><div class="cheat-name">Binary Search — Base 1</div><div class="cheat-eq">low > high → return -1</div><div class="cheat-sub">Not found</div></div>
+    <div class="cheat-item"><div class="cheat-name">Binary Search — Base 2</div><div class="cheat-eq">arr[mid]==key → return mid</div><div class="cheat-sub">Found!</div></div>
+    <div class="cheat-item"><div class="cheat-name">Binary Search — mid</div><div class="cheat-eq">mid = (low + high) / 2</div><div class="cheat-sub">Always integer division</div></div>
+    <div class="cheat-item"><div class="cheat-name">Base Conv — Base</div><div class="cheat-eq">n==0 → return</div><div class="cheat-sub">Nothing left to convert</div></div>
+    <div class="cheat-item"><div class="cheat-name">Base Conv — Recursive</div><div class="cheat-eq">convert(n/base); print(n%base)</div><div class="cheat-sub">Recursive call BEFORE print!</div></div>
+    <div class="cheat-item"><div class="cheat-name">Hanoi — Base</div><div class="cheat-eq">n==1 → move disk 1 directly</div><div class="cheat-sub">Single disk: trivial</div></div>
+    <div class="cheat-item"><div class="cheat-name">Hanoi — Step 1</div><div class="cheat-eq">hanoi(n-1, src, aux, dst)</div><div class="cheat-sub">Move n-1 disks to aux</div></div>
+    <div class="cheat-item"><div class="cheat-name">Hanoi — Step 2</div><div class="cheat-eq">move disk n from src to dst</div><div class="cheat-sub">The largest disk</div></div>
+    <div class="cheat-item"><div class="cheat-name">Hanoi — Step 3</div><div class="cheat-eq">hanoi(n-1, aux, dst, src)</div><div class="cheat-sub">Move n-1 disks from aux</div></div>
+    <div class="cheat-item"><div class="cheat-name">Hanoi — Moves</div><div class="cheat-eq">2ⁿ − 1</div><div class="cheat-sub">Exponential complexity O(2ⁿ)</div></div>
+    <div class="cheat-item"><div class="cheat-name">Stack Overflow</div><div class="cheat-eq">No base case → infinite calls</div><div class="cheat-sub">StackOverflowError in Java</div></div>
+    <div class="cheat-item"><div class="cheat-name">Binary Search</div><div class="cheat-eq">O(log n) time</div><div class="cheat-sub">Array MUST be sorted first</div></div>
+  </div>
+
+  <div class="note-box warn" style="margin-top:1rem;">
+    <div class="note-title">🎯 Top ISC Exam Questions — Recursion</div>
+    <p>
+      1. Write a recursive method to find the factorial of n. Trace it for n=4.<br>
+      2. Write a recursive method to find GCD(a, b). Trace gcd(36, 24).<br>
+      3. Explain the base case and recursive case of binary search.<br>
+      4. Write a recursive method to convert a decimal number to binary.<br>
+      5. Write a recursive method for Tower of Hanoi. How many moves for n disks?<br>
+      6. What is infinite recursion? How can it be avoided?<br>
+      7. Explain the call stack with reference to a recursive method.<br>
+      8. Trace binary search on a sorted array for a given key.
+    </p>
+  </div>
+</section>
+
+</div><!-- end .page -->
+
+<footer>ISC Computer Science · Topic 3: Recursion · Complete Theory Guide &nbsp;|&nbsp; You've got this! 🚀 March 27, crush it!</footer>
+
+<script>
+/* ── NAV ── */
+document.querySelectorAll('section[id]').forEach(s => {});
+window.addEventListener('scroll', () => {
+  let cur = '';
+  document.querySelectorAll('section[id]').forEach(s => { if (window.scrollY >= s.offsetTop - 130) cur = s.id; });
+  document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+});
+
+/* ════════ FACTORIAL TRACER ════════ */
+function runFactorial() {
+  const n = parseInt(document.getElementById('fact-n').value);
+  if (n < 0 || n > 12) { document.getElementById('fact-trace').textContent = 'Please enter n between 0 and 12.'; return; }
+  let out = '';
+  function fact(x, depth) {
+    const pad = '  '.repeat(depth);
+    out += `${pad}<span class="call">→ factorial(${x}) called</span>\n`;
+    if (x === 0 || x === 1) {
+      out += `${pad}<span class="base">  BASE CASE: factorial(${x}) = 1</span>\n`;
+      return 1;
+    }
+    const sub = fact(x - 1, depth + 1);
+    const result = x * sub;
+    out += `${pad}<span class="ret">← factorial(${x}) = ${x} × ${sub} = ${result}</span>\n`;
+    return result;
+  }
+  const result = fact(n, 0);
+  out += `\n<span class="base">✓ Final Answer: ${n}! = ${result}</span>`;
+  document.getElementById('fact-trace').innerHTML = out;
+}
+
+/* ════════ GCD TRACER ════════ */
+function runGCD() {
+  const a = parseInt(document.getElementById('gcd-a').value);
+  const b = parseInt(document.getElementById('gcd-b').value);
+  let out = '';
+  function gcd(x, y, depth) {
+    const pad = '  '.repeat(depth);
+    out += `${pad}<span class="call">→ gcd(${x}, ${y}) called</span>\n`;
+    if (y === 0) {
+      out += `${pad}<span class="base">  BASE CASE: b=0, return ${x}</span>\n`;
+      return x;
+    }
+    const rem = x % y;
+    out += `${pad}<span class="indent">  ${x} mod ${y} = ${rem}, so call gcd(${y}, ${rem})</span>\n`;
+    const result = gcd(y, rem, depth + 1);
+    out += `${pad}<span class="ret">← gcd(${x}, ${y}) = ${result}</span>\n`;
+    return result;
+  }
+  const result = gcd(a, b, 0);
+  out += `\n<span class="base">✓ GCD(${a}, ${b}) = ${result}</span>`;
+  document.getElementById('gcd-trace').innerHTML = out;
+}
+
+/* ════════ BINARY SEARCH TRACER ════════ */
+function runBinarySearch() {
+  const raw = document.getElementById('bs-arr').value.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
+  const key = parseInt(document.getElementById('bs-key').value);
+  let out = `Array: [${raw.join(', ')}]\nSearching for: ${key}\n\n`;
+  let callNum = 0;
+  function bs(arr, low, high, k, depth) {
+    callNum++;
+    const pad = '  '.repeat(depth);
+    out += `${pad}<span class="call">→ Call ${callNum}: binarySearch(low=${low}, high=${high})</span>\n`;
+    if (low > high) {
+      out += `${pad}<span class="base">  BASE CASE: low(${low}) > high(${high}) → NOT FOUND, return -1</span>\n`;
+      return -1;
+    }
+    const mid = Math.floor((low + high) / 2);
+    out += `${pad}<span class="indent">  mid = (${low}+${high})/2 = ${mid}, arr[${mid}] = ${arr[mid]}</span>\n`;
+    if (arr[mid] === k) {
+      out += `${pad}<span class="base">  BASE CASE: arr[${mid}]=${arr[mid]} == key=${k} → FOUND at index ${mid}!</span>\n`;
+      return mid;
+    }
+    if (k < arr[mid]) {
+      out += `${pad}<span class="indent">  ${k} < ${arr[mid]} → search LEFT half (${low} to ${mid-1})</span>\n`;
+      const r = bs(arr, low, mid - 1, k, depth + 1);
+      out += `${pad}<span class="ret">← return ${r}</span>\n`;
+      return r;
+    } else {
+      out += `${pad}<span class="indent">  ${k} > ${arr[mid]} → search RIGHT half (${mid+1} to ${high})</span>\n`;
+      const r = bs(arr, mid + 1, high, k, depth + 1);
+      out += `${pad}<span class="ret">← return ${r}</span>\n`;
+      return r;
+    }
+  }
+  const result = bs(raw, 0, raw.length - 1, key, 0);
+  out += result === -1 ? `\n<span class="base">✓ Result: ${key} NOT FOUND in array</span>`
+                       : `\n<span class="base">✓ Result: ${key} found at index ${result}</span>`;
+  document.getElementById('bs-trace').innerHTML = out;
+}
+
+/* ════════ BASE CONVERSION TRACER ════════ */
+function runBaseConv() {
+  const n = parseInt(document.getElementById('bc-n').value);
+  const base = parseInt(document.getElementById('bc-base').value);
+  const digits = '0123456789ABCDEF';
+  if (base < 2 || base > 16) { document.getElementById('bc-trace').textContent = 'Base must be 2–16.'; return; }
+  let out = `Converting ${n} to base ${base}:\n\n`;
+  let result = '';
+  function conv(x, depth) {
+    const pad = '  '.repeat(depth);
+    out += `${pad}<span class="call">→ convert(${x}, ${base}) called</span>\n`;
+    if (x === 0) {
+      out += `${pad}<span class="base">  BASE CASE: n=0, return (nothing to print)</span>\n`;
+      return;
+    }
+    const q = Math.floor(x / base), r = x % base;
+    out += `${pad}<span class="indent">  ${x} / ${base} = ${q} remainder ${r} (digit: ${digits[r]})</span>\n`;
+    out += `${pad}<span class="indent">  Recurse first (to print higher digits)...</span>\n`;
+    conv(q, depth + 1);
+    result = digits[r] + result;
+    out += `${pad}<span class="ret">← convert(${x}): print digit '${digits[r]}'</span>\n`;
+  }
+  conv(n, 0);
+  const baseNames = {2:'Binary',8:'Octal',10:'Decimal',16:'Hexadecimal'};
+  const bname = baseNames[base] || `Base-${base}`;
+  out += `\n<span class="base">✓ ${n} in ${bname} = ${result || '0'}</span>`;
+  document.getElementById('bc-trace').innerHTML = out;
+}
+
+/* ════════ HANOI VISUALIZER ════════ */
+let hanoiMoves = [], hanoiCurrentStep = -1, hanoiPegs = [], hanoiN = 3;
+const DISK_COLORS = ['#c0392b','#e67e22','#f1c40f','#27ae60','#2980b9','#8e44ad'];
+
+function generateHanoiMoves(n, from, to, aux, moves) {
+  if (n === 1) { moves.push({from, to, disk:1}); return; }
+  generateHanoiMoves(n-1, from, aux, to, moves);
+  moves.push({from, to, disk:n});
+  generateHanoiMoves(n-1, aux, to, from, moves);
+}
+
+function renderHanoi() {
+  const pegsEl = document.getElementById('hanoi-display');
+  const pegNames = ['A','B','C'];
+  pegsEl.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const pegDiv = document.createElement('div');
+    pegDiv.className = 'peg';
+    const rod = document.createElement('div');
+    rod.className = 'peg-rod';
+    pegDiv.appendChild(rod);
+    [...hanoiPegs[i]].reverse().forEach(diskNum => {
+      const disk = document.createElement('div');
+      disk.className = 'disk';
+      const maxW = 85, minW = 28;
+      const w = minW + (diskNum - 1) * (maxW - minW) / (hanoiN - 1 || 1);
+      disk.style.cssText = `width:${w}%;background:${DISK_COLORS[diskNum-1]};`;
+      disk.textContent = diskNum;
+      pegDiv.appendChild(disk);
+    });
+    const base = document.createElement('div');
+    base.className = 'peg-base';
+    pegDiv.appendChild(base);
+    const lbl = document.createElement('div');
+    lbl.className = 'peg-label';
+    lbl.textContent = `Peg ${pegNames[i]}`;
+    pegDiv.appendChild(lbl);
+    pegsEl.appendChild(pegDiv);
+  }
+}
+
+function initHanoi() {
+  hanoiN = parseInt(document.getElementById('hanoi-n').value) || 3;
+  hanoiPegs = [Array.from({length:hanoiN},(_,i)=>hanoiN-i), [], []];
+  hanoiMoves = [];
+  generateHanoiMoves(hanoiN, 0, 2, 1, hanoiMoves);
+  hanoiCurrentStep = -1;
+  renderHanoi();
+  document.getElementById('hanoi-log').innerHTML = `<span style="color:#7a7060;">Ready. ${hanoiN} disks need ${Math.pow(2,hanoiN)-1} moves. Press Next ▶ to start.</span>`;
+  document.getElementById('hanoi-counter').textContent = `Move: 0 / ${hanoiMoves.length}`;
+  document.getElementById('hanoi-prev').disabled = true;
+  document.getElementById('hanoi-next').disabled = false;
+}
+
+function pegIdx(name) { return {A:0,B:1,C:2}[name] ?? name; }
+const pegNames = ['A','B','C'];
+
+function hanoiStep(dir) {
+  const newStep = hanoiCurrentStep + dir;
+  if (newStep < 0 || newStep >= hanoiMoves.length) return;
+  if (dir === 1) {
+    const m = hanoiMoves[newStep];
+    const disk = hanoiPegs[m.from].pop();
+    hanoiPegs[m.to].push(disk);
+    const log = document.getElementById('hanoi-log');
+    log.innerHTML += `<span style="color:#7ec8e3;">Move ${newStep+1}:</span> Disk <span style="color:${DISK_COLORS[disk-1]};font-weight:700;">${disk}</span> → Peg ${pegNames[m.from]} to Peg ${pegNames[m.to]}\n`;
+    log.scrollTop = log.scrollHeight;
+  } else {
+    const m = hanoiMoves[hanoiCurrentStep];
+    const disk = hanoiPegs[m.to].pop();
+    hanoiPegs[m.from].push(disk);
+  }
+  hanoiCurrentStep = newStep;
+  renderHanoi();
+  document.getElementById('hanoi-counter').textContent = `Move: ${hanoiCurrentStep+1} / ${hanoiMoves.length}`;
+  document.getElementById('hanoi-prev').disabled = hanoiCurrentStep < 0;
+  document.getElementById('hanoi-next').disabled = hanoiCurrentStep >= hanoiMoves.length - 1;
+}
+
+let autoInterval = null;
+function hanoiAuto() {
+  if (autoInterval) { clearInterval(autoInterval); autoInterval = null; document.getElementById('auto-btn').textContent = '▶▶ Auto'; return; }
+  document.getElementById('auto-btn').textContent = '⏸ Pause';
+  autoInterval = setInterval(() => {
+    if (hanoiCurrentStep >= hanoiMoves.length - 1) { clearInterval(autoInterval); autoInterval = null; document.getElementById('auto-btn').textContent = '▶▶ Auto'; return; }
+    hanoiStep(1);
+  }, 700);
+}
+
+/* ════════ QUIZ ════════ */
+let scores = {c:0,t:0}, answered = {};
+function ans(qId, btn, result) {
+  if (answered[qId]) return;
+  answered[qId] = true; scores.t++;
+  if (result === 'c') { btn.classList.add('correct'); scores.c++; }
+  else { btn.classList.add('wrong'); btn.closest('.quiz-card').querySelectorAll('.qopt').forEach(o => { if (o.getAttribute('onclick').includes(",'c'")) o.classList.add('correct'); }); }
+  document.getElementById(qId+'-exp').style.display = 'block';
+  document.getElementById('quiz-score').textContent = scores.c + ' / ' + scores.t;
+}
+function resetQuiz() {
+  scores = {c:0,t:0}; answered = {};
+  document.querySelectorAll('.qopt').forEach(b => b.classList.remove('correct','wrong'));
+  document.querySelectorAll('.quiz-exp').forEach(e => e.style.display = 'none');
+  document.getElementById('quiz-score').textContent = '0 / 0';
+}
+
+/* ── INIT ── */
+initHanoi();
+</script>
+</body>
+</html>

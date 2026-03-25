@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computer Hardware — ISC Computer Science Topic 2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Lato:wght@300;400;700&display=swap');
+
+:root {
+  --bg:     #09090f;
+  --bg2:    #111118;
+  --bg3:    #18181f;
+  --card:   #141419;
+  --border: rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.13);
+  --text:   #dde0f0;
+  --text2:  #8e92b0;
+  --text3:  #555878;
+  --cyan:   #00e5ff;
+  --cyan2:  #00b4cc;
+  --green:  #39ff8a;
+  --green2: #22c55e;
+  --amber:  #ffc442;
+  --red:    #ff5f6d;
+  --pink:   #ff6eb4;
+  --blue:   #5b9dff;
+  --purple: #b07dff;
+  --mono:   'IBM Plex Mono', monospace;
+  --head:   'Syne', sans-serif;
+  --body:   'Lato', sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.7;}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:200;background:rgba(9,9,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;overflow-x:auto;padding:0 1.5rem;gap:0;}
+.nav-logo{font-family:var(--head);font-size:15px;font-weight:800;color:var(--cyan);white-space:nowrap;padding:1rem 1rem 1rem 0;margin-right:0.5rem;letter-spacing:0.04em;}
+.nav a{padding:1rem 1rem;font-size:12.5px;font-weight:700;color:var(--text3);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all 0.2s;letter-spacing:0.03em;text-transform:uppercase;}
+.nav a:hover{color:var(--text);}
+.nav a.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+
+/* ── HERO ── */
+.hero{padding:5rem 2rem 3.5rem;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,229,255,0.07) 0%,transparent 70%);}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan2),transparent);}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.25);color:var(--cyan);padding:4px 14px;border-radius:4px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.5rem;}
+.hero h1{font-family:var(--head);font-size:clamp(2.2rem,6vw,4rem);font-weight:800;line-height:1.05;letter-spacing:-0.01em;margin-bottom:0.75rem;}
+.hero h1 em{color:var(--cyan);font-style:normal;}
+.hero p{color:var(--text2);font-size:1.05rem;max-width:540px;margin:0 auto 2rem;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.chip{background:var(--bg3);border:1px solid var(--border);padding:5px 14px;border-radius:3px;font-size:11.5px;color:var(--text2);font-family:var(--mono);}
+
+/* ── LAYOUT ── */
+.page{max-width:980px;margin:0 auto;}
+.section{padding:3.5rem 2rem;border-bottom:1px solid var(--border);}
+
+/* ── SECTION HEADER ── */
+.sec-head{display:flex;align-items:center;gap:14px;margin-bottom:2rem;}
+.sec-num{font-family:var(--mono);font-size:11px;color:var(--cyan);background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);padding:4px 10px;border-radius:3px;font-weight:600;letter-spacing:0.08em;flex-shrink:0;}
+.sec-title{font-family:var(--head);font-size:1.75rem;font-weight:800;letter-spacing:-0.01em;}
+.sec-sub{color:var(--text3);font-size:0.85rem;margin-top:2px;font-family:var(--mono);}
+
+.sub{font-family:var(--head);font-size:1.1rem;font-weight:700;margin:1.75rem 0 0.85rem;display:flex;align-items:center;gap:10px;color:var(--text);}
+.sub::before{content:'';display:block;width:3px;height:18px;border-radius:2px;background:var(--cyan);flex-shrink:0;}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.4rem;margin-bottom:1rem;}
+.card h3{font-family:var(--head);font-size:1rem;font-weight:700;margin-bottom:0.75rem;color:var(--cyan);}
+.card p,.card li{color:var(--text2);font-size:0.9rem;line-height:1.65;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1rem;}
+@media(max-width:700px){.grid2,.grid3,.grid4{grid-template-columns:1fr;}}
+@media(max-width:900px){.grid3{grid-template-columns:1fr 1fr;}.grid4{grid-template-columns:1fr 1fr;}}
+
+/* ── FORMULA ── */
+.formula{background:#070710;border:1px solid var(--border);border-left:3px solid var(--cyan2);border-radius:6px;padding:0.75rem 1.1rem;font-family:var(--mono);font-size:0.85rem;color:var(--text);margin:0.5rem 0;overflow-x:auto;line-height:1.7;}
+.formula .lbl{color:var(--text3);font-size:0.75rem;margin-bottom:3px;}
+.formula .eq{color:var(--green);}
+.formula .note{color:var(--text3);}
+
+/* ── TRUTH TABLES ── */
+.tt-wrap{overflow-x:auto;margin:0.75rem 0;}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.83rem;}
+th{background:rgba(0,229,255,0.08);color:var(--cyan);font-weight:600;padding:9px 12px;text-align:center;border:1px solid var(--border2);}
+td{padding:7px 12px;text-align:center;border:1px solid var(--border);color:var(--text);}
+tr:nth-child(even) td{background:rgba(255,255,255,0.015);}
+.v1{color:var(--green);font-weight:700;}
+.v0{color:var(--red);}
+.hl{background:rgba(0,229,255,0.05)!important;}
+
+/* ── GATE SVG CARDS ── */
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;margin:1rem 0;}
+.gate-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.2rem;text-align:center;transition:border-color 0.2s;}
+.gate-card:hover{border-color:var(--cyan2);}
+.gate-card svg{width:120px;height:70px;display:block;margin:0 auto 0.75rem;}
+.gate-name{font-family:var(--head);font-size:1rem;font-weight:700;margin-bottom:3px;}
+.gate-expr{font-family:var(--mono);font-size:0.8rem;color:var(--cyan);margin-bottom:6px;}
+.gate-desc{font-size:0.82rem;color:var(--text2);line-height:1.5;}
+
+/* ── NOTE BOXES ── */
+.note-box{border-radius:8px;padding:1rem 1.25rem;margin:1rem 0;}
+.note-box.info{background:rgba(91,157,255,0.06);border:1px solid rgba(91,157,255,0.2);}
+.note-box.warn{background:rgba(255,196,66,0.06);border:1px solid rgba(255,196,66,0.2);}
+.note-box.danger{background:rgba(255,95,109,0.06);border:1px solid rgba(255,95,109,0.2);}
+.note-box.success{background:rgba(57,255,138,0.05);border:1px solid rgba(57,255,138,0.2);}
+.note-title{font-size:12px;font-weight:700;font-family:var(--mono);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px;}
+.note-box.info .note-title{color:var(--blue);}
+.note-box.warn .note-title{color:var(--amber);}
+.note-box.danger .note-title{color:var(--red);}
+.note-box.success .note-title{color:var(--green);}
+.note-box p,.note-box li{color:var(--text2);font-size:0.88rem;line-height:1.6;}
+
+/* ── TAGS ── */
+.tag{display:inline-block;padding:2px 9px;border-radius:3px;font-size:10.5px;font-weight:700;font-family:var(--mono);letter-spacing:0.04em;margin-right:4px;}
+.tag-cyan{background:rgba(0,229,255,0.1);color:var(--cyan);}
+.tag-green{background:rgba(57,255,138,0.1);color:var(--green);}
+.tag-amber{background:rgba(255,196,66,0.1);color:var(--amber);}
+.tag-red{background:rgba(255,95,109,0.1);color:var(--red);}
+
+/* ── CIRCUIT DIAGRAMS (SVG) ── */
+.circuit-box{background:#07070e;border:1px solid var(--border2);border-radius:10px;padding:1.25rem;margin:1rem 0;overflow-x:auto;text-align:center;}
+.circuit-box svg{max-width:100%;height:auto;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:3px;background:var(--bg3);border-radius:8px;padding:3px;margin-bottom:1.25rem;overflow-x:auto;}
+.tab-btn{flex:1;min-width:max-content;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:700;color:var(--text3);cursor:pointer;border:none;background:none;transition:all 0.2s;font-family:var(--mono);letter-spacing:0.03em;white-space:nowrap;}
+.tab-btn.active{background:var(--card);color:var(--cyan);border:1px solid var(--border2);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ── STEPS ── */
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{display:flex;gap:1rem;}
+.step-line{display:flex;flex-direction:column;align-items:center;}
+.step-dot{width:30px;height:30px;border-radius:50%;background:rgba(0,229,255,0.1);border:1.5px solid rgba(0,229,255,0.35);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--cyan);font-weight:700;flex-shrink:0;}
+.step-connector{width:1.5px;background:var(--border);flex:1;min-height:16px;margin:4px 0;}
+.step-body{padding-bottom:1.4rem;padding-top:3px;}
+.step-title{font-weight:700;font-size:0.95rem;margin-bottom:3px;font-family:var(--head);}
+.step-desc{color:var(--text2);font-size:0.88rem;}
+
+ul.list{list-style:none;padding:0;}
+ul.list li{padding:4px 0 4px 1.4rem;position:relative;color:var(--text2);font-size:0.9rem;}
+ul.list li::before{content:'▶';position:absolute;left:0;color:var(--cyan);font-size:0.65rem;top:8px;}
+
+/* ── INTERACTIVE GATE SIMULATOR ── */
+.sim-box{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:1.5rem;margin:1rem 0;}
+.sim-title{font-family:var(--head);font-size:0.95rem;font-weight:700;color:var(--cyan);margin-bottom:1.25rem;}
+.sim-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;}
+.sim-inputs{display:flex;flex-direction:column;gap:10px;}
+.inp-row{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;}
+.inp-row label{color:var(--text2);width:16px;}
+.toggle{width:48px;height:26px;border-radius:13px;background:var(--bg3);border:1px solid var(--border2);cursor:pointer;position:relative;transition:background 0.2s;}
+.toggle.on{background:rgba(57,255,138,0.2);border-color:var(--green2);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--text3);transition:all 0.2s;}
+.toggle.on::after{left:25px;background:var(--green);}
+.inp-val{font-family:var(--mono);font-size:13px;min-width:14px;}
+.inp-val.v1{color:var(--green);}
+.inp-val.v0{color:var(--red);}
+.sim-arrow{font-size:1.4rem;color:var(--text3);}
+.sim-gate-name{font-family:var(--head);font-size:1rem;font-weight:700;color:var(--text2);}
+.sim-out{font-family:var(--mono);font-size:2.5rem;font-weight:700;min-width:50px;text-align:center;transition:all 0.3s;}
+.sim-out.v1{color:var(--green);text-shadow:0 0 20px rgba(57,255,138,0.5);}
+.sim-out.v0{color:var(--red);text-shadow:0 0 20px rgba(255,95,109,0.3);}
+.gate-selector{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.25rem;}
+.gate-sel-btn{padding:5px 14px;border-radius:4px;font-family:var(--mono);font-size:11.5px;font-weight:600;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all 0.2s;}
+.gate-sel-btn:hover{border-color:var(--cyan2);color:var(--cyan);}
+.gate-sel-btn.active{background:rgba(0,229,255,0.1);border-color:var(--cyan);color:var(--cyan);}
+
+/* ── UNIVERSAL GATES ── */
+.univ-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.4rem;margin-bottom:1rem;}
+.univ-card h3{font-family:var(--head);font-weight:700;font-size:1rem;margin-bottom:0.75rem;}
+.conversion-row{display:flex;align-items:center;gap:10px;margin:0.5rem 0;flex-wrap:wrap;}
+.conv-label{font-size:11px;color:var(--text3);font-family:var(--mono);min-width:50px;}
+.conv-expr{font-family:var(--mono);font-size:0.83rem;color:var(--text);background:var(--bg3);padding:5px 10px;border-radius:5px;border:1px solid var(--border);}
+.conv-arrow{color:var(--cyan);font-size:0.9rem;}
+.conv-nand{color:var(--amber);font-family:var(--mono);font-size:0.83rem;background:rgba(255,196,66,0.07);padding:5px 10px;border-radius:5px;border:1px solid rgba(255,196,66,0.2);}
+.conv-nor{color:var(--purple);font-family:var(--mono);font-size:0.83rem;background:rgba(176,125,255,0.07);padding:5px 10px;border-radius:5px;border:1px solid rgba(176,125,255,0.2);}
+
+/* ── MUX / DECODER TABLES ── */
+.component-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0;}
+@media(max-width:650px){.component-grid{grid-template-columns:1fr;}}
+
+/* ── QUIZ ── */
+.quiz-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.4rem;margin:1.25rem 0;}
+.quiz-q{font-size:0.95rem;font-weight:700;margin-bottom:1rem;color:var(--text);}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;}
+.qopt{padding:9px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--mono);font-size:0.84rem;transition:all 0.2s;color:var(--text2);text-align:left;}
+.qopt:hover{border-color:var(--cyan2);color:var(--text);}
+.qopt.correct{background:rgba(57,255,138,0.08);border-color:var(--green2);color:var(--green);}
+.qopt.wrong{background:rgba(255,95,109,0.08);border-color:var(--red);color:var(--red);}
+.quiz-exp{background:var(--bg3);border-radius:6px;padding:0.75rem 1rem;font-size:0.87rem;color:var(--text2);margin-top:0.75rem;display:none;border-left:3px solid var(--cyan2);}
+
+/* ── SCORE ── */
+.score-bar{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.25rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.score-val{font-family:var(--mono);font-weight:700;font-size:1.3rem;color:var(--cyan);}
+
+/* ── CHEATSHEET ── */
+.cheat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.6rem;margin:1rem 0;}
+.cheat-item{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:0.7rem 0.9rem;}
+.cheat-name{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-family:var(--mono);margin-bottom:4px;}
+.cheat-eq{font-family:var(--mono);font-size:0.82rem;color:var(--text);}
+.cheat-eq2{font-family:var(--mono);font-size:0.77rem;color:var(--text2);margin-top:2px;}
+
+footer{text-align:center;padding:2rem;color:var(--text3);font-size:0.78rem;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">ISC // HW</div>
+  <a href="#gates" class="active">Logic Gates</a>
+  <a href="#adders">Adders</a>
+  <a href="#encoder">Encoder</a>
+  <a href="#decoder">Decoder</a>
+  <a href="#mux">Multiplexer</a>
+  <a href="#universal">Universal Gates</a>
+  <a href="#sim">Gate Simulator</a>
+  <a href="#quiz">Quiz</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">📟 ISC CS · Topic 2</div>
+  <h1>Computer<br><em>Hardware</em></h1>
+  <p>Logic gates, adders, encoders, decoders, multiplexers & universal gates — complete ISC theory for 100/100.</p>
+  <div class="hero-chips">
+    <div class="chip">NOT AND OR</div>
+    <div class="chip">NAND NOR XOR XNOR</div>
+    <div class="chip">Half/Full Adder</div>
+    <div class="chip">Encoder/Decoder</div>
+    <div class="chip">Multiplexer</div>
+    <div class="chip">Universal Gates</div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 1 — ELEMENTARY LOGIC GATES -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" id="gates">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 2A</div>
+    <div>
+      <div class="sec-title">Elementary Logic Gates</div>
+      <div class="sec-sub">NOT · AND · OR · NAND · NOR · XOR · XNOR</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1.5rem;">A logic gate is a basic electronic circuit that implements a Boolean function. It takes one or more binary inputs (0 or 1) and produces a single binary output.</p>
+
+  <!-- GATE CARDS -->
+  <div class="gate-grid">
+
+    <!-- NOT -->
+    <div class="gate-card">
+      <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <line x1="10" y1="35" x2="35" y2="35" stroke="#555878" stroke-width="1.5"/>
+        <path d="M35 15 L80 35 L35 55 Z" fill="none" stroke="#00e5ff" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="84" cy="35" r="5" fill="none" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="89" y1="35" x2="110" y2="35" stroke="#555878" stroke-width="1.5"/>
+        <text x="10" y="14" fill="#555878" font-size="9" font-family="IBM Plex Mono">A</text>
+        <text x="100" y="14" fill="#555878" font-size="9" font-family="IBM Plex Mono">Y</text>
+      </svg>
+      <div class="gate-name">NOT Gate</div>
+      <div class="gate-expr">Y = Ā</div>
+      <div class="gate-desc">Inverter. Outputs the complement of the input. Single input only.</div>
+    </div>
+
+    <!-- AND -->
+    <div class="gate-card">
+      <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <line x1="10" y1="25" x2="40" y2="25" stroke="#555878" stroke-width="1.5"/>
+        <line x1="10" y1="45" x2="40" y2="45" stroke="#555878" stroke-width="1.5"/>
+        <path d="M40 15 L40 55 Q80 55 80 35 Q80 15 40 15 Z" fill="none" stroke="#39ff8a" stroke-width="1.5"/>
+        <line x1="80" y1="35" x2="110" y2="35" stroke="#555878" stroke-width="1.5"/>
+        <text x="4" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">A</text>
+        <text x="4" y="50" fill="#555878" font-size="9" font-family="IBM Plex Mono">B</text>
+        <text x="100" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">Y</text>
+      </svg>
+      <div class="gate-name">AND Gate</div>
+      <div class="gate-expr">Y = A · B</div>
+      <div class="gate-desc">Output is 1 only when ALL inputs are 1. Like multiplication in Boolean.</div>
+    </div>
+
+    <!-- OR -->
+    <div class="gate-card">
+      <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <line x1="10" y1="25" x2="40" y2="25" stroke="#555878" stroke-width="1.5"/>
+        <line x1="10" y1="45" x2="40" y2="45" stroke="#555878" stroke-width="1.5"/>
+        <path d="M35 15 Q50 15 78 35 Q50 55 35 55 Q48 35 35 15 Z" fill="none" stroke="#5b9dff" stroke-width="1.5"/>
+        <line x1="78" y1="35" x2="110" y2="35" stroke="#555878" stroke-width="1.5"/>
+        <text x="4" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">A</text>
+        <text x="4" y="50" fill="#555878" font-size="9" font-family="IBM Plex Mono">B</text>
+        <text x="100" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">Y</text>
+      </svg>
+      <div class="gate-name">OR Gate</div>
+      <div class="gate-expr">Y = A + B</div>
+      <div class="gate-desc">Output is 1 when AT LEAST ONE input is 1. Like addition in Boolean.</div>
+    </div>
+
+    <!-- NAND -->
+    <div class="gate-card">
+      <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <line x1="10" y1="25" x2="40" y2="25" stroke="#555878" stroke-width="1.5"/>
+        <line x1="10" y1="45" x2="40" y2="45" stroke="#555878" stroke-width="1.5"/>
+        <path d="M40 15 L40 55 Q77 55 77 35 Q77 15 40 15 Z" fill="none" stroke="#ffc442" stroke-width="1.5"/>
+        <circle cx="81" cy="35" r="4" fill="none" stroke="#ffc442" stroke-width="1.5"/>
+        <line x1="85" y1="35" x2="110" y2="35" stroke="#555878" stroke-width="1.5"/>
+        <text x="4" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">A</text>
+        <text x="4" y="50" fill="#555878" font-size="9" font-family="IBM Plex Mono">B</text>
+        <text x="100" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">Y</text>
+      </svg>
+      <div class="gate-name">NAND Gate</div>
+      <div class="gate-expr">Y = ̄(A · B)</div>
+      <div class="gate-desc">NOT-AND. Output is 0 only when ALL inputs are 1. <strong>Universal gate.</strong></div>
+    </div>
+
+    <!-- NOR -->
+    <div class="gate-card">
+      <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <line x1="10" y1="25" x2="38" y2="25" stroke="#555878" stroke-width="1.5"/>
+        <line x1="10" y1="45" x2="38" y2="45" stroke="#555878" stroke-width="1.5"/>
+        <path d="M35 15 Q50 15 75 35 Q50 55 35 55 Q48 35 35 15 Z" fill="none" stroke="#b07dff" stroke-width="1.5"/>
+        <circle cx="79" cy="35" r="4" fill="none" stroke="#b07dff" stroke-width="1.5"/>
+        <line x1="83" y1="35" x2="110" y2="35" stroke="#555878" stroke-width="1.5"/>
+        <text x="4" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">A</text>
+        <text x="4" y="50" fill="#555878" font-size="9" font-family="IBM Plex Mono">B</text>
+        <text x="100" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">Y</text>
+      </svg>
+      <div class="gate-name">NOR Gate</div>
+      <div class="gate-expr">Y = ̄(A + B)</div>
+      <div class="gate-desc">NOT-OR. Output is 1 only when ALL inputs are 0. <strong>Universal gate.</strong></div>
+    </div>
+
+    <!-- XOR -->
+    <div class="gate-card">
+      <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <line x1="10" y1="25" x2="40" y2="25" stroke="#555878" stroke-width="1.5"/>
+        <line x1="10" y1="45" x2="40" y2="45" stroke="#555878" stroke-width="1.5"/>
+        <path d="M35 15 Q50 15 78 35 Q50 55 35 55 Q48 35 35 15 Z" fill="none" stroke="#ff6eb4" stroke-width="1.5"/>
+        <path d="M29 15 Q42 35 29 55" fill="none" stroke="#ff6eb4" stroke-width="1.5"/>
+        <line x1="78" y1="35" x2="110" y2="35" stroke="#555878" stroke-width="1.5"/>
+        <text x="4" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">A</text>
+        <text x="4" y="50" fill="#555878" font-size="9" font-family="IBM Plex Mono">B</text>
+        <text x="100" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">Y</text>
+      </svg>
+      <div class="gate-name">XOR Gate</div>
+      <div class="gate-expr">Y = A ⊕ B</div>
+      <div class="gate-desc">Exclusive OR. Output is 1 when inputs are DIFFERENT. Used in adders.</div>
+    </div>
+
+    <!-- XNOR -->
+    <div class="gate-card">
+      <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <line x1="10" y1="25" x2="38" y2="25" stroke="#555878" stroke-width="1.5"/>
+        <line x1="10" y1="45" x2="38" y2="45" stroke="#555878" stroke-width="1.5"/>
+        <path d="M35 15 Q50 15 74 35 Q50 55 35 55 Q48 35 35 15 Z" fill="none" stroke="#00e5ff" stroke-width="1.5"/>
+        <path d="M29 15 Q42 35 29 55" fill="none" stroke="#00e5ff" stroke-width="1.5"/>
+        <circle cx="78" cy="35" r="4" fill="none" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="82" y1="35" x2="110" y2="35" stroke="#555878" stroke-width="1.5"/>
+        <text x="4" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">A</text>
+        <text x="4" y="50" fill="#555878" font-size="9" font-family="IBM Plex Mono">B</text>
+        <text x="100" y="22" fill="#555878" font-size="9" font-family="IBM Plex Mono">Y</text>
+      </svg>
+      <div class="gate-name">XNOR Gate</div>
+      <div class="gate-expr">Y = ̄(A ⊕ B)</div>
+      <div class="gate-desc">Exclusive NOR. Output is 1 when inputs are SAME. Equality detector.</div>
+    </div>
+
+  </div><!-- end gate-grid -->
+
+  <div class="sub">Complete Truth Tables — All 7 Gates</div>
+  <div class="tt-wrap">
+    <table>
+      <tr><th>A</th><th>B</th><th>NOT A</th><th>A AND B</th><th>A OR B</th><th>A NAND B</th><th>A NOR B</th><th>A XOR B</th><th>A XNOR B</th></tr>
+      <tr><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td></tr>
+      <tr><td class="v0">0</td><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td></tr>
+      <tr><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td></tr>
+      <tr><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td></tr>
+    </table>
+  </div>
+
+  <div class="note-box warn" style="margin-top:1rem;">
+    <div class="note-title">⭐ Memory Tricks</div>
+    <p>
+      <strong>AND:</strong> All must be 1 → output is 1<br>
+      <strong>OR:</strong> Any one is 1 → output is 1<br>
+      <strong>NAND:</strong> Opposite of AND (bubble on output)<br>
+      <strong>NOR:</strong> Opposite of OR (bubble on output)<br>
+      <strong>XOR:</strong> "eXclusive OR" — different inputs → 1<br>
+      <strong>XNOR:</strong> Same inputs → 1 (equality checker)
+    </p>
+  </div>
+
+  <div class="sub">XOR and XNOR — Extended Expressions</div>
+  <div class="grid2">
+    <div class="card">
+      <h3>XOR (A ⊕ B)</h3>
+      <div class="formula"><span class="eq">Y = A⊕B = Ā·B + A·B̄</span></div>
+      <p>Output is 1 when an <strong>odd number</strong> of inputs are 1. Used in arithmetic (half adder sum), parity generation and checking.</p>
+    </div>
+    <div class="card">
+      <h3>XNOR ̄(A ⊕ B)</h3>
+      <div class="formula"><span class="eq">Y = ̄(A⊕B) = A·B + Ā·B̄</span></div>
+      <p>Output is 1 when an <strong>even number</strong> of inputs are 1 (including zero). Used as an equality comparator.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 2 — ADDERS -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" id="adders">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 2B</div>
+    <div>
+      <div class="sec-title">Half Adder & Full Adder</div>
+      <div class="sec-sub">Boolean expressions, truth tables, gate implementations</div>
+    </div>
+  </div>
+
+  <div class="sub">Half Adder</div>
+  <div class="note-box info">
+    <div class="note-title">Definition</div>
+    <p>A half adder adds two single-bit binary numbers A and B, producing a Sum (S) and Carry (C). It cannot accommodate a carry from a previous addition (no carry-in).</p>
+  </div>
+
+  <div class="component-grid">
+    <div class="card">
+      <h3>Half Adder Truth Table</h3>
+      <div class="tt-wrap">
+        <table>
+          <tr><th>A</th><th>B</th><th>Sum (S)</th><th>Carry (C)</th></tr>
+          <tr><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td></tr>
+          <tr><td class="v0">0</td><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td></tr>
+          <tr><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td></tr>
+          <tr><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Boolean Expressions</h3>
+      <div class="formula">
+        <div class="lbl">Sum (S) — XOR gate:</div>
+        <div class="eq">S = A ⊕ B = Ā·B + A·B̄</div>
+      </div>
+      <div class="formula">
+        <div class="lbl">Carry (C) — AND gate:</div>
+        <div class="eq">C = A · B</div>
+      </div>
+      <div class="note-box warn" style="margin-top:0.75rem;">
+        <div class="note-title">Gates needed</div>
+        <p>1 XOR gate (for Sum) + 1 AND gate (for Carry) = 2 gates total</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">Half Adder Circuit Diagram</div>
+  <div class="circuit-box">
+    <svg width="500" height="130" viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg">
+      <!-- Input lines A -->
+      <text x="10" y="42" fill="#8e92b0" font-size="13" font-family="IBM Plex Mono">A</text>
+      <line x1="25" y1="38" x2="160" y2="38" stroke="#555878" stroke-width="1.5"/>
+      <!-- Input lines B -->
+      <text x="10" y="92" fill="#8e92b0" font-size="13" font-family="IBM Plex Mono">B</text>
+      <line x1="25" y1="88" x2="160" y2="88" stroke="#555878" stroke-width="1.5"/>
+      <!-- branch lines -->
+      <line x1="80" y1="38" x2="80" y2="55" stroke="#555878" stroke-width="1" stroke-dasharray="3 2"/>
+      <line x1="100" y1="88" x2="100" y2="72" stroke="#555878" stroke-width="1" stroke-dasharray="3 2"/>
+      <!-- XOR gate body -->
+      <path d="M155 22 Q170 22 196 38 Q170 54 155 54 Q168 38 155 22 Z" fill="none" stroke="#ff6eb4" stroke-width="1.5"/>
+      <path d="M149 22 Q162 38 149 54" fill="none" stroke="#ff6eb4" stroke-width="1.5"/>
+      <!-- AND gate body -->
+      <path d="M160 72 L160 106 Q198 106 198 89 Q198 72 160 72 Z" fill="none" stroke="#39ff8a" stroke-width="1.5"/>
+      <!-- XOR output -->
+      <line x1="196" y1="38" x2="280" y2="38" stroke="#555878" stroke-width="1.5"/>
+      <text x="290" y="42" fill="#ff6eb4" font-size="12" font-family="IBM Plex Mono">S (Sum)</text>
+      <!-- AND output -->
+      <line x1="198" y1="89" x2="280" y2="89" stroke="#555878" stroke-width="1.5"/>
+      <text x="290" y="93" fill="#39ff8a" font-size="12" font-family="IBM Plex Mono">C (Carry)</text>
+      <!-- Labels -->
+      <text x="162" y="18" fill="#ff6eb4" font-size="9" font-family="IBM Plex Mono">XOR</text>
+      <text x="165" y="68" fill="#39ff8a" font-size="9" font-family="IBM Plex Mono">AND</text>
+    </svg>
+  </div>
+
+  <div class="sub">Full Adder</div>
+  <div class="note-box info">
+    <div class="note-title">Definition</div>
+    <p>A full adder adds three bits: A, B, and Carry-in (Cᵢₙ), producing a Sum (S) and Carry-out (Cₒᵤₜ). It can be cascaded to add multi-bit binary numbers (ripple carry adder).</p>
+  </div>
+
+  <div class="card">
+    <h3>Full Adder Truth Table</h3>
+    <div class="tt-wrap">
+      <table>
+        <tr><th>A</th><th>B</th><th>Cᵢₙ</th><th>Sum (S)</th><th>Carry-out (Cₒᵤₜ)</th><th>Minterms</th></tr>
+        <tr><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td><td>m₀</td></tr>
+        <tr><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td>m₁ →S</td></tr>
+        <tr><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td>m₂ →S</td></tr>
+        <tr><td class="v0">0</td><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td><td>m₃ →Cout</td></tr>
+        <tr><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td>m₄ →S</td></tr>
+        <tr><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td><td>m₅ →Cout</td></tr>
+        <tr><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td>m₆ →Cout</td></tr>
+        <tr><td class="v1">1</td><td class="v1">1</td><td class="v1">1</td><td class="v1">1</td><td class="v1">1</td><td>m₇ →S,Cout</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="component-grid">
+    <div class="card">
+      <h3>Boolean Expressions (SOP)</h3>
+      <div class="formula">
+        <div class="lbl">Sum = ∑m(1,2,4,7):</div>
+        <div class="eq">S = A⊕B⊕Cᵢₙ</div>
+      </div>
+      <div class="formula">
+        <div class="lbl">Carry-out = ∑m(3,5,6,7):</div>
+        <div class="eq">Cₒᵤₜ = A·B + B·Cᵢₙ + A·Cᵢₙ</div>
+        <div class="note">     = A·B + Cᵢₙ·(A⊕B)</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Implementation using 2 Half Adders</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-line"><div class="step-dot">1</div><div class="step-connector"></div></div>
+          <div class="step-body"><div class="step-title">Half Adder 1</div><div class="step-desc">S₁ = A ⊕ B &nbsp;&nbsp; C₁ = A · B</div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><div class="step-dot">2</div><div class="step-connector"></div></div>
+          <div class="step-body"><div class="step-title">Half Adder 2</div><div class="step-desc">S = S₁ ⊕ Cᵢₙ &nbsp;&nbsp; C₂ = S₁ · Cᵢₙ</div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><div class="step-dot">3</div></div>
+          <div class="step-body"><div class="step-title">Final Carry</div><div class="step-desc">Cₒᵤₜ = C₁ + C₂ (OR gate)</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 3 — ENCODER -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" id="encoder">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 2C</div>
+    <div>
+      <div class="sec-title">Encoder</div>
+      <div class="sec-sub">Converts 2ⁿ inputs → n-bit binary code</div>
+    </div>
+  </div>
+
+  <div class="note-box info">
+    <div class="note-title">Definition</div>
+    <p>An encoder is a combinational circuit that converts one of 2ⁿ input lines into an n-bit binary output code. At any given time, exactly ONE input line is active (HIGH). It is the reverse of a decoder.</p>
+  </div>
+
+  <div class="note-box warn">
+    <div class="note-title">⭐ Key Point — Assumption</div>
+    <p>Only ONE input is 1 at a time (mutually exclusive). If multiple inputs are 1 simultaneously, a priority encoder is needed (not in ISC syllabus).</p>
+  </div>
+
+  <div class="sub">4-to-2 Encoder (4 inputs → 2-bit output)</div>
+  <div class="component-grid">
+    <div class="card">
+      <h3>Truth Table</h3>
+      <div class="tt-wrap">
+        <table>
+          <tr><th>I₃</th><th>I₂</th><th>I₁</th><th>I₀</th><th>Y₁</th><th>Y₀</th></tr>
+          <tr><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td></tr>
+          <tr><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td></tr>
+          <tr><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td></tr>
+          <tr><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v1">1</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Boolean Expressions</h3>
+      <div class="formula">
+        <div class="lbl">Output bit Y₁ (MSB):</div>
+        <div class="eq">Y₁ = I₂ + I₃</div>
+      </div>
+      <div class="formula">
+        <div class="lbl">Output bit Y₀ (LSB):</div>
+        <div class="eq">Y₀ = I₁ + I₃</div>
+      </div>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.75rem;">Each output bit is simply the OR of the input lines where that output bit is 1 in the truth table.</p>
+      <div class="note-box success" style="margin-top:0.75rem;">
+        <div class="note-title">Implementation</div>
+        <p>Only 2 OR gates needed (one per output bit).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">8-to-3 Encoder (Octal to Binary)</div>
+  <div class="card">
+    <h3>Truth Table</h3>
+    <div class="tt-wrap">
+      <table>
+        <tr><th>I₇</th><th>I₆</th><th>I₅</th><th>I₄</th><th>I₃</th><th>I₂</th><th>I₁</th><th>I₀</th><th>Y₂</th><th>Y₁</th><th>Y₀</th></tr>
+        <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td></tr>
+        <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="v1">1</td><td>0</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td></tr>
+        <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="v1">1</td><td>0</td><td>0</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td></tr>
+        <tr><td>0</td><td>0</td><td>0</td><td>0</td><td class="v1">1</td><td>0</td><td>0</td><td>0</td><td class="v0">0</td><td class="v1">1</td><td class="v1">1</td></tr>
+        <tr><td>0</td><td>0</td><td>0</td><td class="v1">1</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td></tr>
+        <tr><td>0</td><td>0</td><td class="v1">1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td></tr>
+        <tr><td>0</td><td class="v1">1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td></tr>
+        <tr><td class="v1">1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="v1">1</td><td class="v1">1</td><td class="v1">1</td></tr>
+      </table>
+    </div>
+    <div class="formula" style="margin-top:1rem;">
+      <div class="lbl">Y₂ = I₄ + I₅ + I₆ + I₇</div>
+      <div class="lbl">Y₁ = I₂ + I₃ + I₆ + I₇</div>
+      <div class="lbl">Y₀ = I₁ + I₃ + I₅ + I₇</div>
+      <div class="eq">Each Yᵢ = OR of all inputs where bit i of their binary encoding is 1</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 4 — DECODER -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" id="decoder">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 2D</div>
+    <div>
+      <div class="sec-title">Decoder</div>
+      <div class="sec-sub">Converts n-bit binary code → 2ⁿ output lines</div>
+    </div>
+  </div>
+
+  <div class="note-box info">
+    <div class="note-title">Definition</div>
+    <p>A decoder is a combinational circuit that converts an n-bit binary input into one of 2ⁿ output lines. Exactly ONE output is active (HIGH) for each unique binary input combination. It is the reverse of an encoder.</p>
+  </div>
+
+  <div class="sub">2-to-4 Decoder (2-bit input → 4 outputs)</div>
+  <div class="component-grid">
+    <div class="card">
+      <h3>Truth Table</h3>
+      <div class="tt-wrap">
+        <table>
+          <tr><th>A</th><th>B</th><th>D₀</th><th>D₁</th><th>D₂</th><th>D₃</th></tr>
+          <tr><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td></tr>
+          <tr><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td></tr>
+          <tr><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td><td class="v0">0</td></tr>
+          <tr><td class="v1">1</td><td class="v1">1</td><td class="v0">0</td><td class="v0">0</td><td class="v0">0</td><td class="v1">1</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Boolean Expressions</h3>
+      <div class="formula">
+        <div class="eq">D₀ = Ā · B̄</div>
+        <div class="eq">D₁ = Ā · B</div>
+        <div class="eq">D₂ = A · B̄</div>
+        <div class="eq">D₃ = A · B</div>
+      </div>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.75rem;">Each output is a <strong>minterm</strong> of the inputs. D₀ = m₀, D₁ = m₁, D₂ = m₂, D₃ = m₃.</p>
+      <div class="note-box success" style="margin-top:0.75rem;">
+        <div class="note-title">Implementation</div>
+        <p>2 NOT gates + 4 AND gates. Each AND gate generates one minterm.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">3-to-8 Decoder (Binary to Octal)</div>
+  <div class="card">
+    <h3>Boolean Expressions — 3-to-8 Decoder</h3>
+    <div class="formula">
+      <div class="eq">D₀ = Ā·B̄·C̄ &nbsp; (minterm 0)</div>
+      <div class="eq">D₁ = Ā·B̄·C  &nbsp; (minterm 1)</div>
+      <div class="eq">D₂ = Ā·B·C̄  &nbsp; (minterm 2)</div>
+      <div class="eq">D₃ = Ā·B·C  &nbsp; (minterm 3)</div>
+      <div class="eq">D₄ = A·B̄·C̄  &nbsp; (minterm 4)</div>
+      <div class="eq">D₅ = A·B̄·C  &nbsp; (minterm 5)</div>
+      <div class="eq">D₆ = A·B·C̄  &nbsp; (minterm 6)</div>
+      <div class="eq">D₇ = A·B·C  &nbsp; (minterm 7)</div>
+    </div>
+    <p style="color:var(--text2);font-size:0.9rem;margin-top:0.75rem;">A decoder generates ALL minterms of n variables. It can therefore implement ANY Boolean function by connecting relevant outputs to an OR gate.</p>
+  </div>
+
+  <div class="note-box warn">
+    <div class="note-title">⭐ EXAM KEY — Decoder Implementing Boolean Functions</div>
+    <p>Any n-variable Boolean function in SOP form can be realized using an n-to-2ⁿ decoder and an external OR gate. The decoder generates all minterms; the OR gate selects the required ones.<br><br>
+    <strong>Example:</strong> f(A,B,C) = ∑m(1,3,5,7) — connect D₁, D₃, D₅, D₇ to an OR gate.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 5 — MULTIPLEXER -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" id="mux">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 2E</div>
+    <div>
+      <div class="sec-title">Multiplexer (MUX)</div>
+      <div class="sec-sub">Many-to-one data selector — 2ⁿ inputs, n select lines, 1 output</div>
+    </div>
+  </div>
+
+  <div class="note-box info">
+    <div class="note-title">Definition</div>
+    <p>A multiplexer (MUX) is a combinational circuit that selects ONE of several input data lines and routes it to a single output, based on a set of selection (control) lines. It acts as a data selector.</p>
+  </div>
+
+  <div class="grid3">
+    <div class="card" style="text-align:center;">
+      <h3>Inputs</h3>
+      <div style="font-size:2rem;color:var(--cyan);font-family:var(--mono);font-weight:700;">2ⁿ</div>
+      <p>Data input lines</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <h3>Select Lines</h3>
+      <div style="font-size:2rem;color:var(--amber);font-family:var(--mono);font-weight:700;">n</div>
+      <p>Control/select lines</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <h3>Output</h3>
+      <div style="font-size:2rem;color:var(--green);font-family:var(--mono);font-weight:700;">1</div>
+      <p>Single output line</p>
+    </div>
+  </div>
+
+  <div class="sub">2:1 Multiplexer (2 inputs, 1 select line)</div>
+  <div class="component-grid">
+    <div class="card">
+      <h3>Truth Table</h3>
+      <div class="tt-wrap">
+        <table>
+          <tr><th>S (Select)</th><th>Output Y</th></tr>
+          <tr><td class="v0">0</td><td>I₀ (selects input I₀)</td></tr>
+          <tr><td class="v1">1</td><td>I₁ (selects input I₁)</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Boolean Expression</h3>
+      <div class="formula"><span class="eq">Y = S̄·I₀ + S·I₁</span></div>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.5rem;">When S=0: Y = I₀. When S=1: Y = I₁. Needs 1 NOT, 2 AND, 1 OR gate.</p>
+    </div>
+  </div>
+
+  <div class="sub">4:1 Multiplexer (4 inputs, 2 select lines)</div>
+  <div class="component-grid">
+    <div class="card">
+      <h3>Truth Table</h3>
+      <div class="tt-wrap">
+        <table>
+          <tr><th>S₁</th><th>S₀</th><th>Output Y</th></tr>
+          <tr><td class="v0">0</td><td class="v0">0</td><td>I₀</td></tr>
+          <tr><td class="v0">0</td><td class="v1">1</td><td>I₁</td></tr>
+          <tr><td class="v1">1</td><td class="v0">0</td><td>I₂</td></tr>
+          <tr><td class="v1">1</td><td class="v1">1</td><td>I₃</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Boolean Expression</h3>
+      <div class="formula"><span class="eq">Y = S̄₁·S̄₀·I₀ + S̄₁·S₀·I₁ + S₁·S̄₀·I₂ + S₁·S₀·I₃</span></div>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.5rem;">Each term enables exactly one input based on the select line combination.</p>
+    </div>
+  </div>
+
+  <div class="note-box warn">
+    <div class="note-title">⭐ MUX as a Universal Logic Circuit</div>
+    <p>A 2ⁿ:1 MUX can implement any n-variable Boolean function by connecting the data inputs (I₀ to I₂ⁿ⁻¹) to 0 or 1 based on the function's truth table, and using the n variables as select lines.<br><br>
+    <strong>Example:</strong> To implement f(A,B) = A XOR B using a 4:1 MUX with A,B as select lines:<br>
+    S₁S₀=00 (A=0,B=0): f=0 → I₀=0 &nbsp;&nbsp; S₁S₀=01 (A=0,B=1): f=1 → I₁=1<br>
+    S₁S₀=10 (A=1,B=0): f=1 → I₂=1 &nbsp;&nbsp; S₁S₀=11 (A=1,B=1): f=0 → I₃=0</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 6 — UNIVERSAL GATES -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" id="universal">
+  <div class="sec-head">
+    <div class="sec-num">TOPIC 2F</div>
+    <div>
+      <div class="sec-title">NAND & NOR as Universal Gates</div>
+      <div class="sec-sub">Proving universality by implementing NOT, AND, OR using only NAND or NOR</div>
+    </div>
+  </div>
+
+  <div class="note-box info">
+    <div class="note-title">What is a Universal Gate?</div>
+    <p>A gate is called a <strong>universal gate</strong> if it can be used to implement any Boolean function — i.e., any combination of NOT, AND, and OR gates can be replaced by using only that gate. NAND and NOR are the two universal gates.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('univ','nand')">NAND as Universal</button>
+    <button class="tab-btn" onclick="switchTab('univ','nor')">NOR as Universal</button>
+  </div>
+
+  <!-- NAND UNIVERSAL -->
+  <div id="univ-nand" class="tab-content active">
+    <div class="univ-card">
+      <h3 style="color:var(--amber);">NAND Gate: Y = ̄(A·B)</h3>
+
+      <div class="sub" style="margin-top:0.5rem;">1. NOT using NAND</div>
+      <div class="conversion-row">
+        <span class="conv-label">NOT A =</span>
+        <span class="conv-expr">Ā</span>
+        <span class="conv-arrow">→</span>
+        <span class="conv-nand">NAND(A, A) = ̄(A·A) = Ā ✓</span>
+      </div>
+      <div class="circuit-box">
+        <svg width="300" height="60" viewBox="0 0 300 60">
+          <text x="10" y="35" fill="#8e92b0" font-size="12" font-family="IBM Plex Mono">A</text>
+          <line x1="25" y1="30" x2="80" y2="22" stroke="#555878" stroke-width="1.5"/>
+          <line x1="25" y1="30" x2="80" y2="38" stroke="#555878" stroke-width="1.5"/>
+          <path d="M80 15 L80 45 Q110 45 110 30 Q110 15 80 15 Z" fill="none" stroke="#ffc442" stroke-width="1.5"/>
+          <circle cx="114" cy="30" r="4" fill="none" stroke="#ffc442" stroke-width="1.5"/>
+          <line x1="118" y1="30" x2="160" y2="30" stroke="#555878" stroke-width="1.5"/>
+          <text x="165" y="34" fill="#ffc442" font-size="12" font-family="IBM Plex Mono">Ā (NOT A)</text>
+          <text x="82" y="10" fill="#ffc442" font-size="9" font-family="IBM Plex Mono">Both inputs = A</text>
+        </svg>
+      </div>
+      <p style="color:var(--text2);font-size:0.88rem;"><strong>Proof:</strong> NAND(A,A) = ̄(A·A) = ̄(A) = Ā ✓ (idempotent law A·A=A)</p>
+
+      <div class="sub">2. AND using NAND</div>
+      <div class="conversion-row">
+        <span class="conv-label">A AND B =</span>
+        <span class="conv-expr">A · B</span>
+        <span class="conv-arrow">→</span>
+        <span class="conv-nand">NOT[NAND(A,B)] = NOT[̄(A·B)] = A·B ✓</span>
+      </div>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.5rem;"><strong>Proof:</strong> NAND gives ̄(A·B). Apply NOT (which is NAND with itself): ̄[̄(A·B)] = A·B ✓</p>
+      <div class="formula"><span class="eq">AND(A,B) = NAND(NAND(A,B), NAND(A,B))</span></div>
+
+      <div class="sub">3. OR using NAND</div>
+      <div class="conversion-row">
+        <span class="conv-label">A OR B =</span>
+        <span class="conv-expr">A + B</span>
+        <span class="conv-arrow">→</span>
+        <span class="conv-nand">NAND(Ā, B̄) = ̄(Ā·B̄) = A+B ✓ (De Morgan)</span>
+      </div>
+      <div class="formula">
+        <div class="lbl">Step 1: Get Ā using NAND(A,A)</div>
+        <div class="lbl">Step 2: Get B̄ using NAND(B,B)</div>
+        <div class="eq">Step 3: OR(A,B) = NAND(Ā, B̄) = NAND(NAND(A,A), NAND(B,B))</div>
+      </div>
+      <div class="note-box success" style="margin-top:0.75rem;">
+        <div class="note-title">NAND Summary — Gates needed</div>
+        <p>NOT: 1 NAND gate | AND: 2 NAND gates | OR: 3 NAND gates</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1rem;">
+      <h3>Converting any circuit to NAND-only — Method</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-line"><div class="step-dot">1</div><div class="step-connector"></div></div>
+          <div class="step-body"><div class="step-title">Write the Boolean expression</div><div class="step-desc">Get the expression from the circuit or truth table.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><div class="step-dot">2</div><div class="step-connector"></div></div>
+          <div class="step-body"><div class="step-title">Convert to SOP (Sum of Products)</div><div class="step-desc">All expressions can be written in AND-OR form.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><div class="step-dot">3</div><div class="step-connector"></div></div>
+          <div class="step-body"><div class="step-title">Double negate the entire expression</div><div class="step-desc">̄̄f = f. Apply De Morgan to the outer NOT to get NAND form.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><div class="step-dot">4</div></div>
+          <div class="step-body"><div class="step-title">Replace each operation with NAND</div><div class="step-desc">Each AND with bubble = NAND gate. NOT = self-connected NAND.</div></div>
+        </div>
+      </div>
+      <div class="note-box warn" style="margin-top:0.5rem;">
+        <div class="note-title">⭐ Key Rule for SOP → NAND-NAND</div>
+        <p>A two-level AND-OR circuit implementing SOP form can be directly converted to a two-level NAND-NAND circuit. Replace each AND gate and the final OR gate with NAND gates. This works because: ̄(Ā·B̄·...) = A+B+... by De Morgan's, and ̄[̄(AB)+̄(CD)+...] = AB+CD+... ✓</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOR UNIVERSAL -->
+  <div id="univ-nor" class="tab-content">
+    <div class="univ-card">
+      <h3 style="color:var(--purple);">NOR Gate: Y = ̄(A+B)</h3>
+
+      <div class="sub" style="margin-top:0.5rem;">1. NOT using NOR</div>
+      <div class="conversion-row">
+        <span class="conv-label">NOT A =</span>
+        <span class="conv-expr">Ā</span>
+        <span class="conv-arrow">→</span>
+        <span class="conv-nor">NOR(A, A) = ̄(A+A) = Ā ✓</span>
+      </div>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.5rem;"><strong>Proof:</strong> NOR(A,A) = ̄(A+A) = ̄(A) = Ā ✓ (idempotent law A+A=A)</p>
+
+      <div class="sub">2. OR using NOR</div>
+      <div class="conversion-row">
+        <span class="conv-label">A OR B =</span>
+        <span class="conv-expr">A + B</span>
+        <span class="conv-arrow">→</span>
+        <span class="conv-nor">NOT[NOR(A,B)] = NOT[̄(A+B)] = A+B ✓</span>
+      </div>
+      <div class="formula"><span class="eq">OR(A,B) = NOR(NOR(A,B), NOR(A,B))</span></div>
+
+      <div class="sub">3. AND using NOR</div>
+      <div class="conversion-row">
+        <span class="conv-label">A AND B =</span>
+        <span class="conv-expr">A · B</span>
+        <span class="conv-arrow">→</span>
+        <span class="conv-nor">NOR(Ā, B̄) = ̄(Ā+B̄) = A·B ✓ (De Morgan)</span>
+      </div>
+      <div class="formula">
+        <div class="lbl">Step 1: Get Ā using NOR(A,A)</div>
+        <div class="lbl">Step 2: Get B̄ using NOR(B,B)</div>
+        <div class="eq">Step 3: AND(A,B) = NOR(Ā, B̄) = NOR(NOR(A,A), NOR(B,B))</div>
+      </div>
+      <div class="note-box success" style="margin-top:0.75rem;">
+        <div class="note-title">NOR Summary — Gates needed</div>
+        <p>NOT: 1 NOR gate | OR: 2 NOR gates | AND: 3 NOR gates</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1rem;">
+      <h3>POS → NOR-NOR Conversion</h3>
+      <p style="color:var(--text2);font-size:0.9rem;margin-bottom:0.75rem;">Just as SOP maps to NAND-NAND, <strong>POS (Product of Sums)</strong> maps to NOR-NOR:</p>
+      <div class="note-box warn">
+        <div class="note-title">⭐ Key Rule for POS → NOR-NOR</div>
+        <p>A two-level OR-AND circuit implementing POS form can be converted to a two-level NOR-NOR circuit. Replace each OR gate and the final AND gate with NOR gates.</p>
+      </div>
+      <div class="formula">
+        <div class="lbl">Example: f = (A+B)·(C+D)</div>
+        <div class="lbl">Step 1: Apply double NOT: f = ̄[̄((A+B)·(C+D))]</div>
+        <div class="lbl">Step 2: De Morgan inner: = ̄[̄(A+B) + ̄(C+D)]</div>
+        <div class="eq">= NOR(NOR(A,B), NOR(C,D))  ← two-level NOR-NOR ✓</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">Comparison: NAND vs NOR as Universal Gates</div>
+  <div class="tt-wrap">
+    <table>
+      <tr><th>Function</th><th>Using NAND only</th><th>Using NOR only</th></tr>
+      <tr><td>NOT A</td><td class="v1">NAND(A,A)</td><td class="v1">NOR(A,A)</td></tr>
+      <tr><td>A AND B</td><td>NAND(NAND(A,B), NAND(A,B))</td><td>NOR(NOR(A,A), NOR(B,B))</td></tr>
+      <tr><td>A OR B</td><td>NAND(NAND(A,A), NAND(B,B))</td><td>NOR(NOR(A,B), NOR(A,B))</td></tr>
+      <tr><td>Best for</td><td class="v1">SOP (Sum of Products)</td><td class="v1">POS (Product of Sums)</td></tr>
+      <tr><td>2-level form</td><td>NAND-NAND (≡ AND-OR)</td><td>NOR-NOR (≡ OR-AND)</td></tr>
+    </table>
+  </div>
+
+  <div class="note-box warn" style="margin-top:1rem;">
+    <div class="note-title">⭐⭐ Conversion Example — Half Adder to NAND only</div>
+    <p>
+      Half Adder: S = A⊕B = Ā·B + A·B̄ &nbsp;&nbsp; C = A·B<br><br>
+      <strong>Carry using NAND:</strong><br>
+      C = A·B = NAND(NAND(A,B), NAND(A,B))<br><br>
+      <strong>Sum using NAND (5 gates):</strong><br>
+      Let P = NAND(A,B) = ̄(A·B)<br>
+      Let Q = NAND(A,P) = ̄(A·̄(AB)) = Ā + AB = A+̄AB... (simplifies to A⊕B via NAND construction)<br>
+      Full NAND implementation: S = NAND(NAND(A, NAND(A,B)), NAND(B, NAND(A,B)))<br><br>
+      Verification: NAND(A,B)=P; NAND(A,P)=̄(A·̄(AB)); NAND(B,P)=̄(B·̄(AB)); S=NAND(these two)=A⊕B ✓
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 7 — INTERACTIVE GATE SIMULATOR -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" id="sim">
+  <div class="sec-head">
+    <div class="sec-num">INTERACTIVE</div>
+    <div>
+      <div class="sec-title">Gate Simulator</div>
+      <div class="sec-sub">Toggle inputs and see live gate output</div>
+    </div>
+  </div>
+
+  <div class="sim-box">
+    <div class="sim-title">Select a gate and toggle inputs:</div>
+
+    <div class="gate-selector">
+      <button class="gate-sel-btn active" onclick="selectGate('NOT')">NOT</button>
+      <button class="gate-sel-btn" onclick="selectGate('AND')">AND</button>
+      <button class="gate-sel-btn" onclick="selectGate('OR')">OR</button>
+      <button class="gate-sel-btn" onclick="selectGate('NAND')">NAND</button>
+      <button class="gate-sel-btn" onclick="selectGate('NOR')">NOR</button>
+      <button class="gate-sel-btn" onclick="selectGate('XOR')">XOR</button>
+      <button class="gate-sel-btn" onclick="selectGate('XNOR')">XNOR</button>
+    </div>
+
+    <div class="sim-row">
+      <div class="sim-inputs" id="sim-inputs">
+        <div class="inp-row">
+          <label>A</label>
+          <div class="toggle" id="tA" onclick="toggleInp('A')"></div>
+          <span class="inp-val v0" id="valA">0</span>
+        </div>
+        <div class="inp-row" id="rowB">
+          <label>B</label>
+          <div class="toggle" id="tB" onclick="toggleInp('B')"></div>
+          <span class="inp-val v0" id="valB">0</span>
+        </div>
+      </div>
+      <div class="sim-arrow">→</div>
+      <div>
+        <div class="sim-gate-name" id="sim-gate-label">NOT</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:2px;" id="sim-expr">Y = Ā</div>
+      </div>
+      <div class="sim-arrow">→</div>
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:4px;">Output Y</div>
+        <div class="sim-out v0" id="sim-out">0</div>
+      </div>
+    </div>
+
+    <div style="font-family:var(--mono);font-size:12px;color:var(--text2);margin-top:0.5rem;" id="sim-explanation"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 8 — QUIZ -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" id="quiz">
+  <div class="sec-head">
+    <div class="sec-num">PRACTICE</div>
+    <div>
+      <div class="sec-title">Quick Quiz</div>
+      <div class="sec-sub">ISC exam-level questions on Computer Hardware</div>
+    </div>
+  </div>
+
+  <div class="score-bar">
+    <span style="color:var(--text2);font-size:0.9rem;">Your Score</span>
+    <span class="score-val" id="score-disp">0 / 0</span>
+  </div>
+
+  <div class="quiz-card" id="hw-q1">
+    <div class="quiz-q">Q1. Which gate outputs 1 ONLY when both inputs are 0?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ansQ('hw-q1',this,'w')">NAND gate</button>
+      <button class="qopt" onclick="ansQ('hw-q1',this,'c')">NOR gate</button>
+      <button class="qopt" onclick="ansQ('hw-q1',this,'w')">XOR gate</button>
+      <button class="qopt" onclick="ansQ('hw-q1',this,'w')">XNOR gate</button>
+    </div>
+    <div class="quiz-exp" id="hw-q1-exp">NOR gate: Y = ̄(A+B). Output is 1 only when A=0 AND B=0 (0+0=0, NOT 0 = 1). All other input combos give 0.</div>
+  </div>
+
+  <div class="quiz-card" id="hw-q2">
+    <div class="quiz-q">Q2. To implement NOT gate using NAND, what do you do?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ansQ('hw-q2',this,'w')">Connect A and B to different signals</button>
+      <button class="qopt" onclick="ansQ('hw-q2',this,'c')">Connect both inputs of NAND to the same signal A</button>
+      <button class="qopt" onclick="ansQ('hw-q2',this,'w')">Leave one input unconnected</button>
+      <button class="qopt" onclick="ansQ('hw-q2',this,'w')">Connect A to input, set B=1</button>
+    </div>
+    <div class="quiz-exp" id="hw-q2-exp">NAND(A,A) = ̄(A·A) = ̄A (because A·A = A by idempotent law). This gives NOT A using a single NAND gate.</div>
+  </div>
+
+  <div class="quiz-card" id="hw-q3">
+    <div class="quiz-q">Q3. A 4-to-1 MUX has how many select lines?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ansQ('hw-q3',this,'w')">1 select line</button>
+      <button class="qopt" onclick="ansQ('hw-q3',this,'c')">2 select lines</button>
+      <button class="qopt" onclick="ansQ('hw-q3',this,'w')">4 select lines</button>
+      <button class="qopt" onclick="ansQ('hw-q3',this,'w')">3 select lines</button>
+    </div>
+    <div class="quiz-exp" id="hw-q3-exp">A 4:1 MUX has 4 = 2² data inputs, so it needs n=2 select lines. Generally: 2ⁿ:1 MUX needs n select lines.</div>
+  </div>
+
+  <div class="quiz-card" id="hw-q4">
+    <div class="quiz-q">Q4. What are the Boolean expressions for a 2-to-4 decoder outputs?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ansQ('hw-q4',this,'c')">D₀=Ā·B̄, D₁=Ā·B, D₂=A·B̄, D₃=A·B</button>
+      <button class="qopt" onclick="ansQ('hw-q4',this,'w')">D₀=A+B, D₁=A+B̄, D₂=Ā+B, D₃=Ā+B̄</button>
+      <button class="qopt" onclick="ansQ('hw-q4',this,'w')">D₀=A·B, D₁=A·B̄, D₂=Ā·B, D₃=Ā·B̄</button>
+      <button class="qopt" onclick="ansQ('hw-q4',this,'w')">D₀=A⊕B, D₁=A⊕B̄</button>
+    </div>
+    <div class="quiz-exp" id="hw-q4-exp">A 2-to-4 decoder generates all 4 minterms of 2 variables: D₀=m₀=Ā·B̄, D₁=m₁=Ā·B, D₂=m₂=A·B̄, D₃=m₃=A·B. Exactly one is HIGH for each input combination.</div>
+  </div>
+
+  <div class="quiz-card" id="hw-q5">
+    <div class="quiz-q">Q5. OR gate using only NOR gates requires:</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ansQ('hw-q5',this,'w')">1 NOR gate</button>
+      <button class="qopt" onclick="ansQ('hw-q5',this,'c')">2 NOR gates</button>
+      <button class="qopt" onclick="ansQ('hw-q5',this,'w')">3 NOR gates</button>
+      <button class="qopt" onclick="ansQ('hw-q5',this,'w')">4 NOR gates</button>
+    </div>
+    <div class="quiz-exp" id="hw-q5-exp">OR(A,B) = NOT[NOR(A,B)]. NOT using NOR needs 1 NOR gate. So: NOR gate #1 = NOR(A,B); then NOR gate #2 = NOR(output₁, output₁) = NOT(output₁) = A+B. Total: 2 NOR gates.</div>
+  </div>
+
+  <div class="quiz-card" id="hw-q6">
+    <div class="quiz-q">Q6. In an 8-to-3 encoder, which expression is correct for Y₀ (LSB)?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ansQ('hw-q6',this,'c')">Y₀ = I₁ + I₃ + I₅ + I₇</button>
+      <button class="qopt" onclick="ansQ('hw-q6',this,'w')">Y₀ = I₄ + I₅ + I₆ + I₇</button>
+      <button class="qopt" onclick="ansQ('hw-q6',this,'w')">Y₀ = I₂ + I₃ + I₆ + I₇</button>
+      <button class="qopt" onclick="ansQ('hw-q6',this,'w')">Y₀ = I₁ + I₂ + I₃ + I₄</button>
+    </div>
+    <div class="quiz-exp" id="hw-q6-exp">Y₀ (LSB) is 1 for inputs 1,3,5,7 (odd numbers in binary have LSB=1). So Y₀ = I₁+I₃+I₅+I₇. Y₁ = I₂+I₃+I₆+I₇ (bit 1 is 1 for 2,3,6,7). Y₂ = I₄+I₅+I₆+I₇ (bit 2 is 1 for 4,5,6,7).</div>
+  </div>
+
+  <div class="quiz-card" id="hw-q7">
+    <div class="quiz-q">Q7. Which two-level NAND-NAND circuit is equivalent to?</div>
+    <div class="quiz-opts">
+      <button class="qopt" onclick="ansQ('hw-q7',this,'w')">OR-AND (POS form)</button>
+      <button class="qopt" onclick="ansQ('hw-q7',this,'c')">AND-OR (SOP form)</button>
+      <button class="qopt" onclick="ansQ('hw-q7',this,'w')">NOR-NOR</button>
+      <button class="qopt" onclick="ansQ('hw-q7',this,'w')">NOT-AND</button>
+    </div>
+    <div class="quiz-exp" id="hw-q7-exp">Two-level NAND-NAND is equivalent to AND-OR (SOP). This is because: first level NAND does AND then inverts; second level NAND inverts the previous inversions and ORs them, giving the same result as AND-OR. Similarly, NOR-NOR ≡ OR-AND (POS).</div>
+  </div>
+
+  <div style="text-align:center;margin-top:1.5rem;">
+    <button onclick="resetHwQuiz()" style="background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);color:var(--cyan);padding:10px 28px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;font-family:var(--mono);letter-spacing:0.05em;">RESET QUIZ</button>
+  </div>
+</section>
+
+<!-- CHEAT SHEET -->
+<section class="section" id="cheatsheet" style="padding-bottom:1.5rem;">
+  <div class="sec-head">
+    <div class="sec-num">QUICK REF</div>
+    <div>
+      <div class="sec-title">Master Cheat Sheet</div>
+      <div class="sec-sub">All key formulas — Computer Hardware Topic 2</div>
+    </div>
+  </div>
+
+  <div class="cheat-grid">
+    <div class="cheat-item"><div class="cheat-name">NOT</div><div class="cheat-eq">Y = Ā</div><div class="cheat-eq2">Output is complement of input</div></div>
+    <div class="cheat-item"><div class="cheat-name">AND</div><div class="cheat-eq">Y = A · B</div><div class="cheat-eq2">1 only when ALL inputs = 1</div></div>
+    <div class="cheat-item"><div class="cheat-name">OR</div><div class="cheat-eq">Y = A + B</div><div class="cheat-eq2">1 when ANY input = 1</div></div>
+    <div class="cheat-item"><div class="cheat-name">NAND</div><div class="cheat-eq">Y = ̄(A·B)</div><div class="cheat-eq2">0 only when ALL inputs = 1</div></div>
+    <div class="cheat-item"><div class="cheat-name">NOR</div><div class="cheat-eq">Y = ̄(A+B)</div><div class="cheat-eq2">1 only when ALL inputs = 0</div></div>
+    <div class="cheat-item"><div class="cheat-name">XOR</div><div class="cheat-eq">Y = A⊕B</div><div class="cheat-eq2">1 when inputs are DIFFERENT</div></div>
+    <div class="cheat-item"><div class="cheat-name">XNOR</div><div class="cheat-eq">Y = ̄(A⊕B)</div><div class="cheat-eq2">1 when inputs are SAME</div></div>
+    <div class="cheat-item"><div class="cheat-name">Half Adder S</div><div class="cheat-eq">S = A ⊕ B</div><div class="cheat-eq2">XOR gate</div></div>
+    <div class="cheat-item"><div class="cheat-name">Half Adder C</div><div class="cheat-eq">C = A · B</div><div class="cheat-eq2">AND gate</div></div>
+    <div class="cheat-item"><div class="cheat-name">Full Adder S</div><div class="cheat-eq">S = A⊕B⊕Cᵢₙ</div><div class="cheat-eq2">Two XOR gates</div></div>
+    <div class="cheat-item"><div class="cheat-name">Full Adder Cout</div><div class="cheat-eq">Cout = AB+BCin+ACin</div><div class="cheat-eq2">Majority function</div></div>
+    <div class="cheat-item"><div class="cheat-name">4:1 MUX</div><div class="cheat-eq">Y = S̄₁S̄₀I₀+S̄₁S₀I₁+...</div><div class="cheat-eq2">2 select lines, 4 inputs</div></div>
+    <div class="cheat-item"><div class="cheat-name">NOT via NAND</div><div class="cheat-eq">NAND(A,A)</div><div class="cheat-eq2">Tie both inputs together</div></div>
+    <div class="cheat-item"><div class="cheat-name">AND via NAND</div><div class="cheat-eq">NAND(NAND(A,B),NAND(A,B))</div><div class="cheat-eq2">2 NAND gates</div></div>
+    <div class="cheat-item"><div class="cheat-name">OR via NAND</div><div class="cheat-eq">NAND(NAND(A,A),NAND(B,B))</div><div class="cheat-eq2">3 NAND gates</div></div>
+    <div class="cheat-item"><div class="cheat-name">NOT via NOR</div><div class="cheat-eq">NOR(A,A)</div><div class="cheat-eq2">Tie both inputs together</div></div>
+    <div class="cheat-item"><div class="cheat-name">OR via NOR</div><div class="cheat-eq">NOR(NOR(A,B),NOR(A,B))</div><div class="cheat-eq2">2 NOR gates</div></div>
+    <div class="cheat-item"><div class="cheat-name">AND via NOR</div><div class="cheat-eq">NOR(NOR(A,A),NOR(B,B))</div><div class="cheat-eq2">3 NOR gates</div></div>
+    <div class="cheat-item"><div class="cheat-name">Encoder</div><div class="cheat-eq">2ⁿ → n lines</div><div class="cheat-eq2">Each output = OR of inputs</div></div>
+    <div class="cheat-item"><div class="cheat-name">Decoder</div><div class="cheat-eq">n → 2ⁿ lines</div><div class="cheat-eq2">Each output = a minterm</div></div>
+  </div>
+
+  <div class="note-box warn" style="margin-top:1rem;">
+    <div class="note-title">🎯 Top ISC Exam Questions for Topic 2</div>
+    <p>
+      1. Draw and explain the logic circuit and truth table of a Half Adder / Full Adder<br>
+      2. Show how NAND gate is a universal gate by implementing NOT, AND, OR<br>
+      3. Show how NOR gate is a universal gate by implementing NOT, OR, AND<br>
+      4. Write Boolean expressions for a 2-to-4 decoder<br>
+      5. Convert an AND-OR circuit to NAND-NAND equivalent<br>
+      6. Write the Boolean expression for a 4:1 MUX<br>
+      7. Find the output of a given logic circuit for specific inputs<br>
+      8. Draw the logic diagram for the SOP expression of a given truth table
+    </p>
+  </div>
+</section>
+
+</div><!-- end .page -->
+
+<footer>ISC Computer Science · Topic 2: Computer Hardware · Complete Theory Guide &nbsp;|&nbsp; All the best for March 27! 🚀</footer>
+
+<script>
+/* ── NAV SCROLL HIGHLIGHT ── */
+const secs = document.querySelectorAll('section[id]');
+const navAs = document.querySelectorAll('.nav a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  secs.forEach(s => { if (window.scrollY >= s.offsetTop - 130) cur = s.id; });
+  navAs.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+});
+
+/* ── TABS ── */
+function switchTab(group, id) {
+  document.querySelectorAll(`[id^="${group}-"]`).forEach(c => c.classList.remove('active'));
+  document.querySelectorAll(`[onclick*="'${group}'"]`).forEach(b => b.classList.remove('active'));
+  document.getElementById(`${group}-${id}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* ── GATE SIMULATOR ── */
+let simState = { A: 0, B: 0, gate: 'NOT' };
+const gateExprs = {
+  NOT:  { expr:'Y = Ā',           fn:(a,b)=>a^1,     label:'NOT',  needsB:false },
+  AND:  { expr:'Y = A · B',       fn:(a,b)=>a&b,     label:'AND',  needsB:true  },
+  OR:   { expr:'Y = A + B',       fn:(a,b)=>a|b,     label:'OR',   needsB:true  },
+  NAND: { expr:'Y = ̄(A·B)',       fn:(a,b)=>(a&b)^1, label:'NAND', needsB:true  },
+  NOR:  { expr:'Y = ̄(A+B)',       fn:(a,b)=>(a|b)^1, label:'NOR',  needsB:true  },
+  XOR:  { expr:'Y = A ⊕ B',       fn:(a,b)=>a^b,     label:'XOR',  needsB:true  },
+  XNOR: { expr:'Y = ̄(A⊕B)',       fn:(a,b)=>(a^b)^1, label:'XNOR', needsB:true  },
+};
+const explanations = {
+  NOT:  (a,b,y) => `A=${a} → NOT → Y=${y}. Complement of input.`,
+  AND:  (a,b,y) => `A=${a} AND B=${b} → Y=${y}. ${a&&b ? 'Both are 1 → output 1.' : 'Not both 1 → output 0.'}`,
+  OR:   (a,b,y) => `A=${a} OR B=${b} → Y=${y}. ${a||b ? 'At least one is 1 → output 1.' : 'Both are 0 → output 0.'}`,
+  NAND: (a,b,y) => `A=${a} NAND B=${b} → Y=${y}. ${a&&b ? 'Both 1 → AND=1 → NOT gives 0.' : 'Not both 1 → AND=0 → NOT gives 1.'}`,
+  NOR:  (a,b,y) => `A=${a} NOR B=${b} → Y=${y}. ${a||b ? 'OR=1 → NOT gives 0.' : 'Both 0 → OR=0 → NOT gives 1.'}`,
+  XOR:  (a,b,y) => `A=${a} XOR B=${b} → Y=${y}. ${a!==b ? 'Inputs are different → 1.' : 'Inputs are same → 0.'}`,
+  XNOR: (a,b,y) => `A=${a} XNOR B=${b} → Y=${y}. ${a===b ? 'Inputs are same → 1.' : 'Inputs are different → 0.'}`,
+};
+
+function updateSim() {
+  const g = gateExprs[simState.gate];
+  const y = g.fn(simState.A, simState.B);
+  const out = document.getElementById('sim-out');
+  out.textContent = y;
+  out.className = 'sim-out ' + (y ? 'v1' : 'v0');
+  document.getElementById('sim-expr').textContent = g.expr;
+  document.getElementById('sim-gate-label').textContent = g.label;
+  document.getElementById('rowB').style.display = g.needsB ? '' : 'none';
+  document.getElementById('sim-explanation').textContent = explanations[simState.gate](simState.A, simState.B, y);
+}
+
+function toggleInp(inp) {
+  simState[inp] ^= 1;
+  const t = document.getElementById('t'+inp);
+  const v = document.getElementById('val'+inp);
+  t.classList.toggle('on', !!simState[inp]);
+  v.textContent = simState[inp];
+  v.className = 'inp-val ' + (simState[inp] ? 'v1' : 'v0');
+  updateSim();
+}
+
+function selectGate(g) {
+  simState.gate = g;
+  document.querySelectorAll('.gate-sel-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  updateSim();
+}
+updateSim();
+
+/* ── QUIZ ── */
+let hwScores = { c: 0, t: 0 };
+let hwAnswered = {};
+
+function ansQ(qId, btn, result) {
+  if (hwAnswered[qId]) return;
+  hwAnswered[qId] = true;
+  hwScores.t++;
+  if (result === 'c') { btn.classList.add('correct'); hwScores.c++; }
+  else {
+    btn.classList.add('wrong');
+    btn.closest('.quiz-card').querySelectorAll('.qopt').forEach(o => {
+      if (o.getAttribute('onclick').includes(",'c'")) o.classList.add('correct');
+    });
+  }
+  document.getElementById(qId + '-exp').style.display = 'block';
+  document.getElementById('score-disp').textContent = hwScores.c + ' / ' + hwScores.t;
+}
+
+function resetHwQuiz() {
+  hwScores = { c: 0, t: 0 };
+  hwAnswered = {};
+  document.querySelectorAll('.qopt').forEach(b => b.classList.remove('correct','wrong'));
+  document.querySelectorAll('.quiz-exp').forEach(e => e.style.display = 'none');
+  document.getElementById('score-disp').textContent = '0 / 0';
+}
+</script>
+</body>
+</html>

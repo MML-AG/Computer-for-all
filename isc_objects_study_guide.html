@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISC CS — Objects & Classes Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d14;
+    --bg2: #0f1320;
+    --bg3: #141928;
+    --card: #161c2e;
+    --card2: #1c2540;
+    --border: #2a3558;
+    --accent: #4f8ef7;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --accent4: #fb923c;
+    --accent5: #f472b6;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --gold: #fbbf24;
+    --code-bg: #0d1117;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── ANIMATED GRID BACKGROUND ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,142,247,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,142,247,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(79,142,247,0.15) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  .hero-glow2 {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(167,139,250,0.1) 0%, transparent 70%);
+    top: 30%;
+    right: 10%;
+    animation: pulse 6s ease-in-out infinite reverse;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(79,142,247,0.1);
+    border: 1px solid rgba(79,142,247,0.3);
+    border-radius: 100px;
+    padding: 6px 18px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: blink 1.5s infinite;
+  }
+
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    position: relative;
+    z-index: 1;
+    animation: fadeDown 0.9s 0.1s ease both;
+  }
+
+  .hero h1 .line1 { color: var(--text); }
+  .hero h1 .line2 {
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent5));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--text2);
+    max-width: 560px;
+    margin: 1.5rem auto 0;
+    position: relative;
+    z-index: 1;
+    animation: fadeDown 1s 0.2s ease both;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 2.5rem;
+    margin-top: 3rem;
+    position: relative;
+    z-index: 1;
+    animation: fadeDown 1s 0.3s ease both;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+
+  .hero-stat .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .hero-stat .label {
+    font-size: 0.75rem;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── NAV PILLS ─── */
+  .nav-pills {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,13,20,0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 2rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav-pill {
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .nav-pill:hover, .nav-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* ─── MAIN CONTENT ─── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── SECTION ─── */
+  .section {
+    margin-bottom: 5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(79,142,247,0.1);
+    border: 1px solid rgba(79,142,247,0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.3s, transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover {
+    border-color: rgba(79,142,247,0.4);
+    transform: translateY(-2px);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .card h3 .icon {
+    font-size: 1.1rem;
+  }
+
+  .card p { color: var(--text2); font-size: 0.95rem; line-height: 1.75; }
+
+  /* ─── GRID LAYOUTS ─── */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; }
+
+  /* ─── DEFINITION BLOCK ─── */
+  .def-block {
+    background: linear-gradient(135deg, rgba(79,142,247,0.08), rgba(167,139,250,0.08));
+    border: 1px solid rgba(79,142,247,0.25);
+    border-radius: 14px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .def-block .def-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--accent2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .def-block .def-text {
+    font-size: 1.05rem;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.7;
+  }
+
+  /* ─── CODE BLOCK ─── */
+  .code-wrap {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .code-dots span:nth-child(1) { background: #ff5f57; }
+  .code-dots span:nth-child(2) { background: #febc2e; }
+  .code-dots span:nth-child(3) { background: #28c840; }
+
+  .code-filename {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text3);
+    letter-spacing: 0.04em;
+  }
+
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    background: rgba(79,142,247,0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  pre {
+    padding: 1.5rem;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: #e6edf3;
+  }
+
+  .kw { color: #ff7b72; }
+  .type { color: #79c0ff; }
+  .str { color: #a5d6ff; }
+  .num { color: #f2cc60; }
+  .cmt { color: #8b949e; font-style: italic; }
+  .fn { color: #d2a8ff; }
+  .cls { color: #ffa657; }
+  .var { color: #e6edf3; }
+  .ann { color: #7ce38b; }
+
+  /* ─── HIGHLIGHT BOXES ─── */
+  .highlight {
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.2rem 0;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .highlight-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+  .highlight-body { flex: 1; }
+  .highlight-body strong { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .highlight-body p { font-size: 0.88rem; line-height: 1.65; }
+
+  .hl-blue { background: rgba(79,142,247,0.1); border: 1px solid rgba(79,142,247,0.25); }
+  .hl-blue .highlight-body strong { color: var(--accent); }
+  .hl-blue .highlight-body p { color: #a0b4d6; }
+
+  .hl-green { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.25); }
+  .hl-green .highlight-body strong { color: var(--accent3); }
+  .hl-green .highlight-body p { color: #8fcfb8; }
+
+  .hl-orange { background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.25); }
+  .hl-orange .highlight-body strong { color: var(--accent4); }
+  .hl-orange .highlight-body p { color: #c9a07a; }
+
+  .hl-purple { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.25); }
+  .hl-purple .highlight-body strong { color: var(--accent2); }
+  .hl-purple .highlight-body p { color: #b5a5e0; }
+
+  .hl-pink { background: rgba(244,114,182,0.08); border: 1px solid rgba(244,114,182,0.25); }
+  .hl-pink .highlight-body strong { color: var(--accent5); }
+  .hl-pink .highlight-body p { color: #d4a0c0; }
+
+  /* ─── TABLE ─── */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    background: rgba(79,142,247,0.12);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px 16px;
+    font-size: 0.88rem;
+    color: var(--text2);
+    border-top: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tr:hover td { background: rgba(79,142,247,0.04); }
+
+  td code, th code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent3);
+    background: rgba(52,211,153,0.08);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  /* ─── ANALOGY DIAGRAM ─── */
+  .analogy-diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    margin: 1.5rem 0;
+    text-align: center;
+  }
+
+  .analogy-diagram .class-box {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(79,142,247,0.15), rgba(167,139,250,0.15));
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 1.25rem 2rem;
+    min-width: 200px;
+    margin-bottom: 1.5rem;
+  }
+
+  .class-box .class-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .class-box .class-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .arrow-down {
+    font-size: 2rem;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .instances-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .instance-box {
+    background: rgba(52,211,153,0.06);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    min-width: 130px;
+    text-align: left;
+  }
+
+  .instance-box .inst-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--accent3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .instance-box .inst-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .instance-box .inst-data {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text3);
+    line-height: 1.6;
+  }
+
+  /* ─── LIST STYLES ─── */
+  .styled-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
+
+  .styled-list li {
+    padding: 0.6rem 0 0.6rem 1.5rem;
+    position: relative;
+    color: var(--text2);
+    font-size: 0.92rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .styled-list li:last-child { border-bottom: none; }
+
+  .styled-list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .styled-list li strong { color: var(--text); font-weight: 600; }
+
+  /* ─── EXAM TIPS ─── */
+  .exam-tip {
+    background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(251,146,60,0.08));
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .exam-tip .tip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .exam-tip ul { padding-left: 1.2rem; }
+  .exam-tip ul li {
+    color: #c8b070;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin-bottom: 0.4rem;
+  }
+
+  /* ─── QUICK REFERENCE ─── */
+  .quick-ref {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 18px;
+    padding: 2.5rem;
+    margin: 3rem 0;
+  }
+
+  .quick-ref h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    background: linear-gradient(90deg, var(--gold), var(--accent4));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .ref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+  }
+
+  .ref-item .ref-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.04em;
+  }
+
+  .ref-item .ref-val {
+    font-size: 0.85rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* ─── CONSTRUCTOR TYPES ─── */
+  .constructor-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.2rem;
+    margin: 1.5rem 0;
+  }
+
+  .con-card {
+    border-radius: 14px;
+    padding: 1.5rem;
+    border: 1px solid;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .con-card.default-con {
+    background: rgba(79,142,247,0.06);
+    border-color: rgba(79,142,247,0.3);
+  }
+
+  .con-card.param-con {
+    background: rgba(52,211,153,0.06);
+    border-color: rgba(52,211,153,0.3);
+  }
+
+  .con-card.copy-con {
+    background: rgba(167,139,250,0.06);
+    border-color: rgba(167,139,250,0.3);
+  }
+
+  .con-card h4 {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .default-con h4 { color: var(--accent); }
+  .param-con h4 { color: var(--accent3); }
+  .copy-con h4 { color: var(--accent2); }
+
+  .con-card p { font-size: 0.85rem; color: var(--text2); line-height: 1.6; }
+
+  /* ─── BADGE INLINE ─── */
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 100px;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+    margin: 0 2px;
+  }
+
+  .badge-blue { background: rgba(79,142,247,0.15); color: var(--accent); border: 1px solid rgba(79,142,247,0.3); }
+  .badge-green { background: rgba(52,211,153,0.1); color: var(--accent3); border: 1px solid rgba(52,211,153,0.25); }
+  .badge-orange { background: rgba(251,146,60,0.1); color: var(--accent4); border: 1px solid rgba(251,146,60,0.25); }
+  .badge-purple { background: rgba(167,139,250,0.1); color: var(--accent2); border: 1px solid rgba(167,139,250,0.25); }
+
+  /* ─── INTERACTIVE QUIZ ─── */
+  .quiz-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 2.5rem;
+    margin: 3rem 0;
+  }
+
+  .quiz-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .quiz-section .quiz-sub {
+    text-align: center;
+    color: var(--text3);
+    font-size: 0.88rem;
+    margin-bottom: 2rem;
+  }
+
+  .quiz-q {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .quiz-q .q-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .quiz-q .q-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text3);
+    margin-bottom: 0.5rem;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .option {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: var(--text2);
+    background: transparent;
+    text-align: left;
+    transition: all 0.2s;
+  }
+
+  .option:hover { border-color: var(--accent); color: var(--text); background: rgba(79,142,247,0.06); }
+  .option.correct { background: rgba(52,211,153,0.1); border-color: var(--accent3); color: var(--accent3); }
+  .option.wrong { background: rgba(255,95,87,0.1); border-color: #ff5f57; color: #ff8a82; }
+  .option.reveal { background: rgba(52,211,153,0.1); border-color: var(--accent3); color: var(--accent3); }
+
+  .q-feedback {
+    margin-top: 0.75rem;
+    font-size: 0.83rem;
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: none;
+  }
+
+  .q-feedback.show { display: block; }
+  .q-feedback.correct { background: rgba(52,211,153,0.1); color: var(--accent3); border: 1px solid rgba(52,211,153,0.2); }
+  .q-feedback.wrong { background: rgba(255,95,87,0.1); color: #ff8a82; border: 1px solid rgba(255,95,87,0.2); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text3);
+    font-size: 0.82rem;
+    border-top: 1px solid var(--border);
+    position: relative;
+    z-index: 1;
+  }
+
+  footer .footer-note {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    opacity: 0.6;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 640px) {
+    .hero-stats { flex-wrap: wrap; gap: 1.5rem; justify-content: center; }
+    .nav-pills { padding: 0.5rem 1rem; }
+    main { padding: 2.5rem 1rem; }
+    .hero { padding: 1.5rem 1rem; }
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 4rem 0;
+  }
+
+  /* ─── INLINE CODE ─── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: rgba(79,142,247,0.1);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+  .section-intro {
+    font-size: 1rem;
+    color: var(--text2);
+    line-height: 1.75;
+    margin-bottom: 2rem;
+    max-width: 800px;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  .progress-tracker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent5));
+    z-index: 9999;
+    transition: width 0.1s;
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-tracker" id="progress"></div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-badge">ISC Computer Science · Class XII</div>
+  <h1>
+    <span class="line1">Objects &amp; Classes</span><br>
+    <span class="line2">Complete Study Guide</span>
+  </h1>
+  <p class="hero-sub">Everything you need to ace your ISC exam — theory, examples, code, and practice questions. All in one place.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">4</div><div class="label">Core Topics</div></div>
+    <div class="hero-stat"><div class="num">15+</div><div class="label">Code Examples</div></div>
+    <div class="hero-stat"><div class="num">10</div><div class="label">Quiz Questions</div></div>
+    <div class="hero-stat"><div class="num">100</div><div class="label">Target Score</div></div>
+  </div>
+</section>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav-pills">
+  <a href="#s1" class="nav-pill">Objects &amp; Classes</a>
+  <a href="#s2" class="nav-pill">Constructors</a>
+  <a href="#s3" class="nav-pill">Real-World Examples</a>
+  <a href="#s4" class="nav-pill">Scanner &amp; Input/Output</a>
+  <a href="#s5" class="nav-pill">Exceptions</a>
+  <a href="#s6" class="nav-pill">Tokens &amp; Tokenizer</a>
+  <a href="#quiz" class="nav-pill">🎯 Quiz</a>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 1: OBJECTS AS DATA + BEHAVIOUR
+═══════════════════════════════════════════════ -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Objects — Data (Attributes) &amp; Behaviour (Methods)</h2>
+  </div>
+
+  <p class="section-intro">
+    Java is a pure object-oriented language. Everything revolves around <strong>objects</strong> and the <strong>classes</strong> they belong to. Understanding this relationship is the foundation of the entire syllabus topic.
+  </p>
+
+  <div class="def-block">
+    <div class="def-label">Definition — Object</div>
+    <div class="def-text">An <strong>object</strong> is a real-world entity that has <em>state</em> (data/attributes) and <em>behaviour</em> (operations/methods). In Java, an object is a specific instance of a class that occupies memory at runtime.</div>
+  </div>
+
+  <div class="def-block">
+    <div class="def-label">Definition — Class</div>
+    <div class="def-text">A <strong>class</strong> is a blueprint or template that defines the common properties (fields) and behaviours (methods) that all objects of that type will possess. A class does not occupy memory by itself — only objects do.</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3><span class="icon">📦</span> Attributes (Data / State)</h3>
+      <p>These are the <strong>instance variables</strong> declared inside a class. Each object has its own copy. They represent the <em>state</em> of the object at any given moment.</p>
+      <br>
+      <p><strong>Example:</strong> A <code>Car</code> object has attributes: <code>color</code>, <code>speed</code>, <code>brand</code>, <code>model</code>.</p>
+    </div>
+    <div class="card">
+      <h3><span class="icon">⚙️</span> Methods (Behaviour)</h3>
+      <p>These are the <strong>functions defined inside a class</strong> that operate on the object's data. They represent what an object <em>can do</em>.</p>
+      <br>
+      <p><strong>Example:</strong> A <code>Car</code> object has methods: <code>accelerate()</code>, <code>brake()</code>, <code>honk()</code>.</p>
+    </div>
+  </div>
+
+  <div class="highlight hl-blue">
+    <div class="highlight-icon">🔑</div>
+    <div class="highlight-body">
+      <strong>Key Relationship: Class vs Object</strong>
+      <p><strong>Class</strong> is the cookie-cutter; <strong>Object</strong> is the cookie. You can bake many cookies (objects) using one cookie-cutter (class). A class is a compile-time concept; an object is a runtime reality.</p>
+    </div>
+  </div>
+
+  <!-- CLASS DIAGRAM -->
+  <div class="analogy-diagram">
+    <div class="class-box">
+      <div class="class-label">Class (Blueprint)</div>
+      <div class="class-name">Student</div>
+    </div>
+    <span class="arrow-down">↓ instantiation</span>
+    <div class="instances-row">
+      <div class="instance-box">
+        <div class="inst-label">Object / Instance</div>
+        <div class="inst-name">s1</div>
+        <div class="inst-data">
+          name = "Aarav"<br>
+          roll = 101<br>
+          marks = 92
+        </div>
+      </div>
+      <div class="instance-box">
+        <div class="inst-label">Object / Instance</div>
+        <div class="inst-name">s2</div>
+        <div class="inst-data">
+          name = "Priya"<br>
+          roll = 102<br>
+          marks = 87
+        </div>
+      </div>
+      <div class="instance-box">
+        <div class="inst-label">Object / Instance</div>
+        <div class="inst-name">s3</div>
+        <div class="inst-data">
+          name = "Rahul"<br>
+          roll = 103<br>
+          marks = 95
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">Student.java</span>
+      <span class="code-lang">Java</span>
+    </div>
+    <pre><span class="cmt">// CLASS DEFINITION — the blueprint</span>
+<span class="kw">class</span> <span class="cls">Student</span> {
+    <span class="cmt">// ─── ATTRIBUTES (instance variables / data) ───</span>
+    <span class="type">String</span> <span class="var">name</span>;
+    <span class="type">int</span>    <span class="var">rollNo</span>;
+    <span class="type">double</span> <span class="var">marks</span>;
+
+    <span class="cmt">// ─── METHODS (behaviour) ───</span>
+    <span class="kw">void</span> <span class="fn">display</span>() {
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Name: "</span> + name + <span class="str">"  Roll: "</span> + rollNo + <span class="str">"  Marks: "</span> + marks);
+    }
+
+    <span class="kw">void</span> <span class="fn">promote</span>() {
+        <span class="kw">if</span> (marks >= <span class="num">40</span>)
+            <span class="cls">System</span>.out.<span class="fn">println</span>(name + <span class="str">" is PROMOTED!"</span>);
+        <span class="kw">else</span>
+            <span class="cls">System</span>.out.<span class="fn">println</span>(name + <span class="str">" needs to reappear."</span>);
+    }
+}
+
+<span class="cmt">// CREATING OBJECTS (instances) in main</span>
+<span class="kw">class</span> <span class="cls">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="type">String</span>[] args) {
+        <span class="cls">Student</span> s1 = <span class="kw">new</span> <span class="cls">Student</span>();  <span class="cmt">// s1 is an OBJECT / INSTANCE</span>
+        s1.name   = <span class="str">"Aarav"</span>;           <span class="cmt">// accessing attribute</span>
+        s1.rollNo = <span class="num">101</span>;
+        s1.marks  = <span class="num">92.5</span>;
+        s1.<span class="fn">display</span>();                   <span class="cmt">// calling method</span>
+
+        <span class="cls">Student</span> s2 = <span class="kw">new</span> <span class="cls">Student</span>();  <span class="cmt">// another independent object</span>
+        s2.name   = <span class="str">"Priya"</span>;
+        s2.rollNo = <span class="num">102</span>;
+        s2.marks  = <span class="num">87.0</span>;
+        s2.<span class="fn">display</span>();
+        s2.<span class="fn">promote</span>();
+    }
+}</pre>
+  </div>
+
+  <div class="highlight hl-green">
+    <div class="highlight-icon">✅</div>
+    <div class="highlight-body">
+      <strong>Object as an Instance of a Class</strong>
+      <p>When you write <code>Student s1 = new Student();</code> — <code>s1</code> is an <strong>instance</strong> (object) of the <strong>class</strong> <code>Student</code>. The <code>new</code> keyword allocates memory on the heap and returns a reference. <code>s1</code> holds that reference (memory address).</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Concept</th>
+        <th>Class</th>
+        <th>Object</th>
+      </tr>
+      <tr>
+        <td>Nature</td>
+        <td>Template / Blueprint</td>
+        <td>Real entity in memory</td>
+      </tr>
+      <tr>
+        <td>Memory</td>
+        <td>No memory allocated</td>
+        <td>Memory allocated on heap</td>
+      </tr>
+      <tr>
+        <td>Keyword</td>
+        <td><code>class</code></td>
+        <td><code>new</code></td>
+      </tr>
+      <tr>
+        <td>Creation time</td>
+        <td>Compile time</td>
+        <td>Runtime</td>
+      </tr>
+      <tr>
+        <td>Count</td>
+        <td>One class</td>
+        <td>Many objects per class</td>
+      </tr>
+      <tr>
+        <td>Example</td>
+        <td><code>Student</code> class</td>
+        <td><code>s1</code>, <code>s2</code>, <code>s3</code> …</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="exam-tip">
+    <div class="tip-header">⭐ Exam Tips — Section 1</div>
+    <ul>
+      <li><strong>Definition question:</strong> Always mention "blueprint/template", "state (attributes)", and "behaviour (methods)" in your definition.</li>
+      <li>When asked to differentiate class vs object: memory allocation is the key differentiator.</li>
+      <li>The dot operator (<code>.</code>) is used to access attributes and methods of an object.</li>
+      <li><code>new</code> keyword: (a) allocates heap memory, (b) calls the constructor, (c) returns a reference.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 2: CONSTRUCTORS
+═══════════════════════════════════════════════ -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Constructors</h2>
+  </div>
+
+  <p class="section-intro">
+    A constructor is a special method that is automatically called when an object is created using <code>new</code>. It initialises the object's attributes to meaningful values.
+  </p>
+
+  <div class="def-block">
+    <div class="def-label">Definition — Constructor</div>
+    <div class="def-text">A <strong>constructor</strong> is a special member method of a class that has the <em>same name as the class</em>, has <em>no return type</em> (not even <code>void</code>), and is <em>automatically invoked</em> when an object is created using the <code>new</code> keyword.</div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">Types of Constructors</h3>
+
+  <div class="constructor-cards">
+    <div class="con-card default-con">
+      <h4>① Default Constructor</h4>
+      <p>Takes <strong>no parameters</strong>. Initialises all instance variables to default values (0, null, false). If you don't write any constructor, Java provides one automatically.</p>
+    </div>
+    <div class="con-card param-con">
+      <h4>② Parameterised Constructor</h4>
+      <p>Takes <strong>parameters</strong> to initialise the object with specific values at the time of creation. Most commonly used in ISC programs.</p>
+    </div>
+    <div class="con-card copy-con">
+      <h4>③ Copy Constructor</h4>
+      <p>Takes an <strong>object of the same class</strong> as parameter and creates a duplicate with the same field values.</p>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">Box.java — All Constructor Types</span>
+      <span class="code-lang">Java</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="cls">Box</span> {
+    <span class="type">double</span> <span class="var">length</span>, <span class="var">width</span>, <span class="var">height</span>;
+
+    <span class="cmt">// ① DEFAULT CONSTRUCTOR — no parameters</span>
+    <span class="cls">Box</span>() {
+        length = <span class="num">1.0</span>;
+        width  = <span class="num">1.0</span>;
+        height = <span class="num">1.0</span>;
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Default constructor called"</span>);
+    }
+
+    <span class="cmt">// ② PARAMETERISED CONSTRUCTOR</span>
+    <span class="cls">Box</span>(<span class="type">double</span> l, <span class="type">double</span> w, <span class="type">double</span> h) {
+        length = l;
+        width  = w;
+        height = h;
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Parameterised constructor called"</span>);
+    }
+
+    <span class="cmt">// ③ COPY CONSTRUCTOR — takes object of same class</span>
+    <span class="cls">Box</span>(<span class="cls">Box</span> b) {
+        length = b.length;
+        width  = b.width;
+        height = b.height;
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Copy constructor called"</span>);
+    }
+
+    <span class="type">double</span> <span class="fn">volume</span>() {
+        <span class="kw">return</span> length * width * height;
+    }
+}
+
+<span class="kw">class</span> <span class="cls">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="type">String</span>[] args) {
+        <span class="cls">Box</span> b1 = <span class="kw">new</span> <span class="cls">Box</span>();          <span class="cmt">// default constructor</span>
+        <span class="cls">Box</span> b2 = <span class="kw">new</span> <span class="cls">Box</span>(<span class="num">3.0</span>, <span class="num">4.0</span>, <span class="num">5.0</span>); <span class="cmt">// parameterised</span>
+        <span class="cls">Box</span> b3 = <span class="kw">new</span> <span class="cls">Box</span>(b2);         <span class="cmt">// copy constructor</span>
+
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"b1 volume: "</span> + b1.<span class="fn">volume</span>()); <span class="cmt">// 1.0</span>
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"b2 volume: "</span> + b2.<span class="fn">volume</span>()); <span class="cmt">// 60.0</span>
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"b3 volume: "</span> + b3.<span class="fn">volume</span>()); <span class="cmt">// 60.0</span>
+    }
+}</pre>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">The <code>this</code> Keyword in Constructors</h3>
+
+  <div class="highlight hl-purple">
+    <div class="highlight-icon">💡</div>
+    <div class="highlight-body">
+      <strong>this — Refers to the Current Object</strong>
+      <p><code>this</code> is a reference variable that always points to the <em>current object</em> of the class. It is commonly used when parameter names shadow (overlap with) instance variable names inside constructors.</p>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">using this keyword</span>
+      <span class="code-lang">Java</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="cls">Circle</span> {
+    <span class="type">double</span> <span class="var">radius</span>;
+    <span class="type">String</span> <span class="var">color</span>;
+
+    <span class="cmt">// Without 'this' → parameter names SAME as field names → AMBIGUITY!</span>
+    <span class="cls">Circle</span>(<span class="type">double</span> radius, <span class="type">String</span> color) {
+        <span class="kw">this</span>.radius = radius;  <span class="cmt">// this.radius = instance var; radius = param</span>
+        <span class="kw">this</span>.color  = color;
+    }
+
+    <span class="type">double</span> <span class="fn">area</span>() {
+        <span class="kw">return</span> <span class="cls">Math</span>.PI * <span class="kw">this</span>.radius * <span class="kw">this</span>.radius;
+    }
+}</pre>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">Constructor Overloading</h3>
+
+  <div class="highlight hl-orange">
+    <div class="highlight-icon">🔄</div>
+    <div class="highlight-body">
+      <strong>Constructor Overloading</strong>
+      <p>Having <strong>multiple constructors in the same class</strong> with different parameter lists is called constructor overloading. Java differentiates them by the number, type, or order of parameters — this is decided at <strong>compile time</strong>.</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Feature</th>
+        <th>Constructor</th>
+        <th>Method</th>
+      </tr>
+      <tr>
+        <td>Name</td>
+        <td>Same as class name</td>
+        <td>Any valid identifier</td>
+      </tr>
+      <tr>
+        <td>Return type</td>
+        <td>None (not even <code>void</code>)</td>
+        <td>Must have a return type</td>
+      </tr>
+      <tr>
+        <td>Called</td>
+        <td>Automatically with <code>new</code></td>
+        <td>Explicitly by the programmer</td>
+      </tr>
+      <tr>
+        <td>Purpose</td>
+        <td>Initialise the object</td>
+        <td>Perform operations on the object</td>
+      </tr>
+      <tr>
+        <td>Inheritance</td>
+        <td>Not inherited</td>
+        <td>Inherited (unless private/static)</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="exam-tip">
+    <div class="tip-header">⭐ Exam Tips — Constructors</div>
+    <ul>
+      <li><strong>Must mention:</strong> same name as class, no return type, auto-called with <code>new</code>.</li>
+      <li>If you define any parameterised constructor, Java NO LONGER provides the default — you must write it yourself if needed.</li>
+      <li><code>this()</code> can be used to call one constructor from another (constructor chaining). It must be the FIRST statement.</li>
+      <li>Constructors CANNOT be <code>static</code>, <code>abstract</code>, <code>final</code>, or <code>synchronized</code>.</li>
+      <li>Common ISC question: "Differentiate between constructor and method" — answer using the table above.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 3: REAL-WORLD EXAMPLES
+═══════════════════════════════════════════════ -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Real-World Programming Examples</h2>
+  </div>
+
+  <p class="section-intro">
+    OOP shines when we model real-world entities. ISC exams frequently ask you to identify classes, objects, attributes, and methods from a given scenario. Here are the most common examples with complete code.
+  </p>
+
+  <!-- BANK ACCOUNT -->
+  <div class="card" style="margin-bottom:2rem;">
+    <h3><span class="icon">🏦</span> Example 1: BankAccount</h3>
+    <p>A bank account has <em>state</em> (balance, account number) and <em>behaviour</em> (deposit, withdraw, check balance).</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">BankAccount.java</span>
+      <span class="code-lang">Java</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="cls">BankAccount</span> {
+    <span class="cmt">// ATTRIBUTES</span>
+    <span class="type">private int</span>    <span class="var">accNo</span>;
+    <span class="type">private String</span> <span class="var">holderName</span>;
+    <span class="type">private double</span> <span class="var">balance</span>;
+
+    <span class="cmt">// CONSTRUCTOR</span>
+    <span class="cls">BankAccount</span>(<span class="type">int</span> accNo, <span class="type">String</span> name, <span class="type">double</span> initialBalance) {
+        <span class="kw">this</span>.accNo      = accNo;
+        <span class="kw">this</span>.holderName = name;
+        <span class="kw">this</span>.balance    = initialBalance;
+    }
+
+    <span class="cmt">// METHODS (behaviour)</span>
+    <span class="kw">void</span> <span class="fn">deposit</span>(<span class="type">double</span> amount) {
+        <span class="kw">if</span> (amount > <span class="num">0</span>) balance += amount;
+    }
+
+    <span class="kw">void</span> <span class="fn">withdraw</span>(<span class="type">double</span> amount) {
+        <span class="kw">if</span> (amount > <span class="num">0</span> &amp;&amp; amount &lt;= balance)
+            balance -= amount;
+        <span class="kw">else</span>
+            <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Insufficient funds!"</span>);
+    }
+
+    <span class="kw">void</span> <span class="fn">display</span>() {
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Acc: "</span> + accNo + <span class="str">"  Name: "</span> + holderName + <span class="str">"  Bal: "</span> + balance);
+    }
+}
+
+<span class="kw">class</span> <span class="cls">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="type">String</span>[] args) {
+        <span class="cls">BankAccount</span> acc = <span class="kw">new</span> <span class="cls">BankAccount</span>(<span class="num">1001</span>, <span class="str">"Aarav"</span>, <span class="num">5000.0</span>);
+        acc.<span class="fn">deposit</span>(<span class="num">2000.0</span>);
+        acc.<span class="fn">withdraw</span>(<span class="num">500.0</span>);
+        acc.<span class="fn">display</span>();   <span class="cmt">// Acc: 1001  Name: Aarav  Bal: 6500.0</span>
+    }
+}</pre>
+  </div>
+
+  <!-- EMPLOYEE -->
+  <div class="card" style="margin-bottom:2rem; margin-top: 2rem;">
+    <h3><span class="icon">👔</span> Example 2: Employee (with salary calculation)</h3>
+    <p>A classic ISC-style problem with basic computation inside a class.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">Employee.java</span>
+      <span class="code-lang">Java</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="cls">Employee</span> {
+    <span class="type">int</span>    <span class="var">empId</span>;
+    <span class="type">String</span> <span class="var">name</span>;
+    <span class="type">double</span> <span class="var">basicSalary</span>;
+    <span class="type">double</span> <span class="var">hra</span>, <span class="var">da</span>, <span class="var">grossSalary</span>;
+
+    <span class="cls">Employee</span>(<span class="type">int</span> id, <span class="type">String</span> n, <span class="type">double</span> basic) {
+        empId       = id;
+        name        = n;
+        basicSalary = basic;
+        hra         = <span class="num">0.20</span> * basicSalary; <span class="cmt">// 20%</span>
+        da          = <span class="num">0.10</span> * basicSalary; <span class="cmt">// 10%</span>
+        grossSalary = basicSalary + hra + da;
+    }
+
+    <span class="kw">void</span> <span class="fn">displayDetails</span>() {
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"ID     : "</span> + empId);
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Name   : "</span> + name);
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Basic  : "</span> + basicSalary);
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"HRA    : "</span> + hra);
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"DA     : "</span> + da);
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Gross  : "</span> + grossSalary);
+    }
+}
+
+<span class="kw">class</span> <span class="cls">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="type">String</span>[] args) {
+        <span class="cls">Employee</span> e1 = <span class="kw">new</span> <span class="cls">Employee</span>(<span class="num">201</span>, <span class="str">"Priya Sharma"</span>, <span class="num">30000</span>);
+        e1.<span class="fn">displayDetails</span>();
+    }
+}</pre>
+  </div>
+
+  <!-- COMMON REAL-WORLD MAPPINGS -->
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">Common Real-World → OOP Mapping (ISC Exam Patterns)</h3>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Real-World Entity</th>
+        <th>Class Name</th>
+        <th>Attributes (Data)</th>
+        <th>Methods (Behaviour)</th>
+      </tr>
+      <tr>
+        <td>🚗 Car</td>
+        <td><code>Car</code></td>
+        <td>brand, model, speed, fuel</td>
+        <td>accelerate(), brake(), refuel()</td>
+      </tr>
+      <tr>
+        <td>📚 Book</td>
+        <td><code>Book</code></td>
+        <td>title, author, price, pages</td>
+        <td>display(), calculateDiscount()</td>
+      </tr>
+      <tr>
+        <td>🎓 Student</td>
+        <td><code>Student</code></td>
+        <td>name, rollNo, marks[], grade</td>
+        <td>calcAverage(), display(), promote()</td>
+      </tr>
+      <tr>
+        <td>🏦 Bank</td>
+        <td><code>BankAccount</code></td>
+        <td>accNo, balance, holderName</td>
+        <td>deposit(), withdraw(), display()</td>
+      </tr>
+      <tr>
+        <td>⚽ Player</td>
+        <td><code>Player</code></td>
+        <td>name, age, goals, country</td>
+        <td>scoreGoal(), display()</td>
+      </tr>
+      <tr>
+        <td>📱 Mobile</td>
+        <td><code>Mobile</code></td>
+        <td>brand, model, ram, storage</td>
+        <td>call(), sendSms(), display()</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="exam-tip">
+    <div class="tip-header">⭐ Exam Tips — Real-World Examples</div>
+    <ul>
+      <li>When asked to "identify classes and objects from a scenario", look for <em>nouns</em> → likely classes; <em>verbs</em> → likely methods.</li>
+      <li>Instance variables are usually <code>private</code> (data hiding / encapsulation) — accessed via getters/setters.</li>
+      <li>Attributes represent WHAT the object IS; methods represent WHAT the object DOES.</li>
+      <li>In ISC exams, the program pattern is: define class → constructor → methods → test in main. Always follow this structure.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 4: SCANNER & PRINTER (INPUT/OUTPUT)
+═══════════════════════════════════════════════ -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Basic Input/Output — Scanner &amp; PrintStream</h2>
+  </div>
+
+  <p class="section-intro">
+    Java uses <strong>stream-based I/O</strong>. For standard console I/O in ISC programs, you use <code>Scanner</code> (from <code>java.util</code>) for input and <code>System.out</code> (<code>PrintStream</code>) for output.
+  </p>
+
+  <div class="two-col">
+    <div>
+      <div class="def-block">
+        <div class="def-label">Scanner Class</div>
+        <div class="def-text">Part of <code>java.util</code> package. Reads text input from keyboard (or file) and parses it into primitive types and strings using various <code>next*()</code> methods.</div>
+      </div>
+    </div>
+    <div>
+      <div class="def-block">
+        <div class="def-label">System.out (PrintStream)</div>
+        <div class="def-text"><code>System.out</code> is an object of <code>PrintStream</code> class. It provides <code>print()</code>, <code>println()</code>, and <code>printf()</code> to send output to the console.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">Creating a Scanner Object</h3>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">Scanner Setup</span>
+      <span class="code-lang">Java</span>
+    </div>
+    <pre><span class="kw">import</span> java.util.<span class="cls">Scanner</span>;  <span class="cmt">// Step 1: import</span>
+
+<span class="kw">class</span> <span class="cls">InputDemo</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="type">String</span>[] args) {
+
+        <span class="cmt">// Step 2: Create Scanner object linked to System.in (keyboard)</span>
+        <span class="cls">Scanner</span> sc = <span class="kw">new</span> <span class="cls">Scanner</span>(<span class="cls">System</span>.in);
+
+        <span class="cmt">// Reading different data types</span>
+        <span class="cls">System</span>.out.<span class="fn">print</span>(<span class="str">"Enter name: "</span>);
+        <span class="type">String</span> name = sc.<span class="fn">nextLine</span>();       <span class="cmt">// reads full line including spaces</span>
+
+        <span class="cls">System</span>.out.<span class="fn">print</span>(<span class="str">"Enter age: "</span>);
+        <span class="type">int</span> age = sc.<span class="fn">nextInt</span>();            <span class="cmt">// reads integer</span>
+
+        <span class="cls">System</span>.out.<span class="fn">print</span>(<span class="str">"Enter salary: "</span>);
+        <span class="type">double</span> salary = sc.<span class="fn">nextDouble</span>();  <span class="cmt">// reads double</span>
+
+        <span class="cls">System</span>.out.<span class="fn">print</span>(<span class="str">"Enter grade: "</span>);
+        <span class="type">char</span> grade = sc.<span class="fn">next</span>().<span class="fn">charAt</span>(<span class="num">0</span>); <span class="cmt">// reads char (Scanner has no nextChar)</span>
+
+        <span class="cmt">// OUTPUT using println and printf</span>
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Name: "</span> + name);
+        <span class="cls">System</span>.out.<span class="fn">printf</span>(<span class="str">"Age: %d  Salary: %.2f  Grade: %c%n"</span>, age, salary, grade);
+
+        sc.<span class="fn">close</span>(); <span class="cmt">// good practice: close scanner when done</span>
+    }
+}</pre>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">Complete Scanner Method Reference</h3>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Method</th>
+        <th>Returns</th>
+        <th>Reads</th>
+        <th>Notes</th>
+      </tr>
+      <tr>
+        <td><code>nextInt()</code></td>
+        <td><code>int</code></td>
+        <td>Next integer token</td>
+        <td>Stops at whitespace</td>
+      </tr>
+      <tr>
+        <td><code>nextLong()</code></td>
+        <td><code>long</code></td>
+        <td>Next long integer</td>
+        <td>Stops at whitespace</td>
+      </tr>
+      <tr>
+        <td><code>nextDouble()</code></td>
+        <td><code>double</code></td>
+        <td>Next decimal number</td>
+        <td>Stops at whitespace</td>
+      </tr>
+      <tr>
+        <td><code>nextFloat()</code></td>
+        <td><code>float</code></td>
+        <td>Next float value</td>
+        <td>Stops at whitespace</td>
+      </tr>
+      <tr>
+        <td><code>nextBoolean()</code></td>
+        <td><code>boolean</code></td>
+        <td><code>true</code> or <code>false</code></td>
+        <td>Case-insensitive</td>
+      </tr>
+      <tr>
+        <td><code>next()</code></td>
+        <td><code>String</code></td>
+        <td>Next word (token)</td>
+        <td>Stops at whitespace</td>
+      </tr>
+      <tr>
+        <td><code>nextLine()</code></td>
+        <td><code>String</code></td>
+        <td>Entire line</td>
+        <td>Stops at newline (<code>\n</code>)</td>
+      </tr>
+      <tr>
+        <td><code>hasNext()</code></td>
+        <td><code>boolean</code></td>
+        <td>—</td>
+        <td>Returns true if more input exists</td>
+      </tr>
+      <tr>
+        <td><code>hasNextInt()</code></td>
+        <td><code>boolean</code></td>
+        <td>—</td>
+        <td>Checks if next token is an int</td>
+      </tr>
+      <tr>
+        <td><code>close()</code></td>
+        <td><code>void</code></td>
+        <td>—</td>
+        <td>Closes the scanner/stream</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">Output Methods — PrintStream</h3>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Method</th>
+        <th>Behaviour</th>
+        <th>New Line?</th>
+      </tr>
+      <tr>
+        <td><code>System.out.print(x)</code></td>
+        <td>Prints x</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td><code>System.out.println(x)</code></td>
+        <td>Prints x then newline</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td><code>System.out.printf(fmt, args)</code></td>
+        <td>Formatted output (C-style)</td>
+        <td>Only if <code>%n</code> or <code>\n</code> used</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="highlight hl-orange">
+    <div class="highlight-icon">⚠️</div>
+    <div class="highlight-body">
+      <strong>The nextLine() Pitfall — VERY COMMON ISC TRAP!</strong>
+      <p>After calling <code>nextInt()</code>, <code>nextDouble()</code> etc., a newline character (<code>\n</code>) remains in the buffer. The <em>next</em> <code>nextLine()</code> call immediately reads that empty newline instead of waiting. <strong>Fix:</strong> add an extra <code>sc.nextLine();</code> after any <code>nextInt()</code> / <code>nextDouble()</code> before calling <code>nextLine()</code>.</p>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">nextLine Pitfall Fix</span>
+      <span class="code-lang">Java</span>
+    </div>
+    <pre><span class="type">int</span> age = sc.<span class="fn">nextInt</span>();
+sc.<span class="fn">nextLine</span>();                  <span class="cmt">// ← consume leftover newline</span>
+<span class="type">String</span> address = sc.<span class="fn">nextLine</span>(); <span class="cmt">// ← now reads correctly</span></pre>
+  </div>
+
+  <div class="exam-tip">
+    <div class="tip-header">⭐ Exam Tips — Scanner I/O</div>
+    <ul>
+      <li>Always write <code>import java.util.Scanner;</code> at the top — forgetting this loses marks.</li>
+      <li>Scanner must be connected to <code>System.in</code> for keyboard input: <code>new Scanner(System.in)</code>.</li>
+      <li>No <code>nextChar()</code> in Scanner — use <code>sc.next().charAt(0)</code> to read a character.</li>
+      <li><code>System.out</code> is a <strong>static final</strong> field of the <code>System</code> class, of type <code>PrintStream</code>.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 5: INPUT/OUTPUT EXCEPTIONS
+═══════════════════════════════════════════════ -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Input/Output Exceptions</h2>
+  </div>
+
+  <p class="section-intro">
+    Exceptions are <em>runtime errors</em> that disrupt normal program flow. Java has a robust exception-handling mechanism using <code>try-catch-finally</code>. ISC focuses specifically on I/O exceptions with Scanner.
+  </p>
+
+  <div class="def-block">
+    <div class="def-label">Definition — Exception</div>
+    <div class="def-text">An <strong>exception</strong> is an abnormal condition that arises during program execution. Java provides a hierarchy of exception classes, all descending from <code>java.lang.Throwable</code>. Exceptions can be <em>checked</em> (must be handled/declared) or <em>unchecked</em> (runtime exceptions).</div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">Key Exceptions in I/O Context</h3>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3><span class="icon">🚨</span> InputMismatchException</h3>
+      <p>Thrown by <code>Scanner</code> when the token read does NOT match the expected type. E.g., user types <code>"hello"</code> when <code>nextInt()</code> is called.</p>
+      <br><p><span class="badge badge-orange">Unchecked</span> <span class="badge badge-blue">java.util</span></p>
+    </div>
+    <div class="card">
+      <h3><span class="icon">📭</span> NoSuchElementException</h3>
+      <p>Thrown when the input stream is exhausted (end of input) but <code>Scanner</code> tries to read more tokens.</p>
+      <br><p><span class="badge badge-orange">Unchecked</span> <span class="badge badge-blue">java.util</span></p>
+    </div>
+    <div class="card">
+      <h3><span class="icon">📁</span> IOException</h3>
+      <p>Thrown during file/stream I/O failures — file not found, read/write errors. Parent class for most I/O exceptions.</p>
+      <br><p><span class="badge badge-green">Checked</span> <span class="badge badge-blue">java.io</span></p>
+    </div>
+    <div class="card">
+      <h3><span class="icon">🔒</span> IllegalStateException</h3>
+      <p>Thrown when a method (like <code>Scanner.next()</code>) is called after the Scanner has been closed.</p>
+      <br><p><span class="badge badge-orange">Unchecked</span> <span class="badge badge-blue">java.lang</span></p>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">ExceptionHandling.java</span>
+      <span class="code-lang">Java</span>
+    </div>
+    <pre><span class="kw">import</span> java.util.<span class="cls">Scanner</span>;
+<span class="kw">import</span> java.util.<span class="cls">InputMismatchException</span>;
+
+<span class="kw">class</span> <span class="cls">ExceptionDemo</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="type">String</span>[] args) {
+        <span class="cls">Scanner</span> sc = <span class="kw">new</span> <span class="cls">Scanner</span>(<span class="cls">System</span>.in);
+
+        <span class="kw">try</span> {
+            <span class="cls">System</span>.out.<span class="fn">print</span>(<span class="str">"Enter an integer: "</span>);
+            <span class="type">int</span> n = sc.<span class="fn">nextInt</span>();   <span class="cmt">// may throw InputMismatchException</span>
+            <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Square = "</span> + (n * n));
+        }
+        <span class="kw">catch</span> (<span class="cls">InputMismatchException</span> e) {
+            <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Error: Please enter a valid integer!"</span>);
+            <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Details: "</span> + e.<span class="fn">getMessage</span>());
+        }
+        <span class="kw">catch</span> (<span class="cls">Exception</span> e) {
+            <span class="cmt">// generic catch-all</span>
+            <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Unexpected error: "</span> + e);
+        }
+        <span class="kw">finally</span> {
+            sc.<span class="fn">close</span>();            <span class="cmt">// always executes — close resources</span>
+            <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Scanner closed."</span>);
+        }
+    }
+}</pre>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">try-catch-finally Structure</h3>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Block</th>
+        <th>Purpose</th>
+        <th>Executes When</th>
+      </tr>
+      <tr>
+        <td><code>try</code></td>
+        <td>Contains code that might throw an exception</td>
+        <td>Always</td>
+      </tr>
+      <tr>
+        <td><code>catch(ExType e)</code></td>
+        <td>Handles the specified exception type</td>
+        <td>Only if that exception is thrown in <code>try</code></td>
+      </tr>
+      <tr>
+        <td><code>finally</code></td>
+        <td>Cleanup code (close files, scanners)</td>
+        <td>Always — even if exception occurs</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="exam-tip">
+    <div class="tip-header">⭐ Exam Tips — Exceptions</div>
+    <ul>
+      <li><code>finally</code> ALWAYS runs — even if <code>return</code> is in <code>try</code> or <code>catch</code>.</li>
+      <li>Multiple <code>catch</code> blocks: most specific exception must come BEFORE the more general one.</li>
+      <li><code>InputMismatchException</code> is in <code>java.util</code>; <code>IOException</code> is in <code>java.io</code>.</li>
+      <li>Closing Scanner in <code>finally</code> is best practice — mention it in answers.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 6: TOKENS, WHITESPACE & STRINGTOKENIZER
+═══════════════════════════════════════════════ -->
+<section class="section" id="s6">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Tokens, Whitespace &amp; StringTokenizer</h2>
+  </div>
+
+  <p class="section-intro">
+    Understanding how Java reads input as <em>tokens</em> is critical for both Scanner and StringTokenizer questions in ISC exams.
+  </p>
+
+  <div class="def-block">
+    <div class="def-label">Definition — Token</div>
+    <div class="def-text">A <strong>token</strong> is the smallest meaningful unit extracted from a stream of text. In a Scanner or StringTokenizer context, tokens are words or values separated by <em>delimiters</em> (commonly whitespace characters).</div>
+  </div>
+
+  <div class="def-block">
+    <div class="def-label">Definition — Whitespace</div>
+    <div class="def-text"><strong>Whitespace</strong> is the collective name for invisible characters that separate tokens: space (<code>' '</code>), tab (<code>'\t'</code>), newline (<code>'\n'</code>), carriage return (<code>'\r'</code>), and form feed (<code>'\f'</code>). Scanner uses whitespace as the <em>default delimiter</em>.</div>
+  </div>
+
+  <div class="highlight hl-blue">
+    <div class="highlight-icon">💡</div>
+    <div class="highlight-body">
+      <strong>How Scanner Tokenises Input</strong>
+      <p>When you type <code>"Hello   World   42"</code>, Scanner sees 3 tokens: <code>Hello</code>, <code>World</code>, <code>42</code>. All whitespace between them is ignored. <code>next()</code> reads one token; <code>nextLine()</code> reads the entire line (including spaces) as one string.</p>
+    </div>
+  </div>
+
+  <!-- STRINGTOKENIZER -->
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">StringTokenizer Class</h3>
+
+  <div class="def-block">
+    <div class="def-label">Definition — StringTokenizer</div>
+    <div class="def-text"><strong>StringTokenizer</strong> (in <code>java.util</code>) is a legacy class that breaks a string into tokens based on a specified delimiter. Unlike <code>String.split()</code>, it provides methods to iterate over tokens without creating a full array.</div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--text2); margin:1.5rem 0 0.75rem;">Constructors of StringTokenizer</h3>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Constructor</th>
+        <th>Delimiter</th>
+        <th>Return tokens as delimiters?</th>
+      </tr>
+      <tr>
+        <td><code>StringTokenizer(String s)</code></td>
+        <td>Whitespace (default)</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td><code>StringTokenizer(String s, String delim)</code></td>
+        <td>Custom delimiter string</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td><code>StringTokenizer(String s, String delim, boolean returnDelims)</code></td>
+        <td>Custom delimiter string</td>
+        <td>Yes/No based on flag</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--text2); margin:1.5rem 0 0.75rem;">Key Methods of StringTokenizer</h3>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Method</th>
+        <th>Return Type</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td><code>hasMoreTokens()</code></td>
+        <td><code>boolean</code></td>
+        <td>Returns <code>true</code> if more tokens remain</td>
+      </tr>
+      <tr>
+        <td><code>nextToken()</code></td>
+        <td><code>String</code></td>
+        <td>Returns the next token as a String</td>
+      </tr>
+      <tr>
+        <td><code>nextToken(String delim)</code></td>
+        <td><code>String</code></td>
+        <td>Changes delimiter and returns next token</td>
+      </tr>
+      <tr>
+        <td><code>countTokens()</code></td>
+        <td><code>int</code></td>
+        <td>Returns the number of tokens remaining</td>
+      </tr>
+      <tr>
+        <td><code>hasMoreElements()</code></td>
+        <td><code>boolean</code></td>
+        <td>Same as <code>hasMoreTokens()</code> (from Enumeration)</td>
+      </tr>
+      <tr>
+        <td><code>nextElement()</code></td>
+        <td><code>Object</code></td>
+        <td>Same as <code>nextToken()</code> but returns Object</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">StringTokenizer — Complete Examples</span>
+      <span class="code-lang">Java</span>
+    </div>
+    <pre><span class="kw">import</span> java.util.<span class="cls">StringTokenizer</span>;
+
+<span class="kw">class</span> <span class="cls">TokenDemo</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="type">String</span>[] args) {
+
+        <span class="cmt">// ─── EXAMPLE 1: Default delimiter (whitespace) ───</span>
+        <span class="type">String</span> s1 = <span class="str">"Hello World Java Programming"</span>;
+        <span class="cls">StringTokenizer</span> st1 = <span class="kw">new</span> <span class="cls">StringTokenizer</span>(s1);
+
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Total tokens: "</span> + st1.<span class="fn">countTokens</span>()); <span class="cmt">// 4</span>
+        <span class="kw">while</span> (st1.<span class="fn">hasMoreTokens</span>()) {
+            <span class="cls">System</span>.out.<span class="fn">println</span>(st1.<span class="fn">nextToken</span>());
+        }
+        <span class="cmt">// Output: Hello / World / Java / Programming (one per line)</span>
+
+        <span class="cmt">// ─── EXAMPLE 2: Custom delimiter (",") ───</span>
+        <span class="type">String</span> s2 = <span class="str">"Aarav,Priya,Rahul,Sneha"</span>;
+        <span class="cls">StringTokenizer</span> st2 = <span class="kw">new</span> <span class="cls">StringTokenizer</span>(s2, <span class="str">","</span>);
+
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Names count: "</span> + st2.<span class="fn">countTokens</span>()); <span class="cmt">// 4</span>
+        <span class="kw">while</span> (st2.<span class="fn">hasMoreTokens</span>()) {
+            <span class="cls">System</span>.out.<span class="fn">print</span>(st2.<span class="fn">nextToken</span>() + <span class="str">" | "</span>);
+        }
+        <span class="cmt">// Output: Aarav | Priya | Rahul | Sneha |</span>
+
+        <span class="cmt">// ─── EXAMPLE 3: Multiple delimiters ───</span>
+        <span class="type">String</span> s3 = <span class="str">"10+20-30*40"</span>;
+        <span class="cls">StringTokenizer</span> st3 = <span class="kw">new</span> <span class="cls">StringTokenizer</span>(s3, <span class="str">"+-*"</span>);
+        <span class="kw">while</span> (st3.<span class="fn">hasMoreTokens</span>()) {
+            <span class="cls">System</span>.out.<span class="fn">print</span>(st3.<span class="fn">nextToken</span>() + <span class="str">" "</span>);
+        }
+        <span class="cmt">// Output: 10 20 30 40</span>
+
+        <span class="cmt">// ─── EXAMPLE 4: Word count in a sentence ───</span>
+        <span class="type">String</span> sentence = <span class="str">"ISC exams are not that hard"</span>;
+        <span class="cls">StringTokenizer</span> st4 = <span class="kw">new</span> <span class="cls">StringTokenizer</span>(sentence);
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Word count = "</span> + st4.<span class="fn">countTokens</span>()); <span class="cmt">// 6</span>
+    }
+}</pre>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin:2rem 0 1rem;">StringTokenizer vs String.split() vs Scanner</h3>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Feature</th>
+        <th>StringTokenizer</th>
+        <th>String.split()</th>
+        <th>Scanner</th>
+      </tr>
+      <tr>
+        <td>Package</td>
+        <td><code>java.util</code></td>
+        <td><code>java.lang</code></td>
+        <td><code>java.util</code></td>
+      </tr>
+      <tr>
+        <td>Returns</td>
+        <td>Tokens via iterator</td>
+        <td>String array</td>
+        <td>Tokens via next*()</td>
+      </tr>
+      <tr>
+        <td>Delimiter</td>
+        <td>One char from a set</td>
+        <td>Regex pattern</td>
+        <td>Any pattern (default: whitespace)</td>
+      </tr>
+      <tr>
+        <td>Empty tokens</td>
+        <td>Skipped</td>
+        <td>Included</td>
+        <td>Skipped</td>
+      </tr>
+      <tr>
+        <td>Input source</td>
+        <td>String only</td>
+        <td>String only</td>
+        <td>Any InputStream / String</td>
+      </tr>
+      <tr>
+        <td>Speed</td>
+        <td>Fast (legacy)</td>
+        <td>Medium</td>
+        <td>Medium</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">ISC Pattern — Reading CSV data with StringTokenizer</span>
+      <span class="code-lang">Java</span>
+    </div>
+    <pre><span class="kw">import</span> java.util.*;
+
+<span class="kw">class</span> <span class="cls">CSVReader</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="type">String</span>[] args) {
+        <span class="cls">Scanner</span> sc = <span class="kw">new</span> <span class="cls">Scanner</span>(<span class="cls">System</span>.in);
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Enter student data (name,roll,marks): "</span>);
+        <span class="type">String</span> line = sc.<span class="fn">nextLine</span>();
+
+        <span class="cls">StringTokenizer</span> st = <span class="kw">new</span> <span class="cls">StringTokenizer</span>(line, <span class="str">","</span>);
+
+        <span class="type">String</span> name  = st.<span class="fn">nextToken</span>();
+        <span class="type">int</span>    roll  = <span class="cls">Integer</span>.<span class="fn">parseInt</span>(st.<span class="fn">nextToken</span>().<span class="fn">trim</span>());
+        <span class="type">double</span> marks = <span class="cls">Double</span>.<span class="fn">parseDouble</span>(st.<span class="fn">nextToken</span>().<span class="fn">trim</span>());
+
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Name: "</span>  + name);
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Roll: "</span>  + roll);
+        <span class="cls">System</span>.out.<span class="fn">println</span>(<span class="str">"Marks: "</span> + marks);
+        sc.<span class="fn">close</span>();
+    }
+}</pre>
+  </div>
+
+  <div class="exam-tip">
+    <div class="tip-header">⭐ Exam Tips — Tokens &amp; StringTokenizer</div>
+    <ul>
+      <li>Always <code>import java.util.StringTokenizer;</code> or <code>import java.util.*;</code></li>
+      <li><strong>Standard pattern:</strong> <code>while(st.hasMoreTokens()) { String tok = st.nextToken(); ... }</code></li>
+      <li><code>countTokens()</code> returns remaining count — it changes as you call <code>nextToken()</code>.</li>
+      <li>After <code>nextToken()</code> exhausts all tokens, calling it again throws <code>NoSuchElementException</code>.</li>
+      <li>Use <code>Integer.parseInt()</code> and <code>Double.parseDouble()</code> to convert String tokens to numbers.</li>
+      <li>StringTokenizer delimiter is a <em>set of characters</em> — each character in the delim string is a delimiter, not the whole string as a unit.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ QUICK REFERENCE ═══ -->
+<div class="quick-ref">
+  <h2>⚡ Quick Reference — Last Minute Revision</h2>
+  <div class="ref-grid">
+    <div class="ref-item">
+      <div class="ref-key">Object</div>
+      <div class="ref-val">Instance of class. Has state (attributes) + behaviour (methods). Created with <code>new</code>.</div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">Class</div>
+      <div class="ref-val">Blueprint. No memory by itself. Contains fields + methods. Keyword: <code>class</code>.</div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">Constructor</div>
+      <div class="ref-val">Same name as class. No return type. Auto-called with <code>new</code>. Types: default, parameterised, copy.</div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">this</div>
+      <div class="ref-val">Reference to current object. Resolves name conflicts between params and instance vars.</div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">Scanner setup</div>
+      <div class="ref-val"><code>import java.util.Scanner;</code> → <code>Scanner sc = new Scanner(System.in);</code></div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">Read char</div>
+      <div class="ref-val"><code>sc.next().charAt(0)</code> — no <code>nextChar()</code> in Scanner!</div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">nextLine trap</div>
+      <div class="ref-val">After <code>nextInt()</code>: call <code>sc.nextLine()</code> first to consume leftover <code>\n</code>.</div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">InputMismatchException</div>
+      <div class="ref-val">Thrown by Scanner when wrong data type is entered. In <code>java.util</code>.</div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">finally block</div>
+      <div class="ref-val">Always executes — even after exception or return. Use for cleanup.</div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">Token</div>
+      <div class="ref-val">Smallest unit in input. Separated by whitespace (or custom delimiter).</div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">StringTokenizer</div>
+      <div class="ref-val"><code>new StringTokenizer(str, delim)</code> → use <code>hasMoreTokens()</code> + <code>nextToken()</code> loop.</div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-key">countTokens()</div>
+      <div class="ref-val">Returns remaining tokens. Decreases with each <code>nextToken()</code> call.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     QUIZ SECTION
+═══════════════════════════════════════════════ -->
+<section class="quiz-section" id="quiz">
+  <h2>🎯 Practice Quiz</h2>
+  <p class="quiz-sub">Test your understanding — answer each question before revealing the answer!</p>
+
+  <!-- Q1 -->
+  <div class="quiz-q">
+    <div class="q-num">Q1 of 10</div>
+    <div class="q-text">Which of the following is TRUE about constructors in Java?</div>
+    <div class="options">
+      <button class="option" onclick="checkAnswer(this, false, 'A constructor CAN have a return type — wrong! It has NO return type.')">A constructor must return <code>void</code></button>
+      <button class="option" onclick="checkAnswer(this, false, 'Constructors are NOT inherited by subclasses.')">Constructors are inherited by subclasses</button>
+      <button class="option" onclick="checkAnswer(this, true, '✅ Correct! If you define a parameterised constructor, Java will NOT auto-provide the default constructor. You must write it explicitly.')">If a parameterised constructor is defined, the compiler no longer provides a default constructor</button>
+      <button class="option" onclick="checkAnswer(this, false, 'Constructors cannot be static — incorrect.')">A constructor can be <code>static</code></button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-q">
+    <div class="q-num">Q2 of 10</div>
+    <div class="q-text">What does the <code>new</code> keyword do in Java?</div>
+    <div class="options">
+      <button class="option" onclick="checkAnswer(this, false, 'new does not just declare — it actually creates the object in memory.')">Declares a new variable</button>
+      <button class="option" onclick="checkAnswer(this, true, '✅ Correct! new allocates memory on the heap AND calls the constructor of the class.')">Allocates memory on the heap and calls the constructor</button>
+      <button class="option" onclick="checkAnswer(this, false, 'new creates objects in heap memory, not stack.')">Creates an object in stack memory</button>
+      <button class="option" onclick="checkAnswer(this, false, 'new can only be used with user-defined AND built-in classes — it is not restricted.')">Can only be used with built-in classes</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-q">
+    <div class="q-num">Q3 of 10</div>
+    <div class="q-text">Which Scanner method reads an entire line of input, including spaces?</div>
+    <div class="options">
+      <button class="option" onclick="checkAnswer(this, false, 'next() stops at whitespace — it reads only one token/word.')"><code>next()</code></button>
+      <button class="option" onclick="checkAnswer(this, false, 'nextWord() does not exist in the Scanner class.')"><code>nextWord()</code></button>
+      <button class="option" onclick="checkAnswer(this, true, '✅ Correct! nextLine() reads the entire line up to the newline character, including spaces.')"><code>nextLine()</code></button>
+      <button class="option" onclick="checkAnswer(this, false, 'readLine() is from BufferedReader, not Scanner.')"><code>readLine()</code></button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-q">
+    <div class="q-num">Q4 of 10</div>
+    <div class="q-text">What exception does Scanner throw when the token does NOT match the expected data type?</div>
+    <div class="options">
+      <button class="option" onclick="checkAnswer(this, false, 'NumberFormatException is thrown by Integer.parseInt() etc., not Scanner.')"><code>NumberFormatException</code></button>
+      <button class="option" onclick="checkAnswer(this, true, '✅ Correct! InputMismatchException (from java.util) is thrown by Scanner when the token doesn\'t match the expected type.')"><code>InputMismatchException</code></button>
+      <button class="option" onclick="checkAnswer(this, false, 'IllegalArgumentException is a different exception — not for Scanner type mismatch.')"><code>IllegalArgumentException</code></button>
+      <button class="option" onclick="checkAnswer(this, false, 'IOException is for I/O stream failures, not data type mismatch.')"><code>IOException</code></button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz-q">
+    <div class="q-num">Q5 of 10</div>
+    <div class="q-text">How do you read a <code>char</code> using Scanner in Java? (Scanner has no <code>nextChar()</code>)</div>
+    <div class="options">
+      <button class="option" onclick="checkAnswer(this, false, 'nextChar() does NOT exist in Scanner.')"><code>sc.nextChar()</code></button>
+      <button class="option" onclick="checkAnswer(this, true, '✅ Correct! sc.next().charAt(0) reads the next token as a String and extracts the first character.')"><code>sc.next().charAt(0)</code></button>
+      <button class="option" onclick="checkAnswer(this, false, 'sc.readChar() does not exist.')"><code>sc.readChar()</code></button>
+      <button class="option" onclick="checkAnswer(this, false, 'sc.nextLine().charAt(0) could work but reads an entire line for just one char — not the standard approach.')"><code>sc.nextLine().charAt(0)</code></button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz-q">
+    <div class="q-num">Q6 of 10</div>
+    <div class="q-text">In a StringTokenizer, what does <code>countTokens()</code> return?</div>
+    <div class="options">
+      <button class="option" onclick="checkAnswer(this, false, 'It returns remaining tokens, NOT total tokens initially.')">Total number of tokens in the original string</button>
+      <button class="option" onclick="checkAnswer(this, true, '✅ Correct! countTokens() returns the number of tokens REMAINING — it decreases as you call nextToken().')">Number of remaining tokens (decreases with each <code>nextToken()</code>)</button>
+      <button class="option" onclick="checkAnswer(this, false, 'It returns an int, not a String.')">The next token as a String</button>
+      <button class="option" onclick="checkAnswer(this, false, 'countTokens() does not return a boolean.')">A boolean indicating if tokens exist</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="quiz-q">
+    <div class="q-num">Q7 of 10</div>
+    <div class="q-text">What is the output of: <code>new StringTokenizer("a,,b", ",").countTokens()</code> ?</div>
+    <div class="options">
+      <button class="option" onclick="checkAnswer(this, false, 'StringTokenizer SKIPS empty tokens, so the answer is NOT 3.')">3</button>
+      <button class="option" onclick="checkAnswer(this, true, '✅ Correct! StringTokenizer skips consecutive delimiters. "a,,b" has 2 non-empty tokens: "a" and "b".')">2</button>
+      <button class="option" onclick="checkAnswer(this, false, '4 is wrong. StringTokenizer does not count delimiters unless returnDelims is true.')">4</button>
+      <button class="option" onclick="checkAnswer(this, false, '1 is wrong.')">1</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="quiz-q">
+    <div class="q-num">Q8 of 10</div>
+    <div class="q-text">The <code>finally</code> block in Java:</div>
+    <div class="options">
+      <button class="option" onclick="checkAnswer(this, false, 'finally runs even when exception occurs — not only when it does NOT occur.')">Executes only when no exception occurs</button>
+      <button class="option" onclick="checkAnswer(this, false, 'finally executes always — even after return statements inside try/catch.')">Executes only when an exception occurs</button>
+      <button class="option" onclick="checkAnswer(this, true, '✅ Correct! finally ALWAYS executes — regardless of whether an exception was thrown or not, making it ideal for cleanup.')">Always executes, regardless of exception</button>
+      <button class="option" onclick="checkAnswer(this, false, 'finally can appear without catch when used as try-finally.')">Is optional and can only follow a <code>catch</code> block</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="quiz-q">
+    <div class="q-num">Q9 of 10</div>
+    <div class="q-text">What is <code>this</code> in Java?</div>
+    <div class="options">
+      <button class="option" onclick="checkAnswer(this, false, 'this refers to the current object, not the parent class.')">A reference to the parent class</button>
+      <button class="option" onclick="checkAnswer(this, false, 'this is not a keyword for static context.')">A static method available in all classes</button>
+      <button class="option" onclick="checkAnswer(this, true, '✅ Correct! this is a reference variable that always points to the current object (instance) of the class.')">A reference to the current object of the class</button>
+      <button class="option" onclick="checkAnswer(this, false, 'this is not a reserved word for class variables — it refers to the current object.')">A reserved word for class-level variables</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="quiz-q">
+    <div class="q-num">Q10 of 10</div>
+    <div class="q-text">Which package must be imported to use <code>StringTokenizer</code>?</div>
+    <div class="options">
+      <button class="option" onclick="checkAnswer(this, false, 'java.lang is auto-imported but StringTokenizer is NOT in java.lang.')"><code>java.lang</code></button>
+      <button class="option" onclick="checkAnswer(this, true, '✅ Correct! StringTokenizer is in java.util — you need import java.util.StringTokenizer; or import java.util.*;')"><code>java.util</code></button>
+      <button class="option" onclick="checkAnswer(this, false, 'java.io contains I/O stream classes, not StringTokenizer.')"><code>java.io</code></button>
+      <button class="option" onclick="checkAnswer(this, false, 'java.string is not a real Java package.')"><code>java.string</code></button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <strong style="color:var(--text);">ISC Computer Science — Objects &amp; Classes Study Guide</strong>
+  <div class="footer-note">Prepared for ISC Class XII Examination · All theory aligned with ISC syllabus · Good luck on 27th March! 🚀</div>
+</footer>
+
+<script>
+// ─── PROGRESS BAR ───
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  const max = document.body.scrollHeight - window.innerHeight;
+  const pct = Math.min(100, (scrolled / max) * 100);
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ─── NAV ACTIVE ───
+const pills = document.querySelectorAll('.nav-pill');
+const sections = document.querySelectorAll('.section');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  pills.forEach(p => {
+    p.classList.toggle('active', p.getAttribute('href') === '#' + current);
+  });
+});
+
+// ─── QUIZ ───
+let score = 0;
+
+function checkAnswer(btn, isCorrect, explanation) {
+  const optionsContainer = btn.parentElement;
+  if (optionsContainer.querySelector('.correct') || optionsContainer.querySelector('.wrong')) return; // already answered
+
+  const feedbackEl = btn.closest('.quiz-q').querySelector('.q-feedback');
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    feedbackEl.textContent = explanation;
+    feedbackEl.className = 'q-feedback show correct';
+    score++;
+  } else {
+    btn.classList.add('wrong');
+    feedbackEl.textContent = explanation;
+    feedbackEl.className = 'q-feedback show wrong';
+    // Highlight correct
+    const allOpts = optionsContainer.querySelectorAll('.option');
+    allOpts.forEach(o => {
+      if (o !== btn && o.onclick.toString().includes('true')) {
+        o.classList.add('reveal');
+      }
+    });
+  }
+}
+
+// ─── FADE IN SECTIONS ───
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.05 });
+
+document.querySelectorAll('.section, .card, .def-block, .highlight').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(24px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>

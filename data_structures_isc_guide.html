@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISC Data Structures — Complete Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #12121a;
+    --bg3: #1a1a26;
+    --card: #16161f;
+    --border: #2a2a3d;
+    --accent: #7c5cfc;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --accent4: #ffd93d;
+    --text: #e8e8f0;
+    --muted: #888899;
+    --code-bg: #0d0d17;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #0a0a0f 0%, #12082a 50%, #0a0f1a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,92,252,0.18) 0%, transparent 70%);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(124,92,252,0.15);
+    border: 1px solid rgba(124,92,252,0.4);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    background: linear-gradient(135deg, #fff 0%, #b8a8ff 50%, #00d4aa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 560px;
+    margin: 0 auto 28px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.88rem;
+  }
+  .exam-countdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,107,107,0.12);
+    border: 1px solid rgba(255,107,107,0.35);
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent3);
+  }
+  .exam-countdown .dot { width:8px; height:8px; border-radius:50%; background:var(--accent3); animation: blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  /* NAV */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display:none; }
+  .nav-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    padding: 14px 16px;
+    white-space: nowrap;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* LAYOUT */
+  .container { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* SECTION */
+  .section { display: none; animation: fadeIn 0.35s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .section-title {
+    font-size: 1.9rem; font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .section-subtitle {
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    margin-bottom: 36px;
+    letter-spacing: 0.05em;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px 28px;
+    margin-bottom: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .card:hover::before { opacity:1; }
+  .card-title {
+    font-size: 1.15rem; font-weight: 700;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-title .icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .icon-purple { background: rgba(124,92,252,0.2); color: var(--accent); }
+  .icon-teal   { background: rgba(0,212,170,0.15); color: var(--accent2); }
+  .icon-red    { background: rgba(255,107,107,0.15); color: var(--accent3); }
+  .icon-yellow { background: rgba(255,217,61,0.15); color: var(--accent4); }
+
+  /* TEXT */
+  p { color: #c8c8d8; margin-bottom: 12px; font-size: 0.97rem; }
+  ul, ol { padding-left: 22px; margin-bottom: 14px; }
+  li { color: #c8c8d8; font-size: 0.95rem; margin-bottom: 6px; }
+  strong { color: #fff; }
+  .highlight { color: var(--accent2); font-weight: 600; }
+  .warn { color: var(--accent4); font-weight: 600; }
+  .danger { color: var(--accent3); font-weight: 600; }
+
+  /* CODE */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+    position: relative;
+  }
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: #c8c8e8;
+  }
+  .kw  { color: #7c5cfc; } /* keyword */
+  .ty  { color: #00d4aa; } /* type */
+  .st  { color: #ffd93d; } /* string */
+  .cm  { color: #555570; font-style:italic; } /* comment */
+  .nm  { color: #ff9f7f; } /* number */
+  .fn  { color: #a8e6cf; } /* function */
+  .code-label {
+    position: absolute; top:10px; right:14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* DEFINITION BOX */
+  .def-box {
+    border-left: 3px solid var(--accent);
+    background: rgba(124,92,252,0.07);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+  .def-box.green { border-left-color: var(--accent2); background: rgba(0,212,170,0.06); }
+  .def-box.yellow { border-left-color: var(--accent4); background: rgba(255,217,61,0.06); }
+  .def-box.red { border-left-color: var(--accent3); background: rgba(255,107,107,0.06); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+  table { width:100%; border-collapse: collapse; font-size: 0.88rem; }
+  th {
+    background: rgba(124,92,252,0.15);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    color: #c8c8d8;
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* VISUAL DIAGRAMS */
+  .diagram {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent2);
+    margin: 16px 0;
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.6;
+  }
+
+  /* GRID */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+  @media(max-width:600px){ .grid2 { grid-template-columns: 1fr; } }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.67rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin: 2px;
+  }
+  .badge-purple { background: rgba(124,92,252,0.2); color: var(--accent); border: 1px solid rgba(124,92,252,0.3); }
+  .badge-teal   { background: rgba(0,212,170,0.15); color: var(--accent2); border: 1px solid rgba(0,212,170,0.3); }
+  .badge-red    { background: rgba(255,107,107,0.15); color: var(--accent3); border: 1px solid rgba(255,107,107,0.3); }
+  .badge-yellow { background: rgba(255,217,61,0.15); color: var(--accent4); border: 1px solid rgba(255,217,61,0.3); }
+
+  /* ACCORDION */
+  .accordion { margin: 10px 0; }
+  .acc-head {
+    width:100%; text-align:left; background: var(--bg3);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 13px 18px;
+    cursor: pointer; display:flex; justify-content:space-between; align-items:center;
+    font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 600;
+    color: var(--text); transition: background 0.2s;
+    margin-bottom: 4px;
+  }
+  .acc-head:hover { background: rgba(124,92,252,0.1); border-color: var(--accent); }
+  .acc-body { display:none; padding: 16px 18px; background: rgba(0,0,0,0.2); border-radius: 0 0 8px 8px; border: 1px solid var(--border); border-top:none; margin-bottom:8px; }
+  .acc-body.open { display:block; }
+  .acc-arrow { transition: transform 0.2s; font-size:0.8rem; }
+  .acc-head.open .acc-arrow { transform: rotate(180deg); }
+
+  /* STEP LIST */
+  .steps { counter-reset: step; list-style:none; padding:0; }
+  .steps li {
+    counter-increment: step;
+    display:flex; gap:14px; align-items:flex-start;
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .steps li::before {
+    content: counter(step);
+    min-width:26px; height:26px;
+    background: var(--accent); color:#fff;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:700;
+    flex-shrink:0; margin-top:2px;
+  }
+
+  /* QUIZ */
+  .quiz-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 18px;
+  }
+  .quiz-q { font-weight: 700; margin-bottom: 14px; font-size: 1rem; }
+  .quiz-opt {
+    display:block; width:100%; text-align:left;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 16px;
+    cursor:pointer; margin-bottom:8px;
+    font-family:'Syne',sans-serif; font-size:0.9rem; color: var(--text);
+    transition: all 0.2s;
+  }
+  .quiz-opt:hover { border-color: var(--accent); background: rgba(124,92,252,0.1); }
+  .quiz-opt.correct { border-color: var(--accent2); background: rgba(0,212,170,0.12); color:var(--accent2); }
+  .quiz-opt.wrong { border-color: var(--accent3); background: rgba(255,107,107,0.1); color:var(--accent3); }
+  .quiz-explain { display:none; margin-top:12px; padding:12px; background:rgba(0,212,170,0.07); border-radius:8px; border-left:3px solid var(--accent2); font-size:0.88rem; color:#aaa; }
+
+  h2.sub { font-size:1.1rem; font-weight:700; color:var(--accent); margin:20px 0 10px; font-family:'JetBrains Mono',monospace; letter-spacing:0.04em; }
+  h3.mini { font-size:0.95rem; font-weight:700; color: var(--accent2); margin: 16px 0 8px; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">ISC Computer Science · Class XII</div>
+  <h1>Data Structures<br>Complete Study Guide</h1>
+  <p>// Stack · Queue · Linked List · Binary Trees · Infix/Prefix/Postfix</p>
+  <div class="exam-countdown">
+    <span class="dot"></span>
+    Exam: 27 March 2026 · You've got this! 🚀
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="show('overview')">Overview</button>
+  <button class="nav-btn" onclick="show('stack')">Stack</button>
+  <button class="nav-btn" onclick="show('queue')">Queue</button>
+  <button class="nav-btn" onclick="show('notation')">Infix/Postfix/Prefix</button>
+  <button class="nav-btn" onclick="show('linkedlist')">Linked List</button>
+  <button class="nav-btn" onclick="show('binarytree')">Binary Trees</button>
+  <button class="nav-btn" onclick="show('interface')">Interface & ADT</button>
+  <button class="nav-btn" onclick="show('quiz')">Quiz</button>
+</nav>
+
+<div class="container">
+
+<!-- ==================== OVERVIEW ==================== -->
+<div class="section active" id="overview">
+  <div class="section-title">📚 Data Structures Overview</div>
+  <div class="section-subtitle">// Start here — understand the big picture</div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-purple">🧩</span>What is a Data Structure?</div>
+    <div class="def-box">
+      A <strong>data structure</strong> is a way of organizing, storing, and managing data in a computer so that it can be accessed and modified efficiently. It defines the relationship between data elements and the operations that can be performed on them.
+    </div>
+    <p>Every data structure has:</p>
+    <ul>
+      <li><strong>Definition</strong> — what it is (mathematical/logical)</li>
+      <li><strong>Interface (ADT)</strong> — what operations are supported</li>
+      <li><strong>Implementation</strong> — how operations work in code</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-teal">📋</span>Abstract Data Type (ADT)</div>
+    <p>An <strong>Abstract Data Type (ADT)</strong> is a <span class="highlight">mathematical model</span> for a data type that defines its behavior purely from the user's point of view — specifying the type of data and the operations possible, <em>without specifying how these operations will be implemented</em>.</p>
+    <div class="def-box green">
+      <strong>Key idea:</strong> ADT = Data + Operations (no implementation details). In Java, we use the <code>interface</code> keyword to define ADTs.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-yellow">🗺️</span>ISC Syllabus Map</div>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Topic</th><th>Key Concepts</th><th>Weight</th>
+        </tr>
+        <tr>
+          <td><span class="badge badge-purple">Stack</span></td>
+          <td>LIFO, push, pop, peek, isEmpty, overflow/underflow</td>
+          <td>High ⭐⭐⭐</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-teal">Queue</span></td>
+          <td>FIFO, enqueue, dequeue, circular queue, dequeue (double-ended)</td>
+          <td>High ⭐⭐⭐</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-yellow">Infix/Postfix/Prefix</span></td>
+          <td>Conversion algorithms using stack, precedence rules</td>
+          <td>Very High ⭐⭐⭐⭐</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">Linked List</span></td>
+          <td>Insertion, deletion, reversal, traversal, searching</td>
+          <td>High ⭐⭐⭐</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-purple">Binary Trees</span></td>
+          <td>Terminology, properties, traversals (conceptual)</td>
+          <td>High ⭐⭐⭐</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-teal">Interface & ADT</span></td>
+          <td>Java interface, multiple implementations</td>
+          <td>Medium ⭐⭐</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== STACK ==================== -->
+<div class="section" id="stack">
+  <div class="section-title">🥞 Stack</div>
+  <div class="section-subtitle">// Last In, First Out (LIFO)</div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-purple">📖</span>Definition</div>
+    <div class="def-box">
+      A <strong>Stack</strong> is a linear data structure that follows the <strong>LIFO (Last In, First Out)</strong> principle. The element inserted <em>last</em> is the first to be removed. Think of a stack of plates — you add and remove from the top only.
+    </div>
+    <div class="diagram">
+           PUSH ↓          POP ↑
+        ┌─────────┐
+   TOP →│  40  ← TOP      ← most recently added
+        ├─────────┤
+        │  30   │
+        ├─────────┤
+        │  20   │
+        ├─────────┤
+BOTTOM →│  10   │         ← first element added
+        └─────────┘</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-teal">⚙️</span>Stack Operations (ADT Interface)</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Operation</th><th>Description</th><th>Condition Check</th></tr>
+        <tr><td><code>push(x)</code></td><td>Insert element x onto top of stack</td><td>Check: not full (overflow)</td></tr>
+        <tr><td><code>pop()</code></td><td>Remove and return top element</td><td>Check: not empty (underflow)</td></tr>
+        <tr><td><code>peek() / top()</code></td><td>Return top element without removing</td><td>Check: not empty</td></tr>
+        <tr><td><code>isEmpty()</code></td><td>Returns true if stack has no elements</td><td>—</td></tr>
+        <tr><td><code>isFull()</code></td><td>Returns true if stack is at max capacity</td><td>Array-based only</td></tr>
+        <tr><td><code>size()</code></td><td>Returns number of elements</td><td>—</td></tr>
+      </table>
+    </div>
+    <div class="def-box yellow">
+      <strong>Stack Overflow:</strong> Attempt to push onto a full stack.<br>
+      <strong>Stack Underflow:</strong> Attempt to pop from an empty stack.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-yellow">💻</span>Java Implementation (Array-based)</div>
+<pre><code><span class="cm">// Stack interface (ADT)</span>
+<span class="kw">interface</span> <span class="ty">Stack</span> {
+    <span class="kw">void</span> <span class="fn">push</span>(<span class="kw">int</span> x);
+    <span class="kw">int</span>  <span class="fn">pop</span>();
+    <span class="kw">int</span>  <span class="fn">peek</span>();
+    <span class="kw">boolean</span> <span class="fn">isEmpty</span>();
+    <span class="kw">boolean</span> <span class="fn">isFull</span>();
+}
+
+<span class="cm">// Array-based implementation</span>
+<span class="kw">class</span> <span class="ty">ArrayStack</span> <span class="kw">implements</span> <span class="ty">Stack</span> {
+    <span class="kw">int</span>[] arr;
+    <span class="kw">int</span> top, maxSize;
+
+    <span class="ty">ArrayStack</span>(<span class="kw">int</span> size) {
+        maxSize = size;
+        arr = <span class="kw">new</span> <span class="kw">int</span>[maxSize];
+        top = <span class="nm">-1</span>;  <span class="cm">// -1 means empty</span>
+    }
+
+    <span class="kw">public boolean</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> top == <span class="nm">-1</span>; }
+    <span class="kw">public boolean</span> <span class="fn">isFull</span>()  { <span class="kw">return</span> top == maxSize - <span class="nm">1</span>; }
+
+    <span class="kw">public void</span> <span class="fn">push</span>(<span class="kw">int</span> x) {
+        <span class="kw">if</span> (<span class="fn">isFull</span>())
+            System.out.println(<span class="st">"Stack Overflow!"</span>);
+        <span class="kw">else</span>
+            arr[++top] = x;
+    }
+
+    <span class="kw">public int</span> <span class="fn">pop</span>() {
+        <span class="kw">if</span> (<span class="fn">isEmpty</span>()) {
+            System.out.println(<span class="st">"Stack Underflow!"</span>);
+            <span class="kw">return</span> <span class="nm">-1</span>;
+        }
+        <span class="kw">return</span> arr[top--];
+    }
+
+    <span class="kw">public int</span> <span class="fn">peek</span>() {
+        <span class="kw">if</span> (<span class="fn">isEmpty</span>()) <span class="kw">return</span> <span class="nm">-1</span>;
+        <span class="kw">return</span> arr[top];
+    }
+}</code><span class="code-label">Java</span></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-red">🌍</span>Applications of Stack</div>
+    <ul>
+      <li><strong>Expression conversion</strong> — Infix to Postfix/Prefix</li>
+      <li><strong>Expression evaluation</strong> — Evaluating Postfix expressions</li>
+      <li><strong>Function call stack</strong> — Recursion management</li>
+      <li><strong>Undo operation</strong> — In text editors</li>
+      <li><strong>Balanced parentheses</strong> checking</li>
+      <li><strong>Browser history</strong> — Back button</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== QUEUE ==================== -->
+<div class="section" id="queue">
+  <div class="section-title">🚶 Queue, Circular Queue & Dequeue</div>
+  <div class="section-subtitle">// First In, First Out (FIFO)</div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-teal">📖</span>Simple Queue — Definition</div>
+    <div class="def-box green">
+      A <strong>Queue</strong> is a linear data structure that follows the <strong>FIFO (First In, First Out)</strong> principle. Insertions happen at the <em>REAR</em> and deletions happen at the <em>FRONT</em>. Like a real-world queue (line).
+    </div>
+    <div class="diagram">
+  ENQUEUE →  REAR                     FRONT → DEQUEUE
+
+  ┌────┬────┬────┬────┬────┐
+  │ 10 │ 20 │ 30 │ 40 │ 50 │
+  └────┴────┴────┴────┴────┘
+  REAR=4                  FRONT=0</div>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Operation</th><th>Description</th></tr>
+        <tr><td><code>enqueue(x)</code></td><td>Add element at REAR</td></tr>
+        <tr><td><code>dequeue()</code></td><td>Remove element from FRONT</td></tr>
+        <tr><td><code>peek()</code></td><td>View FRONT element without removing</td></tr>
+        <tr><td><code>isEmpty()</code></td><td>front == -1 (or front > rear)</td></tr>
+        <tr><td><code>isFull()</code></td><td>rear == maxSize - 1</td></tr>
+      </table>
+    </div>
+    <div class="def-box yellow">
+      <strong>Problem with simple queue:</strong> Even if front has moved (spaces freed), rear can't go back — space is wasted! This is solved by <strong>Circular Queue</strong>.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-purple">🔄</span>Circular Queue</div>
+    <div class="def-box">
+      A <strong>Circular Queue</strong> (Ring Buffer) connects the last position back to the first position — forming a circle. It solves the <em>wasted space</em> problem of simple queue.
+    </div>
+    <div class="diagram">
+         ┌────┐
+    ┌──→ │ 10 │ ←──FRONT
+    │    ├────┤
+    │    │ 20 │
+    │    ├────┤
+    │    │ 30 │ ←──REAR
+    │    ├────┤
+    └─── │    │  (free)
+         └────┘
+    front = (front+1) % maxSize
+    rear  = (rear+1)  % maxSize</div>
+
+    <h3 class="mini">Key Formulae (Circular Queue)</h3>
+    <ul>
+      <li><strong>Enqueue:</strong> <code>rear = (rear + 1) % maxSize</code></li>
+      <li><strong>Dequeue:</strong> <code>front = (front + 1) % maxSize</code></li>
+      <li><strong>Empty:</strong> <code>front == -1</code></li>
+      <li><strong>Full:</strong> <code>(rear + 1) % maxSize == front</code></li>
+    </ul>
+
+<pre><code><span class="kw">class</span> <span class="ty">CircularQueue</span> {
+    <span class="kw">int</span>[] arr;
+    <span class="kw">int</span> front, rear, maxSize;
+
+    <span class="ty">CircularQueue</span>(<span class="kw">int</span> size) {
+        maxSize = size;
+        arr = <span class="kw">new</span> <span class="kw">int</span>[maxSize];
+        front = rear = <span class="nm">-1</span>;
+    }
+
+    <span class="kw">boolean</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> front == <span class="nm">-1</span>; }
+
+    <span class="kw">boolean</span> <span class="fn">isFull</span>() {
+        <span class="kw">return</span> (rear + <span class="nm">1</span>) % maxSize == front;
+    }
+
+    <span class="kw">void</span> <span class="fn">enqueue</span>(<span class="kw">int</span> x) {
+        <span class="kw">if</span> (<span class="fn">isFull</span>()) { System.out.println(<span class="st">"Queue Full!"</span>); <span class="kw">return</span>; }
+        <span class="kw">if</span> (<span class="fn">isEmpty</span>()) front = <span class="nm">0</span>;
+        rear = (rear + <span class="nm">1</span>) % maxSize;
+        arr[rear] = x;
+    }
+
+    <span class="kw">int</span> <span class="fn">dequeue</span>() {
+        <span class="kw">if</span> (<span class="fn">isEmpty</span>()) { System.out.println(<span class="st">"Queue Empty!"</span>); <span class="kw">return</span> <span class="nm">-1</span>; }
+        <span class="kw">int</span> val = arr[front];
+        <span class="kw">if</span> (front == rear) front = rear = <span class="nm">-1</span>; <span class="cm">// last element removed</span>
+        <span class="kw">else</span> front = (front + <span class="nm">1</span>) % maxSize;
+        <span class="kw">return</span> val;
+    }
+}</code><span class="code-label">Java</span></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-yellow">↔️</span>Dequeue (Double-Ended Queue)</div>
+    <div class="def-box yellow">
+      A <strong>Dequeue (Deque)</strong> — Double-Ended Queue — allows insertions and deletions from <em>both ends</em> (front and rear).
+    </div>
+    <div class="grid2">
+      <div class="def-box">
+        <strong>Input-Restricted Deque:</strong><br>Insertion allowed only at one end, deletion at both ends.
+      </div>
+      <div class="def-box green">
+        <strong>Output-Restricted Deque:</strong><br>Deletion allowed only at one end, insertion at both ends.
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Operation</th><th>Description</th></tr>
+        <tr><td><code>insertFront(x)</code></td><td>Add at front</td></tr>
+        <tr><td><code>insertRear(x)</code></td><td>Add at rear</td></tr>
+        <tr><td><code>deleteFront()</code></td><td>Remove from front</td></tr>
+        <tr><td><code>deleteRear()</code></td><td>Remove from rear</td></tr>
+        <tr><td><code>peekFront()</code></td><td>View front element</td></tr>
+        <tr><td><code>peekRear()</code></td><td>View rear element</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-red">📊</span>Queue vs Stack vs Dequeue</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Property</th><th>Stack</th><th>Queue</th><th>Dequeue</th></tr>
+        <tr><td>Order</td><td>LIFO</td><td>FIFO</td><td>Both ends</td></tr>
+        <tr><td>Insert at</td><td>TOP only</td><td>REAR only</td><td>Both ends</td></tr>
+        <tr><td>Delete from</td><td>TOP only</td><td>FRONT only</td><td>Both ends</td></tr>
+        <tr><td>Uses</td><td>Recursion, Undo</td><td>Scheduling, BFS</td><td>Palindrome check</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== NOTATION ==================== -->
+<div class="section" id="notation">
+  <div class="section-title">🔁 Infix, Prefix & Postfix</div>
+  <div class="section-subtitle">// Expression Notations — Most Important for Exam!</div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-purple">📖</span>Three Notations Defined</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Notation</th><th>Operator Position</th><th>Example (A+B)</th><th>Also Called</th></tr>
+        <tr>
+          <td><span class="badge badge-purple">Infix</span></td>
+          <td>Between operands</td>
+          <td><code>A + B</code></td>
+          <td>Normal / Human notation</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-teal">Prefix</span></td>
+          <td>Before operands</td>
+          <td><code>+ A B</code></td>
+          <td>Polish Notation</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-yellow">Postfix</span></td>
+          <td>After operands</td>
+          <td><code>A B +</code></td>
+          <td>Reverse Polish Notation (RPN)</td>
+        </tr>
+      </table>
+    </div>
+    <div class="def-box">
+      <strong>Why do we need postfix/prefix?</strong> Computers process these notations without needing parentheses or operator precedence rules — making them efficient for expression evaluation.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-red">📐</span>Operator Precedence & Associativity</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Precedence</th><th>Operator(s)</th><th>Associativity</th></tr>
+        <tr><td>1 (Highest)</td><td><code>( )</code> Parentheses</td><td>—</td></tr>
+        <tr><td>2</td><td><code>^</code> Exponentiation</td><td>Right to Left</td></tr>
+        <tr><td>3</td><td><code>* /</code> Multiply, Divide</td><td>Left to Right</td></tr>
+        <tr><td>4 (Lowest)</td><td><code>+ -</code> Add, Subtract</td><td>Left to Right</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-teal">🔄</span>Infix to Postfix — Algorithm (Stack-based)</div>
+    <ol class="steps">
+      <li>Scan expression <strong>left to right</strong></li>
+      <li>If it's an <strong>operand</strong>, add to output</li>
+      <li>If it's a <strong>'('</strong>, push onto stack</li>
+      <li>If it's a <strong>')'</strong>, pop from stack to output until '(' is found; discard '('</li>
+      <li>If it's an <strong>operator</strong>: pop operators from stack with <em>greater or equal precedence</em> to output, then push current operator</li>
+      <li>At end, pop all remaining operators from stack to output</li>
+    </ol>
+    <div class="def-box yellow">
+      <strong>Exception for '^':</strong> Since it is right-associative, pop only operators with <em>strictly greater</em> precedence (not equal).
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-yellow">📝</span>Infix to Postfix — Worked Example</div>
+    <p>Convert: <strong class="highlight">A + B * C - D</strong></p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Character</th><th>Stack</th><th>Output</th><th>Action</th></tr>
+        <tr><td>A</td><td>[ ]</td><td>A</td><td>Operand → output</td></tr>
+        <tr><td>+</td><td>[+]</td><td>A</td><td>Push +</td></tr>
+        <tr><td>B</td><td>[+]</td><td>AB</td><td>Operand → output</td></tr>
+        <tr><td>*</td><td>[+,*]</td><td>AB</td><td>* has higher precedence, push</td></tr>
+        <tr><td>C</td><td>[+,*]</td><td>ABC</td><td>Operand → output</td></tr>
+        <tr><td>-</td><td>[-]</td><td>ABC*+</td><td>Pop * and + (≥ precedence), push -</td></tr>
+        <tr><td>D</td><td>[-]</td><td>ABC*+D</td><td>Operand → output</td></tr>
+        <tr><td>End</td><td>[ ]</td><td>ABC*+D-</td><td>Pop remaining -</td></tr>
+      </table>
+    </div>
+    <div class="def-box green"><strong>Result:</strong> A B C * + D -</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-purple">📝</span>More Examples — Quick Reference</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Infix</th><th>Postfix</th><th>Prefix</th></tr>
+        <tr><td>A + B</td><td>A B +</td><td>+ A B</td></tr>
+        <tr><td>A + B * C</td><td>A B C * +</td><td>+ A * B C</td></tr>
+        <tr><td>(A + B) * C</td><td>A B + C *</td><td>* + A B C</td></tr>
+        <tr><td>A * B + C * D</td><td>A B * C D * +</td><td>+ * A B * C D</td></tr>
+        <tr><td>A ^ B ^ C</td><td>A B C ^ ^</td><td>^ A ^ B C</td></tr>
+        <tr><td>(A + B) * (C - D)</td><td>A B + C D - *</td><td>* + A B - C D</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-teal">🔄</span>Infix to Prefix — Algorithm</div>
+    <ol class="steps">
+      <li><strong>Reverse</strong> the infix expression</li>
+      <li>Swap '(' with ')' and vice versa in the reversed expression</li>
+      <li>Apply the <strong>Infix to Postfix algorithm</strong> on this modified expression</li>
+      <li><strong>Reverse</strong> the resulting postfix expression to get prefix</li>
+    </ol>
+    <div class="def-box">
+      <strong>Alternative:</strong> Fully parenthesize the infix expression, then move each operator to the position of its corresponding left parenthesis, then remove all parentheses.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-red">💻</span>Postfix Evaluation Using Stack</div>
+    <h3 class="mini">Algorithm</h3>
+    <ol class="steps">
+      <li>Scan postfix expression left to right</li>
+      <li>If <strong>operand</strong>, push onto stack</li>
+      <li>If <strong>operator</strong>, pop two operands (b then a), compute a op b, push result</li>
+      <li>Final result is left on top of stack</li>
+    </ol>
+    <p><strong>Example:</strong> Evaluate <span class="highlight">5 3 2 * + 1 -</span></p>
+<pre><code>Scan 5 → push 5     Stack: [5]
+Scan 3 → push 3     Stack: [5,3]
+Scan 2 → push 2     Stack: [5,3,2]
+Scan * → pop 2,3 → 3*2=6, push 6   Stack: [5,6]
+Scan + → pop 6,5 → 5+6=11, push 11 Stack: [11]
+Scan 1 → push 1     Stack: [11,1]
+Scan - → pop 1,11 → 11-1=10, push 10
+
+Result: <span class="highlight">10</span></code></pre>
+  </div>
+</div>
+
+<!-- ==================== LINKED LIST ==================== -->
+<div class="section" id="linkedlist">
+  <div class="section-title">🔗 Single Linked List</div>
+  <div class="section-subtitle">// Dynamic linear data structure</div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-purple">📖</span>Definition & Structure</div>
+    <div class="def-box">
+      A <strong>Linked List</strong> is a linear data structure where elements (called <strong>nodes</strong>) are stored at non-contiguous memory locations and each node contains a <strong>data field</strong> and a <strong>pointer/reference</strong> to the next node.
+    </div>
+    <div class="diagram">
+  HEAD
+   ↓
+ ┌──────┬────┐    ┌──────┬────┐    ┌──────┬──────┐
+ │  10  │ •──┼───→│  20  │ •──┼───→│  30  │ null │
+ └──────┴────┘    └──────┴────┘    └──────┴──────┘
+   Node 1           Node 2           Node 3 (tail)</div>
+
+    <h3 class="mini">Node Structure in Java</h3>
+<pre><code><span class="kw">class</span> <span class="ty">Node</span> {
+    <span class="kw">int</span> data;
+    <span class="ty">Node</span> next;
+
+    <span class="ty">Node</span>(<span class="kw">int</span> d) {
+        data = d;
+        next = <span class="kw">null</span>;
+    }
+}</code><span class="code-label">Java</span></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-teal">➕</span>Insertion Operations</div>
+
+    <div class="accordion">
+      <button class="acc-head" onclick="toggleAcc(this)">Insert at Beginning <span class="acc-arrow">▼</span></button>
+      <div class="acc-body">
+        <p>New node's next points to current head; head updated to new node.</p>
+<pre><code><span class="kw">void</span> <span class="fn">insertAtBeginning</span>(<span class="kw">int</span> data) {
+    <span class="ty">Node</span> newNode = <span class="kw">new</span> <span class="ty">Node</span>(data);
+    newNode.next = head;  <span class="cm">// point to old head</span>
+    head = newNode;       <span class="cm">// update head</span>
+}</code></pre>
+        <div class="diagram">New→[data|•]→[old head]→...→null</div>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <button class="acc-head" onclick="toggleAcc(this)">Insert at End <span class="acc-arrow">▼</span></button>
+      <div class="acc-body">
+        <p>Traverse to last node, set its next to new node.</p>
+<pre><code><span class="kw">void</span> <span class="fn">insertAtEnd</span>(<span class="kw">int</span> data) {
+    <span class="ty">Node</span> newNode = <span class="kw">new</span> <span class="ty">Node</span>(data);
+    <span class="kw">if</span> (head == <span class="kw">null</span>) { head = newNode; <span class="kw">return</span>; }
+    <span class="ty">Node</span> temp = head;
+    <span class="kw">while</span> (temp.next != <span class="kw">null</span>)
+        temp = temp.next;
+    temp.next = newNode;
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <button class="acc-head" onclick="toggleAcc(this)">Insert at Position <span class="acc-arrow">▼</span></button>
+      <div class="acc-body">
+        <p>Traverse to node before desired position, redirect pointers.</p>
+<pre><code><span class="kw">void</span> <span class="fn">insertAtPosition</span>(<span class="kw">int</span> data, <span class="kw">int</span> pos) {
+    <span class="ty">Node</span> newNode = <span class="kw">new</span> <span class="ty">Node</span>(data);
+    <span class="kw">if</span> (pos == <span class="nm">1</span>) { newNode.next = head; head = newNode; <span class="kw">return</span>; }
+    <span class="ty">Node</span> temp = head;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">1</span>; i &lt; pos - <span class="nm">1</span> &amp;&amp; temp != <span class="kw">null</span>; i++)
+        temp = temp.next;
+    newNode.next = temp.next;
+    temp.next = newNode;
+}</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-red">➖</span>Deletion Operations</div>
+
+    <div class="accordion">
+      <button class="acc-head" onclick="toggleAcc(this)">Delete First Node <span class="acc-arrow">▼</span></button>
+      <div class="acc-body">
+<pre><code><span class="kw">void</span> <span class="fn">deleteFirst</span>() {
+    <span class="kw">if</span> (head == <span class="kw">null</span>) { System.out.println(<span class="st">"Empty!"</span>); <span class="kw">return</span>; }
+    head = head.next;  <span class="cm">// move head forward</span>
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <button class="acc-head" onclick="toggleAcc(this)">Delete Last Node <span class="acc-arrow">▼</span></button>
+      <div class="acc-body">
+<pre><code><span class="kw">void</span> <span class="fn">deleteLast</span>() {
+    <span class="kw">if</span> (head == <span class="kw">null</span>) <span class="kw">return</span>;
+    <span class="kw">if</span> (head.next == <span class="kw">null</span>) { head = <span class="kw">null</span>; <span class="kw">return</span>; }
+    <span class="ty">Node</span> temp = head;
+    <span class="kw">while</span> (temp.next.next != <span class="kw">null</span>)
+        temp = temp.next;
+    temp.next = <span class="kw">null</span>;  <span class="cm">// remove last node</span>
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <button class="acc-head" onclick="toggleAcc(this)">Delete by Value <span class="acc-arrow">▼</span></button>
+      <div class="acc-body">
+<pre><code><span class="kw">void</span> <span class="fn">deleteByValue</span>(<span class="kw">int</span> val) {
+    <span class="kw">if</span> (head == <span class="kw">null</span>) <span class="kw">return</span>;
+    <span class="kw">if</span> (head.data == val) { head = head.next; <span class="kw">return</span>; }
+    <span class="ty">Node</span> temp = head;
+    <span class="kw">while</span> (temp.next != <span class="kw">null</span> &amp;&amp; temp.next.data != val)
+        temp = temp.next;
+    <span class="kw">if</span> (temp.next != <span class="kw">null</span>)
+        temp.next = temp.next.next;
+}</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-yellow">🔃</span>Reversal of Linked List</div>
+    <div class="def-box yellow"><strong>Classic interview question!</strong> Three pointer technique.</div>
+<pre><code><span class="kw">void</span> <span class="fn">reverse</span>() {
+    <span class="ty">Node</span> prev = <span class="kw">null</span>;
+    <span class="ty">Node</span> curr = head;
+    <span class="ty">Node</span> next = <span class="kw">null</span>;
+
+    <span class="kw">while</span> (curr != <span class="kw">null</span>) {
+        next = curr.next;   <span class="cm">// save next</span>
+        curr.next = prev;   <span class="cm">// reverse pointer</span>
+        prev = curr;        <span class="cm">// move prev forward</span>
+        curr = next;        <span class="cm">// move curr forward</span>
+    }
+    head = prev;  <span class="cm">// new head is old tail</span>
+}</code><span class="code-label">Java</span></pre>
+    <div class="diagram">
+Before:  1 → 2 → 3 → 4 → null
+After:   4 → 3 → 2 → 1 → null</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-purple">🔍</span>Other Operations</div>
+    <div class="grid2">
+      <div>
+        <h3 class="mini">Check Emptiness</h3>
+<pre><code><span class="kw">boolean</span> <span class="fn">isEmpty</span>() {
+    <span class="kw">return</span> head == <span class="kw">null</span>;
+}</code></pre>
+      </div>
+      <div>
+        <h3 class="mini">Display / Traverse</h3>
+<pre><code><span class="kw">void</span> <span class="fn">display</span>() {
+    <span class="ty">Node</span> t = head;
+    <span class="kw">while</span> (t != <span class="kw">null</span>) {
+        System.out.print(t.data+<span class="st">" → "</span>);
+        t = t.next;
+    }
+    System.out.println(<span class="st">"null"</span>);
+}</code></pre>
+      </div>
+    </div>
+    <h3 class="mini">Extract Element at Position</h3>
+<pre><code><span class="kw">int</span> <span class="fn">getElement</span>(<span class="kw">int</span> pos) {
+    <span class="ty">Node</span> temp = head;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">1</span>; i &lt; pos &amp;&amp; temp != <span class="kw">null</span>; i++)
+        temp = temp.next;
+    <span class="kw">return</span> (temp != <span class="kw">null</span>) ? temp.data : <span class="nm">-1</span>;
+}</code></pre>
+
+    <h3 class="mini">Array vs Linked List Comparison</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Feature</th><th>Array</th><th>Linked List</th></tr>
+        <tr><td>Size</td><td>Fixed at creation</td><td>Dynamic</td></tr>
+        <tr><td>Memory</td><td>Contiguous</td><td>Non-contiguous</td></tr>
+        <tr><td>Access</td><td>O(1) random</td><td>O(n) sequential</td></tr>
+        <tr><td>Insertion</td><td>O(n) shifting</td><td>O(1) at known position</td></tr>
+        <tr><td>Deletion</td><td>O(n) shifting</td><td>O(1) at known position</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BINARY TREES ==================== -->
+<div class="section" id="binarytree">
+  <div class="section-title">🌳 Binary Trees</div>
+  <div class="section-subtitle">// Hierarchical data structure — Conceptual + Traversals</div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-teal">📖</span>Definition</div>
+    <div class="def-box green">
+      A <strong>Binary Tree</strong> is a hierarchical data structure in which each node has <strong>at most two children</strong>, referred to as the <em>left child</em> and the <em>right child</em>.
+    </div>
+    <div class="diagram">
+              A          ← ROOT (Level 0 / Depth 0)
+            /   \
+           B     C       ← Level 1
+          / \   / \
+         D   E F   G     ← Level 2 (Leaves)
+
+  A = Root, Internal nodes = {A, B, C}
+  Leaves (External) = {D, E, F, G}</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-purple">📚</span>Complete Terminology — All You Must Know</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Term</th><th>Definition</th><th>Example (above tree)</th></tr>
+        <tr><td><strong>Root</strong></td><td>Topmost node; has no parent</td><td>A</td></tr>
+        <tr><td><strong>Internal Node</strong></td><td>Node with at least one child</td><td>A, B, C</td></tr>
+        <tr><td><strong>External Node (Leaf)</strong></td><td>Node with no children</td><td>D, E, F, G</td></tr>
+        <tr><td><strong>Parent</strong></td><td>Node with child nodes</td><td>A is parent of B, C</td></tr>
+        <tr><td><strong>Child</strong></td><td>Nodes directly below a parent</td><td>B, C are children of A</td></tr>
+        <tr><td><strong>Siblings</strong></td><td>Nodes sharing the same parent</td><td>B & C are siblings; D & E are siblings</td></tr>
+        <tr><td><strong>Subtree</strong></td><td>A node and all its descendants</td><td>B's subtree = {B, D, E}</td></tr>
+        <tr><td><strong>Edge</strong></td><td>Connection between parent and child</td><td>A→B, A→C, etc.</td></tr>
+        <tr><td><strong>Path</strong></td><td>Sequence of nodes from one to another</td><td>A→B→D</td></tr>
+        <tr><td><strong>Level</strong></td><td>Distance from root + 1 (root = level 1)</td><td>A=1, B&C=2, D,E,F,G=3</td></tr>
+        <tr><td><strong>Depth of Node</strong></td><td>Number of edges from root to node</td><td>depth(A)=0, depth(B)=1, depth(D)=2</td></tr>
+        <tr><td><strong>Height of Node</strong></td><td>Number of edges on longest path from node to a leaf</td><td>height(A)=2, height(B)=1, height(D)=0</td></tr>
+        <tr><td><strong>Height of Tree</strong></td><td>Height of root = max depth of any leaf</td><td>Height = 2</td></tr>
+        <tr><td><strong>Depth of Tree</strong></td><td>Same as height of tree</td><td>2</td></tr>
+        <tr><td><strong>Degree of Node</strong></td><td>Number of children of that node</td><td>degree(A)=2, degree(D)=0</td></tr>
+        <tr><td><strong>Degree of Tree</strong></td><td>Maximum degree of any node</td><td>2 (binary tree)</td></tr>
+        <tr><td><strong>Size</strong></td><td>Total number of nodes in tree</td><td>7</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-yellow">🏗️</span>Types of Binary Trees</div>
+
+    <div class="grid2">
+      <div class="def-box">
+        <strong>Full Binary Tree</strong><br>
+        Every node has either 0 or 2 children. No node has exactly 1 child.
+      </div>
+      <div class="def-box green">
+        <strong>Complete Binary Tree</strong><br>
+        All levels completely filled except possibly the last, which is filled from left to right.
+      </div>
+      <div class="def-box yellow">
+        <strong>Perfect Binary Tree</strong><br>
+        All internal nodes have exactly 2 children and all leaves are at the same level.
+      </div>
+      <div class="def-box red">
+        <strong>Degenerate (Skewed) Tree</strong><br>
+        Every internal node has only one child. Essentially a linked list.
+      </div>
+    </div>
+
+    <h3 class="mini">Balanced Binary Tree</h3>
+    <div class="def-box">
+      A tree is <strong>balanced</strong> if for every node, the height difference between the left and right subtrees is at most 1 (|height(left) - height(right)| ≤ 1). Example: AVL Tree.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-red">🚶</span>Tree Traversals — The Most Exam-Asked Topic!</div>
+    <div class="def-box red">
+      <strong>Traversal</strong> means visiting every node exactly once. There are 3 standard depth-first traversals.
+    </div>
+
+    <div class="diagram">
+              1
+            /   \
+           2     3
+          / \   / \
+         4   5 6   7</div>
+
+    <h2 class="sub">1. Inorder Traversal — Left → Root → Right</h2>
+    <p>Visit left subtree, then root, then right subtree.</p>
+    <div class="def-box green">
+      <strong>Result for above tree:</strong> 4 → 2 → 5 → 1 → 6 → 3 → 7<br>
+      <strong>Key property:</strong> Inorder traversal of a BST gives <em>sorted ascending order</em>.
+    </div>
+<pre><code><span class="kw">void</span> <span class="fn">inorder</span>(<span class="ty">Node</span> root) {
+    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="kw">return</span>;
+    <span class="fn">inorder</span>(root.left);    <span class="cm">// Left</span>
+    System.out.print(root.data + <span class="st">" "</span>);  <span class="cm">// Root</span>
+    <span class="fn">inorder</span>(root.right);   <span class="cm">// Right</span>
+}</code></pre>
+
+    <h2 class="sub">2. Preorder Traversal — Root → Left → Right</h2>
+    <p>Visit root first, then left subtree, then right subtree.</p>
+    <div class="def-box">
+      <strong>Result:</strong> 1 → 2 → 4 → 5 → 3 → 6 → 7<br>
+      <strong>Use:</strong> Copying/Printing the tree structure; creating a prefix expression.
+    </div>
+<pre><code><span class="kw">void</span> <span class="fn">preorder</span>(<span class="ty">Node</span> root) {
+    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="kw">return</span>;
+    System.out.print(root.data + <span class="st">" "</span>);  <span class="cm">// Root</span>
+    <span class="fn">preorder</span>(root.left);   <span class="cm">// Left</span>
+    <span class="fn">preorder</span>(root.right);  <span class="cm">// Right</span>
+}</code></pre>
+
+    <h2 class="sub">3. Postorder Traversal — Left → Right → Root</h2>
+    <p>Visit left subtree, right subtree, then root last.</p>
+    <div class="def-box yellow">
+      <strong>Result:</strong> 4 → 5 → 2 → 6 → 7 → 3 → 1<br>
+      <strong>Use:</strong> Deleting a tree; evaluating postfix expression trees.
+    </div>
+<pre><code><span class="kw">void</span> <span class="fn">postorder</span>(<span class="ty">Node</span> root) {
+    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="kw">return</span>;
+    <span class="fn">postorder</span>(root.left);   <span class="cm">// Left</span>
+    <span class="fn">postorder</span>(root.right);  <span class="cm">// Right</span>
+    System.out.print(root.data + <span class="st">" "</span>);  <span class="cm">// Root</span>
+}</code></pre>
+
+    <h3 class="mini">Memory Trick</h3>
+    <div class="def-box">
+      <strong>In</strong>order = Left <strong>IN</strong>side Right (LNR)<br>
+      <strong>Pre</strong>order = <strong>PRE</strong>fix = Root first (NLR)<br>
+      <strong>Post</strong>order = <strong>POST</strong>fix = Root last (LRN)<br><br>
+      <span class="highlight">N = Node/Root, L = Left, R = Right</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-teal">🌟</span>Important Properties of Binary Trees</div>
+    <ul>
+      <li>Max nodes at level <em>l</em> = <strong>2<sup>l</sup></strong> (where root is level 0)</li>
+      <li>Max nodes in tree of height <em>h</em> = <strong>2<sup>h+1</sup> − 1</strong></li>
+      <li>Min height for <em>n</em> nodes = <strong>⌊log₂n⌋</strong></li>
+      <li>In a full binary tree: <strong>leaves = internal nodes + 1</strong></li>
+      <li>A complete binary tree with <em>n</em> nodes has height = <strong>⌊log₂n⌋</strong></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== INTERFACE ==================== -->
+<div class="section" id="interface">
+  <div class="section-title">🔌 Interface & ADT in Java</div>
+  <div class="section-subtitle">// Define once, implement many ways</div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-purple">📖</span>Java Interface as ADT</div>
+    <div class="def-box">
+      A Java <code>interface</code> perfectly models an ADT — it declares <em>what</em> operations exist but <em>not how</em> they work. Multiple classes can <code>implement</code> the same interface differently.
+    </div>
+<pre><code><span class="cm">// Stack ADT defined as interface</span>
+<span class="kw">interface</span> <span class="ty">StackADT</span> {
+    <span class="kw">void</span>    <span class="fn">push</span>(<span class="kw">int</span> x);
+    <span class="kw">int</span>     <span class="fn">pop</span>();
+    <span class="kw">int</span>     <span class="fn">peek</span>();
+    <span class="kw">boolean</span> <span class="fn">isEmpty</span>();
+    <span class="kw">int</span>     <span class="fn">size</span>();
+}
+
+<span class="cm">// Implementation 1: using array</span>
+<span class="kw">class</span> <span class="ty">ArrayStack</span> <span class="kw">implements</span> <span class="ty">StackADT</span> {
+    <span class="kw">int</span>[] arr = <span class="kw">new</span> <span class="kw">int</span>[<span class="nm">100</span>];
+    <span class="kw">int</span> top = <span class="nm">-1</span>;
+
+    <span class="kw">public void</span> <span class="fn">push</span>(<span class="kw">int</span> x) { arr[++top] = x; }
+    <span class="kw">public int</span>  <span class="fn">pop</span>()       { <span class="kw">return</span> arr[top--]; }
+    <span class="kw">public int</span>  <span class="fn">peek</span>()      { <span class="kw">return</span> arr[top]; }
+    <span class="kw">public boolean</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> top == <span class="nm">-1</span>; }
+    <span class="kw">public int</span>  <span class="fn">size</span>()      { <span class="kw">return</span> top + <span class="nm">1</span>; }
+}
+
+<span class="cm">// Implementation 2: using linked list node</span>
+<span class="kw">class</span> <span class="ty">LinkedStack</span> <span class="kw">implements</span> <span class="ty">StackADT</span> {
+    <span class="kw">private class</span> <span class="ty">Node</span> {
+        <span class="kw">int</span> data; <span class="ty">Node</span> next;
+        <span class="ty">Node</span>(<span class="kw">int</span> d) { data = d; }
+    }
+    <span class="ty">Node</span> top = <span class="kw">null</span>;
+    <span class="kw">int</span> count = <span class="nm">0</span>;
+
+    <span class="kw">public void</span> <span class="fn">push</span>(<span class="kw">int</span> x) {
+        <span class="ty">Node</span> n = <span class="kw">new</span> <span class="ty">Node</span>(x);
+        n.next = top; top = n; count++;
+    }
+    <span class="kw">public int</span> <span class="fn">pop</span>() {
+        <span class="kw">int</span> v = top.data; top = top.next; count--; <span class="kw">return</span> v;
+    }
+    <span class="kw">public int</span>     <span class="fn">peek</span>()    { <span class="kw">return</span> top.data; }
+    <span class="kw">public boolean</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> top == <span class="kw">null</span>; }
+    <span class="kw">public int</span>     <span class="fn">size</span>()    { <span class="kw">return</span> count; }
+}
+
+<span class="cm">// Usage with polymorphism</span>
+<span class="ty">StackADT</span> s1 = <span class="kw">new</span> <span class="ty">ArrayStack</span>();
+<span class="ty">StackADT</span> s2 = <span class="kw">new</span> <span class="ty">LinkedStack</span>();
+<span class="cm">// Both can be used the same way!</span></code><span class="code-label">Java</span></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon icon-teal">🔑</span>Key Points about Java Interface</div>
+    <ul>
+      <li>All methods in an interface are <strong>implicitly public and abstract</strong></li>
+      <li>A class uses <code>implements</code> keyword to implement an interface</li>
+      <li>A class <strong>must override all</strong> methods of the interface</li>
+      <li>One class can implement <strong>multiple interfaces</strong></li>
+      <li>Interface references can hold objects of implementing classes (<strong>polymorphism</strong>)</li>
+      <li>Interfaces <strong>cannot be instantiated</strong> directly</li>
+    </ul>
+    <div class="def-box green">
+      <strong>ISC Exam tip:</strong> Know how to write an interface for Stack and Queue, then implement it both ways (array and linked list).
+    </div>
+  </div>
+</div>
+
+<!-- ==================== QUIZ ==================== -->
+<div class="section" id="quiz">
+  <div class="section-title">🧠 Practice Quiz</div>
+  <div class="section-subtitle">// Test your understanding — click options to check answers</div>
+
+  <div class="quiz-card">
+    <div class="quiz-q">Q1. A stack follows which principle?</div>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">FIFO — First In First Out</button>
+    <button class="quiz-opt" onclick="checkAns(this,'c')">LIFO — Last In First Out</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">FILO — First In Last Out (different name)</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Random access</button>
+    <div class="quiz-explain">A stack uses LIFO. The last element pushed is the first to be popped. FILO is just an alternate name for the same — so LIFO is the standard answer.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q">Q2. What is the Postfix form of: (A + B) * C?</div>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">A B C + *</button>
+    <button class="quiz-opt" onclick="checkAns(this,'c')">A B + C *</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">* + A B C</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">A + B C *</button>
+    <div class="quiz-explain">(A+B)*C → first evaluate (A+B) → A B +, then multiply by C → A B + C *. Postfix: A B + C *</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q">Q3. In a Circular Queue of size 5, if front=2 and rear=4, what is the position after enqueue?</div>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">rear = 5</button>
+    <button class="quiz-opt" onclick="checkAns(this,'c')">rear = 0 (wraps around)</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">rear = 4 (no change)</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Queue is full, can't enqueue</button>
+    <div class="quiz-explain">rear = (rear+1) % maxSize = (4+1) % 5 = 5 % 5 = 0. This is the circular wraparound!</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q">Q4. Which traversal of a BST gives elements in sorted order?</div>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Preorder (NLR)</button>
+    <button class="quiz-opt" onclick="checkAns(this,'c')">Inorder (LNR)</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Postorder (LRN)</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Level-order</button>
+    <div class="quiz-explain">Inorder traversal (Left → Node → Right) of a Binary Search Tree always produces elements in ascending sorted order.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q">Q5. What is the height of a single node tree?</div>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">1</button>
+    <button class="quiz-opt" onclick="checkAns(this,'c')">0</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">-1</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Undefined</button>
+    <div class="quiz-explain">Height of a node = number of edges on the longest path from that node to a leaf. A single node (root = leaf) has height 0.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q">Q6. In Linked List insertion at beginning, what is the first step?</div>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Update head to new node</button>
+    <button class="quiz-opt" onclick="checkAns(this,'c')">Set new node's next = current head</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Traverse to end</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Delete first element</button>
+    <div class="quiz-explain">You must first link the new node to the current head (newNode.next = head), THEN update head = newNode. If you update head first, you lose the old list!</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q">Q7. What does a Dequeue (Double-Ended Queue) allow?</div>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Insert at rear, delete at front only</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Insert at front, delete at rear only</button>
+    <button class="quiz-opt" onclick="checkAns(this,'c')">Insert and delete at both ends</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">Random access to any element</button>
+    <div class="quiz-explain">A Dequeue (Double Ended Queue) supports insertion and deletion from BOTH ends — making it more flexible than both stack and queue.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q">Q8. Postorder traversal of the tree with root=A, A→B (left), A→C (right), B→D (left), B→E (right) is:</div>
+    <button class="quiz-opt" onclick="checkAns(this,'c')">D E B C A</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">A B C D E</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">D B E A C</button>
+    <button class="quiz-opt" onclick="checkAns(this,'w')">A B D E C</button>
+    <div class="quiz-explain">Postorder = LRN. For B: D(L)→E(R)→B(N) = D,E,B. Then C (leaf). Then root A. Full: D E B C A</div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toggleAcc(btn) {
+  const body = btn.nextElementSibling;
+  body.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+function checkAns(btn, type) {
+  const card = btn.closest('.quiz-card');
+  card.querySelectorAll('.quiz-opt').forEach(b => {
+    b.disabled = true;
+    b.style.cursor = 'default';
+  });
+  btn.classList.add(type === 'c' ? 'correct' : 'wrong');
+  // find correct button if wrong was picked
+  if(type === 'w') {
+    // highlight correct - it's the one with onclick containing 'c'
+    card.querySelectorAll('.quiz-opt').forEach(b => {
+      if(b.getAttribute('onclick').includes("'c'")) b.classList.add('correct');
+    });
+  }
+  card.querySelector('.quiz-explain').style.display = 'block';
+}
+</script>
+</body>
+</html>

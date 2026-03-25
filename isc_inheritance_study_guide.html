@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISC CS — Inheritance, Interfaces & Polymorphism</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #06080f;
+  --bg2:     #0b0e1a;
+  --bg3:     #10152a;
+  --card:    #0e1322;
+  --card2:   #141a30;
+  --border:  #1e2a4a;
+  --border2: #253060;
+
+  --teal:    #2dd4bf;
+  --amber:   #f59e0b;
+  --rose:    #fb7185;
+  --sky:     #38bdf8;
+  --lime:    #a3e635;
+  --violet:  #a78bfa;
+  --orange:  #fb923c;
+
+  --text:    #f1f5f9;
+  --text2:   #94a3b8;
+  --text3:   #4a5a7a;
+
+  --code-bg: #080b14;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ─── NOISE TEXTURE OVERLAY ─── */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:9998; opacity:.4;
+}
+
+/* ─── PROGRESS ─── */
+#progress {
+  position:fixed; top:0; left:0; height:3px;
+  background: linear-gradient(90deg, var(--teal), var(--sky), var(--violet));
+  z-index:9999; transition: width .1s;
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(45,212,191,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(56,189,248,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 50% 100%, rgba(167,139,250,.06) 0%, transparent 60%);
+}
+
+/* animated grid */
+.hero-grid {
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(45,212,191,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45,212,191,.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 70% 70% at center, black 30%, transparent 100%);
+}
+
+.hero-tag {
+  position:relative; z-index:1;
+  display:inline-flex; align-items:center; gap:10px;
+  background: rgba(45,212,191,.08);
+  border: 1px solid rgba(45,212,191,.25);
+  border-radius: 100px;
+  padding: 7px 20px;
+  font-size: .75rem; font-weight:600;
+  letter-spacing: .12em; text-transform:uppercase;
+  color: var(--teal);
+  margin-bottom: 2rem;
+  animation: rise .8s ease both;
+}
+
+.hero-tag .dot {
+  width:7px; height:7px; border-radius:50%;
+  background: var(--teal);
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%,100%{ box-shadow:0 0 0 0 rgba(45,212,191,.5); }
+  50%{ box-shadow:0 0 0 6px rgba(45,212,191,0); }
+}
+
+.hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  line-height: 1.0;
+  position:relative; z-index:1;
+  animation: rise .9s .1s ease both;
+}
+
+.hero h1 em {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--teal) 0%, var(--sky) 50%, var(--violet) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-desc {
+  font-size:1.05rem; color:var(--text2);
+  max-width:560px; margin: 1.5rem auto 0;
+  position:relative; z-index:1;
+  animation: rise 1s .2s ease both;
+}
+
+.hero-pills {
+  display:flex; gap:.75rem; flex-wrap:wrap;
+  justify-content:center;
+  margin-top: 2.5rem;
+  position:relative; z-index:1;
+  animation: rise 1s .3s ease both;
+}
+
+.hero-pill {
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-size: .78rem; font-weight:600;
+  letter-spacing:.04em;
+  border: 1px solid;
+}
+
+.hp-teal  { background:rgba(45,212,191,.1);  border-color:rgba(45,212,191,.3);  color:var(--teal);   }
+.hp-sky   { background:rgba(56,189,248,.1);  border-color:rgba(56,189,248,.3);  color:var(--sky);    }
+.hp-violet{ background:rgba(167,139,250,.1); border-color:rgba(167,139,250,.3); color:var(--violet); }
+.hp-amber { background:rgba(245,158,11,.1);  border-color:rgba(245,158,11,.3);  color:var(--amber);  }
+.hp-rose  { background:rgba(251,113,133,.1); border-color:rgba(251,113,133,.3); color:var(--rose);   }
+
+@keyframes rise {
+  from { opacity:0; transform: translateY(28px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+/* ─── STICKY NAV ─── */
+.topnav {
+  position:sticky; top:0; z-index:200;
+  background: rgba(6,8,15,.92);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  padding: .65rem 1.5rem;
+  display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center;
+}
+
+.tnav {
+  padding: 5px 14px;
+  border-radius:100px; font-size:.75rem; font-weight:600;
+  cursor:pointer; border:1px solid var(--border);
+  background:transparent; color:var(--text2);
+  text-decoration:none; transition:all .2s;
+  letter-spacing:.03em;
+}
+.tnav:hover, .tnav.active {
+  background: var(--teal); border-color:var(--teal); color:#000;
+}
+
+/* ─── MAIN ─── */
+main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 5rem 2rem;
+  position:relative; z-index:1;
+}
+
+/* ─── SECTION ─── */
+.sec {
+  margin-bottom: 6rem;
+  scroll-margin-top: 5rem;
+}
+
+.sec-hd {
+  display:flex; align-items:center; gap:1rem;
+  margin-bottom: 2.5rem;
+}
+
+.sec-num {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.7rem; font-weight:700;
+  color:var(--teal);
+  background:rgba(45,212,191,.1);
+  border:1px solid rgba(45,212,191,.2);
+  padding:4px 10px; border-radius:6px;
+  white-space:nowrap;
+}
+
+.sec-title {
+  font-family:'Fraunces', serif;
+  font-size: clamp(1.6rem,3.5vw,2.4rem);
+  font-weight:700; color:var(--text);
+}
+
+.sec-intro {
+  font-size:.98rem; color:var(--text2);
+  line-height:1.8; max-width:820px;
+  margin-bottom:2rem;
+}
+
+/* ─── DIVIDER ─── */
+.divider {
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+  margin: 5rem 0;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding: 1.75rem;
+  margin-bottom:1.4rem;
+  transition: border-color .3s, transform .3s;
+  position:relative; overflow:hidden;
+}
+.card::after {
+  content:'';
+  position:absolute; inset:0; border-radius:16px;
+  background: linear-gradient(135deg, rgba(45,212,191,.03), transparent 60%);
+  pointer-events:none;
+}
+.card:hover {
+  border-color: rgba(45,212,191,.4);
+  transform: translateY(-3px);
+}
+.card h3 {
+  font-family:'Fraunces', serif;
+  font-size:1.15rem; font-weight:700;
+  color:var(--text); margin-bottom:.6rem;
+  display:flex; align-items:center; gap:.5rem;
+}
+.card p { color:var(--text2); font-size:.92rem; line-height:1.75; }
+
+.g2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.2rem; }
+.g3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1.1rem; }
+
+/* ─── DEFINITION ─── */
+.def {
+  background: linear-gradient(135deg, rgba(45,212,191,.07), rgba(56,189,248,.07));
+  border:1px solid rgba(45,212,191,.2);
+  border-radius:14px;
+  padding:1.5rem 1.75rem;
+  margin-bottom:1.4rem;
+}
+.def .dlabel {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.67rem; font-weight:700;
+  color:var(--teal); letter-spacing:.1em;
+  text-transform:uppercase; margin-bottom:.4rem;
+}
+.def .dtext {
+  font-size:1rem; color:var(--text); font-weight:500; line-height:1.75;
+}
+
+/* ─── HIGHLIGHT BOXES ─── */
+.hl {
+  border-radius:12px; padding:1.2rem 1.5rem;
+  margin:1.2rem 0; display:flex; gap:1rem; align-items:flex-start;
+}
+.hl-icon { font-size:1.15rem; flex-shrink:0; margin-top:2px; }
+.hl-body strong { display:block; font-size:.88rem; font-weight:700; margin-bottom:.3rem; }
+.hl-body p { font-size:.86rem; line-height:1.7; }
+
+.hl-teal   { background:rgba(45,212,191,.08);  border:1px solid rgba(45,212,191,.25); }
+.hl-teal   .hl-body strong { color:var(--teal); }
+.hl-teal   .hl-body p { color:#7ecfc7; }
+
+.hl-amber  { background:rgba(245,158,11,.08);  border:1px solid rgba(245,158,11,.25); }
+.hl-amber  .hl-body strong { color:var(--amber); }
+.hl-amber  .hl-body p { color:#c8a660; }
+
+.hl-rose   { background:rgba(251,113,133,.08); border:1px solid rgba(251,113,133,.25); }
+.hl-rose   .hl-body strong { color:var(--rose); }
+.hl-rose   .hl-body p { color:#d4889a; }
+
+.hl-violet { background:rgba(167,139,250,.08); border:1px solid rgba(167,139,250,.25); }
+.hl-violet .hl-body strong { color:var(--violet); }
+.hl-violet .hl-body p { color:#b5a5d8; }
+
+.hl-sky    { background:rgba(56,189,248,.08);  border:1px solid rgba(56,189,248,.25); }
+.hl-sky    .hl-body strong { color:var(--sky); }
+.hl-sky    .hl-body p { color:#7bbfd8; }
+
+.hl-lime   { background:rgba(163,230,53,.08);  border:1px solid rgba(163,230,53,.25); }
+.hl-lime   .hl-body strong { color:var(--lime); }
+.hl-lime   .hl-body p { color:#9bb870; }
+
+/* ─── CODE BLOCKS ─── */
+.cw {
+  background:var(--code-bg);
+  border:1px solid var(--border);
+  border-radius:14px; overflow:hidden;
+  margin:1.5rem 0;
+}
+.ch {
+  display:flex; align-items:center;
+  justify-content:space-between;
+  padding:9px 16px;
+  background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--border);
+}
+.cd { display:flex; gap:6px; }
+.cd span { width:10px; height:10px; border-radius:50%; }
+.cd span:nth-child(1){ background:#ff5f57; }
+.cd span:nth-child(2){ background:#febc2e; }
+.cd span:nth-child(3){ background:#28c840; }
+.cf {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.7rem; color:var(--text3); letter-spacing:.04em;
+}
+.cl {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.64rem; color:var(--teal);
+  background:rgba(45,212,191,.1);
+  padding:2px 8px; border-radius:4px;
+}
+pre {
+  padding:1.5rem; overflow-x:auto;
+  font-family:'JetBrains Mono', monospace;
+  font-size:.81rem; line-height:1.7; color:#e2e8f0;
+}
+.kw { color:#f472b6; }
+.tp { color:#67e8f9; }
+.st { color:#86efac; }
+.nm { color:#fde68a; }
+.cm { color:#4a5a7a; font-style:italic; }
+.fn { color:#c4b5fd; }
+.cn { color:#fdba74; }
+.an { color:#6ee7b7; }
+pre code { background:none; color:inherit; padding:0; font-size:inherit; }
+code {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.82em;
+  background:rgba(45,212,191,.1);
+  color:var(--teal); padding:2px 6px; border-radius:4px;
+}
+
+/* ─── TABLE ─── */
+.tw { overflow-x:auto; border-radius:12px; border:1px solid var(--border); margin:1.5rem 0; }
+table { width:100%; border-collapse:collapse; }
+th {
+  background:rgba(45,212,191,.1);
+  padding:11px 16px; text-align:left;
+  font-size:.77rem; font-weight:700;
+  color:var(--teal); letter-spacing:.07em; text-transform:uppercase;
+}
+td {
+  padding:11px 16px; font-size:.87rem;
+  color:var(--text2); border-top:1px solid var(--border);
+  vertical-align:top; line-height:1.6;
+}
+tr:hover td { background:rgba(45,212,191,.03); }
+td code { font-size:.78rem; color:var(--teal); }
+
+/* ─── HIERARCHY DIAGRAM ─── */
+.hier {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px; padding:2.5rem 2rem;
+  margin:1.5rem 0; text-align:center;
+}
+.hbox {
+  display:inline-flex; flex-direction:column;
+  align-items:center; gap:.3rem;
+  background:linear-gradient(135deg,rgba(45,212,191,.1),rgba(56,189,248,.1));
+  border:2px solid var(--teal); border-radius:12px;
+  padding:.9rem 1.5rem; min-width:160px;
+}
+.hbox.mid {
+  background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(251,113,133,.1));
+  border-color: var(--violet);
+}
+.hbox.leaf {
+  background:rgba(245,158,11,.08);
+  border-color:var(--amber); min-width:130px;
+}
+.hbox .hlabel {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.62rem; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+}
+.hbox.root .hlabel { color:var(--teal); }
+.hbox.mid  .hlabel { color:var(--violet); }
+.hbox.leaf .hlabel { color:var(--amber); }
+.hbox .hname {
+  font-family:'Fraunces', serif;
+  font-size:1.1rem; font-weight:700; color:var(--text);
+}
+.hbox .hdata {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.66rem; color:var(--text3); line-height:1.6; text-align:left;
+}
+.harrow { font-size:1.6rem; color:var(--border2); line-height:1; margin:6px 0; }
+.hrow { display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap; }
+.hconnect {
+  display:flex; flex-direction:column; align-items:center;
+}
+
+/* ─── INTERFACE DIAGRAM ─── */
+.iface-diagram {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:2rem;
+  margin:1.5rem 0;
+}
+.iface-box {
+  display:inline-block;
+  background:rgba(167,139,250,.1);
+  border:2px dashed var(--violet);
+  border-radius:12px; padding:1rem 1.5rem; min-width:200px;
+  text-align:center;
+}
+.iface-box .ilabel {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.62rem; color:var(--violet); letter-spacing:.1em;
+  text-transform:uppercase; margin-bottom:.3rem;
+}
+.iface-box .iname {
+  font-family:'Fraunces', serif;
+  font-size:1.1rem; font-weight:700; color:var(--text);
+}
+.iface-box .imethods {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.68rem; color:var(--text3); margin-top:.5rem; line-height:1.7;
+}
+.impl-row {
+  display:flex; gap:1rem; justify-content:center;
+  flex-wrap:wrap; margin-top:1rem;
+}
+.impl-box {
+  background:rgba(245,158,11,.08);
+  border:1px solid rgba(245,158,11,.3);
+  border-radius:10px; padding:.8rem 1.2rem; min-width:140px; text-align:center;
+}
+.impl-box .imlabel {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.6rem; color:var(--amber); letter-spacing:.1em;
+  text-transform:uppercase; margin-bottom:.25rem;
+}
+.impl-box .imname {
+  font-weight:700; font-size:.9rem; color:var(--text);
+}
+
+/* ─── BADGE ─── */
+.badge {
+  display:inline-block;
+  font-family:'JetBrains Mono', monospace;
+  font-size:.67rem; font-weight:700;
+  padding:2px 9px; border-radius:100px;
+  letter-spacing:.04em; vertical-align:middle; margin:0 2px;
+}
+.b-teal   { background:rgba(45,212,191,.12);  color:var(--teal);   border:1px solid rgba(45,212,191,.3);  }
+.b-amber  { background:rgba(245,158,11,.12);  color:var(--amber);  border:1px solid rgba(245,158,11,.3);  }
+.b-rose   { background:rgba(251,113,133,.12); color:var(--rose);   border:1px solid rgba(251,113,133,.3); }
+.b-violet { background:rgba(167,139,250,.12); color:var(--violet); border:1px solid rgba(167,139,250,.3); }
+.b-sky    { background:rgba(56,189,248,.12);  color:var(--sky);    border:1px solid rgba(56,189,248,.3);  }
+.b-lime   { background:rgba(163,230,53,.12);  color:var(--lime);   border:1px solid rgba(163,230,53,.3);  }
+
+/* ─── EXAM TIP ─── */
+.etip {
+  background:linear-gradient(135deg,rgba(245,158,11,.07),rgba(251,113,133,.07));
+  border:1px solid rgba(245,158,11,.25);
+  border-radius:14px; padding:1.5rem; margin:1.5rem 0;
+}
+.etip .etitle {
+  display:flex; align-items:center; gap:.5rem;
+  font-weight:700; font-size:.82rem;
+  color:var(--amber); text-transform:uppercase;
+  letter-spacing:.08em; margin-bottom:.9rem;
+}
+.etip ul { padding-left:1.2rem; }
+.etip ul li {
+  color:#c0a050; font-size:.87rem;
+  line-height:1.75; margin-bottom:.35rem;
+}
+.etip ul li strong { color:var(--amber); }
+
+/* ─── QUICK REF ─── */
+.qref {
+  background:var(--card);
+  border:2px solid var(--border2);
+  border-radius:20px; padding:2.5rem;
+  margin:3rem 0;
+}
+.qref h2 {
+  font-family:'Fraunces', serif;
+  font-size:1.8rem; font-weight:700;
+  text-align:center; margin-bottom:2rem;
+  background: linear-gradient(90deg, var(--amber), var(--orange));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.qref-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem;
+}
+.qi {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:10px; padding:1rem 1.2rem;
+}
+.qi .qk {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.72rem; color:var(--teal); font-weight:700;
+  margin-bottom:.35rem; letter-spacing:.04em;
+}
+.qi .qv { font-size:.84rem; color:var(--text2); line-height:1.6; }
+
+/* ─── QUIZ ─── */
+.quiz-wrap {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:20px; padding:2.5rem; margin:3rem 0;
+}
+.quiz-wrap h2 {
+  font-family:'Fraunces', serif;
+  font-size:1.8rem; font-weight:700;
+  color:var(--text); text-align:center; margin-bottom:.4rem;
+}
+.quiz-sub {
+  text-align:center; color:var(--text3);
+  font-size:.87rem; margin-bottom:2rem;
+}
+.qcard {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:12px; padding:1.5rem; margin-bottom:1.2rem;
+}
+.qcard .qnum {
+  font-family:'JetBrains Mono', monospace;
+  font-size:.68rem; color:var(--text3); margin-bottom:.4rem;
+}
+.qcard .qtext {
+  font-weight:600; font-size:.94rem; color:var(--text); margin-bottom:.9rem;
+}
+.opts { display:flex; flex-direction:column; gap:.45rem; }
+.opt {
+  padding:9px 14px; border-radius:8px;
+  border:1px solid var(--border); cursor:pointer;
+  font-size:.87rem; color:var(--text2);
+  background:transparent; text-align:left;
+  transition:all .2s; font-family:inherit;
+}
+.opt:hover { border-color:var(--teal); color:var(--text); background:rgba(45,212,191,.06); }
+.opt.correct { background:rgba(45,212,191,.1); border-color:var(--teal); color:var(--teal); }
+.opt.wrong   { background:rgba(251,113,133,.1); border-color:var(--rose); color:var(--rose); }
+.opt.reveal  { background:rgba(45,212,191,.1); border-color:var(--teal); color:var(--teal); }
+.qfb {
+  margin-top:.7rem; font-size:.82rem;
+  padding:8px 12px; border-radius:8px; display:none;
+}
+.qfb.show { display:block; }
+.qfb.correct { background:rgba(45,212,191,.1); color:var(--teal); border:1px solid rgba(45,212,191,.2); }
+.qfb.wrong   { background:rgba(251,113,133,.1); color:var(--rose); border:1px solid rgba(251,113,133,.2); }
+
+/* ─── FOOTER ─── */
+footer {
+  text-align:center; padding:3rem 2rem;
+  color:var(--text3); font-size:.82rem;
+  border-top:1px solid var(--border); position:relative; z-index:1;
+}
+footer strong { color:var(--text); }
+
+/* ─── SCROLL ANIMATE ─── */
+.fade-in {
+  opacity:0; transform:translateY(22px);
+  transition: opacity .55s ease, transform .55s ease;
+}
+.fade-in.visible { opacity:1; transform:translateY(0); }
+
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--bg2); }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--teal); }
+
+@media(max-width:640px){
+  main { padding:2.5rem 1rem; }
+  .hero { padding:1.5rem 1rem; }
+  .topnav { padding:.5rem 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-tag"><div class="dot"></div>ISC Computer Science · Class XII</div>
+  <h1>Inheritance,<br><em>Interfaces</em> &amp;<br>Polymorphism</h1>
+  <p class="hero-desc">The complete theory guide — every concept explained, every exam pattern covered. Let's get 100/100.</p>
+  <div class="hero-pills">
+    <span class="hero-pill hp-teal">Super &amp; Derived Classes</span>
+    <span class="hero-pill hp-sky">Member Access</span>
+    <span class="hero-pill hp-violet">Abstract Classes</span>
+    <span class="hero-pill hp-amber">Polymorphism</span>
+    <span class="hero-pill hp-rose">Interfaces</span>
+  </div>
+</section>
+
+<!-- ═══ NAV ═══ -->
+<nav class="topnav">
+  <a href="#s1" class="tnav">Inheritance</a>
+  <a href="#s2" class="tnav">super Keyword</a>
+  <a href="#s3" class="tnav">Member Access</a>
+  <a href="#s4" class="tnav">Method Overriding</a>
+  <a href="#s5" class="tnav">Abstract Classes</a>
+  <a href="#s6" class="tnav">class Object</a>
+  <a href="#s7" class="tnav">Polymorphism</a>
+  <a href="#s8" class="tnav">Interfaces</a>
+  <a href="#quiz" class="tnav">🎯 Quiz</a>
+</nav>
+
+<main>
+
+<!-- ════════════════════════════════════
+     S1: INHERITANCE
+════════════════════════════════════ -->
+<section class="sec" id="s1">
+  <div class="sec-hd">
+    <span class="sec-num">01</span>
+    <h2 class="sec-title">Inheritance — The Foundation</h2>
+  </div>
+
+  <p class="sec-intro">
+    Inheritance is the mechanism by which one class <strong>acquires all the properties and behaviours</strong> of another class. It is Java's primary tool for <em>code reuse</em> and establishing a genuine <strong>IS-A relationship</strong> between classes.
+  </p>
+
+  <div class="def fade-in">
+    <div class="dlabel">Definition — Inheritance</div>
+    <div class="dtext"><strong>Inheritance</strong> is the process by which a new class (subclass/derived class) is created from an existing class (superclass/base class), automatically acquiring all its non-private fields and methods. The keyword used is <code>extends</code>.</div>
+  </div>
+
+  <div class="g2 fade-in">
+    <div class="card">
+      <h3>🏛️ Superclass (Parent / Base)</h3>
+      <p>The existing class whose properties are being inherited. Also called <strong>parent class</strong> or <strong>base class</strong>. Defines the common attributes and behaviours shared by all subclasses.</p>
+    </div>
+    <div class="card">
+      <h3>🌿 Subclass (Child / Derived)</h3>
+      <p>The new class that inherits from the superclass. Also called <strong>child class</strong> or <strong>derived class</strong>. It extends the superclass and can add its own attributes and methods, or override existing ones.</p>
+    </div>
+  </div>
+
+  <div class="hl hl-teal fade-in">
+    <div class="hl-icon">⚠️</div>
+    <div class="hl-body">
+      <strong>ISC Emphasis — When to Use Inheritance</strong>
+      <p>Inheritance should ONLY be used when there is a <strong>genuine IS-A relationship</strong>. A <code>Dog</code> IS-A <code>Animal</code> ✅. A <code>Car</code> IS-A <code>Vehicle</code> ✅. Do NOT use inheritance simply to reuse a few methods — that is a design mistake. Use <em>composition</em> (HAS-A) for code reuse without a true specialization relationship.</p>
+    </div>
+  </div>
+
+  <!-- HIERARCHY DIAGRAM -->
+  <div class="hier fade-in">
+    <div class="hconnect">
+      <div class="hbox root">
+        <div class="hlabel">Superclass</div>
+        <div class="hname">Animal</div>
+        <div class="hdata">name, age<br>eat(), sleep(), breathe()</div>
+      </div>
+      <div class="harrow">↓</div>
+      <div class="hrow">
+        <div class="hconnect">
+          <div class="hbox mid">
+            <div class="hlabel">Subclass</div>
+            <div class="hname">Dog</div>
+            <div class="hdata">breed<br>bark(), fetch()</div>
+          </div>
+          <div class="harrow">↓</div>
+          <div class="hbox leaf">
+            <div class="hlabel">Sub-subclass</div>
+            <div class="hname">GoldenRetriever</div>
+            <div class="hdata">coatColor<br>retrieveItem()</div>
+          </div>
+        </div>
+        <div class="hconnect">
+          <div class="hbox mid">
+            <div class="hlabel">Subclass</div>
+            <div class="hname">Cat</div>
+            <div class="hdata">isIndoor<br>purr(), climb()</div>
+          </div>
+        </div>
+        <div class="hconnect">
+          <div class="hbox mid">
+            <div class="hlabel">Subclass</div>
+            <div class="hname">Bird</div>
+            <div class="hdata">wingspan<br>fly(), sing()</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--text);margin:2rem 0 1rem;">Types of Inheritance in Java</h3>
+
+  <div class="tw fade-in">
+    <table>
+      <tr><th>Type</th><th>Description</th><th>Supported in Java?</th></tr>
+      <tr><td><strong>Single</strong></td><td>One class inherits from exactly one superclass</td><td><span class="badge b-teal">✅ Yes</span></td></tr>
+      <tr><td><strong>Multilevel</strong></td><td>Chain: A → B → C (B inherits A, C inherits B)</td><td><span class="badge b-teal">✅ Yes</span></td></tr>
+      <tr><td><strong>Hierarchical</strong></td><td>Multiple classes inherit from one superclass</td><td><span class="badge b-teal">✅ Yes</span></td></tr>
+      <tr><td><strong>Multiple</strong></td><td>One class inherits from two or more classes</td><td><span class="badge b-rose">❌ Not via classes</span> <span class="badge b-violet">✅ Via interfaces</span></td></tr>
+      <tr><td><strong>Hybrid</strong></td><td>Combination of the above types</td><td><span class="badge b-amber">⚠️ Partial via interfaces</span></td></tr>
+    </table>
+  </div>
+
+  <div class="cw fade-in">
+    <div class="ch">
+      <div class="cd"><span></span><span></span><span></span></div>
+      <span class="cf">Animal.java — Single Inheritance</span>
+      <span class="cl">Java</span>
+    </div>
+    <pre><span class="cm">// SUPERCLASS</span>
+<span class="kw">class</span> <span class="cn">Animal</span> {
+    <span class="tp">String</span> name;
+    <span class="tp">int</span>    age;
+
+    <span class="cn">Animal</span>(<span class="tp">String</span> name, <span class="tp">int</span> age) {
+        <span class="kw">this</span>.name = name;
+        <span class="kw">this</span>.age  = age;
+    }
+
+    <span class="kw">void</span> <span class="fn">eat</span>()    { <span class="cn">System</span>.out.<span class="fn">println</span>(name + <span class="st">" is eating."</span>); }
+    <span class="kw">void</span> <span class="fn">breathe</span>(){ <span class="cn">System</span>.out.<span class="fn">println</span>(name + <span class="st">" is breathing."</span>); }
+}
+
+<span class="cm">// SUBCLASS — inherits from Animal using 'extends'</span>
+<span class="kw">class</span> <span class="cn">Dog</span> <span class="kw">extends</span> <span class="cn">Animal</span> {
+    <span class="tp">String</span> breed;  <span class="cm">// new attribute specific to Dog</span>
+
+    <span class="cn">Dog</span>(<span class="tp">String</span> name, <span class="tp">int</span> age, <span class="tp">String</span> breed) {
+        <span class="kw">super</span>(name, age);  <span class="cm">// call superclass constructor</span>
+        <span class="kw">this</span>.breed = breed;
+    }
+
+    <span class="kw">void</span> <span class="fn">bark</span>() {          <span class="cm">// new method specific to Dog</span>
+        <span class="cn">System</span>.out.<span class="fn">println</span>(name + <span class="st">" says: Woof!"</span>);
+    }
+}
+
+<span class="kw">class</span> <span class="cn">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="tp">String</span>[] args) {
+        <span class="cn">Dog</span> d = <span class="kw">new</span> <span class="cn">Dog</span>(<span class="st">"Bruno"</span>, <span class="nm">3</span>, <span class="st">"Labrador"</span>);
+        d.<span class="fn">eat</span>();    <span class="cm">// inherited from Animal → "Bruno is eating."</span>
+        d.<span class="fn">breathe</span>(); <span class="cm">// inherited               → "Bruno is breathing."</span>
+        d.<span class="fn">bark</span>();   <span class="cm">// own method             → "Bruno says: Woof!"</span>
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Breed: "</span> + d.breed);
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Age:   "</span> + d.age);   <span class="cm">// inherited field</span>
+    }
+}</pre>
+  </div>
+
+  <div class="etip fade-in">
+    <div class="etitle">⭐ Exam Tips — Inheritance Basics</div>
+    <ul>
+      <li><strong>IS-A test:</strong> Before using <code>extends</code>, ask — is a Dog an Animal? Yes ✅. Is an Engine a Car? No ❌ (it HAS a car → use composition).</li>
+      <li>Java does NOT support multiple inheritance through classes — to avoid the "Diamond Problem".</li>
+      <li>A subclass inherits all members EXCEPT: private members (accessible via getters), constructors (not inherited), static members (shared but not inherited per se).</li>
+      <li>The keyword is <code>extends</code> for classes, <code>implements</code> for interfaces.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════
+     S2: super KEYWORD
+════════════════════════════════════ -->
+<section class="sec" id="s2">
+  <div class="sec-hd">
+    <span class="sec-num">02</span>
+    <h2 class="sec-title">The <code>super</code> Keyword</h2>
+  </div>
+
+  <p class="sec-intro">
+    <code>super</code> is a reference variable that refers to the <strong>immediate parent class object</strong>. It is used in three key ways — calling the parent constructor, accessing parent methods, and accessing parent variables.
+  </p>
+
+  <div class="g3 fade-in">
+    <div class="card">
+      <h3>① super() — Constructor Call</h3>
+      <p>Calls the superclass constructor. <strong>Must be the FIRST statement</strong> in the subclass constructor. Used to initialise the inherited portion of the object.</p>
+    </div>
+    <div class="card">
+      <h3>② super.method() — Method Call</h3>
+      <p>Calls a method of the superclass that has been <em>overridden</em> in the subclass. Allows you to extend superclass behaviour rather than replace it entirely.</p>
+    </div>
+    <div class="card">
+      <h3>③ super.variable — Field Access</h3>
+      <p>Accesses a variable of the superclass when the subclass defines a variable with the <em>same name</em> (variable hiding/shadowing).</p>
+    </div>
+  </div>
+
+  <div class="cw fade-in">
+    <div class="ch">
+      <div class="cd"><span></span><span></span><span></span></div>
+      <span class="cf">super — All Three Uses</span>
+      <span class="cl">Java</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="cn">Shape</span> {
+    <span class="tp">String</span> color;
+
+    <span class="cn">Shape</span>(<span class="tp">String</span> color) {
+        <span class="kw">this</span>.color = color;
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Shape constructor: color = "</span> + color);
+    }
+
+    <span class="kw">void</span> <span class="fn">draw</span>() {
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Drawing a "</span> + color + <span class="st">" shape"</span>);
+    }
+}
+
+<span class="kw">class</span> <span class="cn">Circle</span> <span class="kw">extends</span> <span class="cn">Shape</span> {
+    <span class="tp">double</span> radius;
+    <span class="tp">String</span> color; <span class="cm">// shadows Shape.color → variable hiding</span>
+
+    <span class="cn">Circle</span>(<span class="tp">String</span> color, <span class="tp">double</span> radius) {
+        <span class="kw">super</span>(color);          <span class="cm">// ① calls Shape(color) — MUST be first!</span>
+        <span class="kw">this</span>.radius = radius;
+        <span class="kw">this</span>.color  = <span class="st">"Bright "</span> + color; <span class="cm">// subclass color</span>
+    }
+
+    <span class="kw">void</span> <span class="fn">draw</span>() {             <span class="cm">// overrides Shape.draw()</span>
+        <span class="kw">super</span>.<span class="fn">draw</span>();          <span class="cm">// ② calls superclass draw() first</span>
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Drawing circle of radius "</span> + radius);
+    }
+
+    <span class="kw">void</span> <span class="fn">showColors</span>() {
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Subclass color : "</span> + <span class="kw">this</span>.color);
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Superclass color: "</span> + <span class="kw">super</span>.color); <span class="cm">// ③ parent field</span>
+    }
+}
+
+<span class="kw">class</span> <span class="cn">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="tp">String</span>[] args) {
+        <span class="cn">Circle</span> c = <span class="kw">new</span> <span class="cn">Circle</span>(<span class="st">"Red"</span>, <span class="nm">5.0</span>);
+        c.<span class="fn">draw</span>();
+        c.<span class="fn">showColors</span>();
+    }
+}</pre>
+  </div>
+
+  <div class="hl hl-amber fade-in">
+    <div class="hl-icon">⚠️</div>
+    <div class="hl-body">
+      <strong>super() vs this() — Critical Difference</strong>
+      <p><code>super()</code> calls the <em>superclass constructor</em>; <code>this()</code> calls another constructor in the <em>same class</em>. Both must be the FIRST statement in a constructor — so they CANNOT both appear in the same constructor.</p>
+    </div>
+  </div>
+
+  <div class="tw fade-in">
+    <table>
+      <tr><th>Usage</th><th>Syntax</th><th>Purpose</th></tr>
+      <tr><td>Constructor call</td><td><code>super(args)</code></td><td>Invoke parent class constructor — must be first line</td></tr>
+      <tr><td>Method call</td><td><code>super.methodName()</code></td><td>Call overridden parent method from subclass</td></tr>
+      <tr><td>Field access</td><td><code>super.fieldName</code></td><td>Access parent field when subclass field has same name</td></tr>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════
+     S3: MEMBER ACCESS & PROTECTED
+════════════════════════════════════ -->
+<section class="sec" id="s3">
+  <div class="sec-hd">
+    <span class="sec-num">03</span>
+    <h2 class="sec-title">Member Access in Derived Classes &amp; protected Visibility</h2>
+  </div>
+
+  <p class="sec-intro">
+    Not all members of a superclass are directly accessible in a subclass. Java's access modifiers control exactly which members are visible and where.
+  </p>
+
+  <div class="tw fade-in">
+    <table>
+      <tr>
+        <th>Modifier</th>
+        <th>Same Class</th>
+        <th>Same Package</th>
+        <th>Subclass (diff. pkg)</th>
+        <th>Any Other Class</th>
+      </tr>
+      <tr>
+        <td><code>private</code></td>
+        <td>✅</td><td>❌</td><td>❌</td><td>❌</td>
+      </tr>
+      <tr>
+        <td><code>default</code> (no modifier)</td>
+        <td>✅</td><td>✅</td><td>❌</td><td>❌</td>
+      </tr>
+      <tr>
+        <td><code>protected</code></td>
+        <td>✅</td><td>✅</td><td>✅ <span class="badge b-teal">KEY FOR INHERITANCE</span></td><td>❌</td>
+      </tr>
+      <tr>
+        <td><code>public</code></td>
+        <td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="def fade-in">
+    <div class="dlabel">protected Visibility</div>
+    <div class="dtext"><code>protected</code> members are accessible within the same package AND in any subclass (even from a different package). It is designed specifically for inheritance — giving subclasses access to superclass internals without making them fully <code>public</code>. This is the recommended access level for fields intended to be used by subclasses.</div>
+  </div>
+
+  <div class="cw fade-in">
+    <div class="ch">
+      <div class="cd"><span></span><span></span><span></span></div>
+      <span class="cf">Access Modifiers in Inheritance</span>
+      <span class="cl">Java</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="cn">Vehicle</span> {
+    <span class="kw">private</span>   <span class="tp">String</span> chassisNo;  <span class="cm">// NOT accessible in subclass directly</span>
+    <span class="kw">protected</span> <span class="tp">String</span> brand;       <span class="cm">// accessible in subclass ✅</span>
+    <span class="kw">protected</span> <span class="tp">int</span>    speed;       <span class="cm">// accessible in subclass ✅</span>
+    <span class="kw">public</span>    <span class="tp">String</span> type;        <span class="cm">// accessible everywhere ✅</span>
+
+    <span class="kw">protected</span> <span class="kw">void</span> <span class="fn">startEngine</span>() {
+        <span class="cn">System</span>.out.<span class="fn">println</span>(brand + <span class="st">" engine started."</span>);
+    }
+
+    <span class="kw">private</span> <span class="tp">String</span> <span class="fn">getChassis</span>() {  <span class="cm">// can be called by Vehicle only</span>
+        <span class="kw">return</span> chassisNo;
+    }
+}
+
+<span class="kw">class</span> <span class="cn">Car</span> <span class="kw">extends</span> <span class="cn">Vehicle</span> {
+    <span class="tp">int</span> doors;
+
+    <span class="cn">Car</span>(<span class="tp">String</span> brand, <span class="tp">int</span> speed, <span class="tp">int</span> doors) {
+        <span class="kw">this</span>.brand = brand;   <span class="cm">// ✅ protected — accessible here</span>
+        <span class="kw">this</span>.speed = speed;   <span class="cm">// ✅ protected</span>
+        <span class="kw">this</span>.doors = doors;
+        <span class="cm">// this.chassisNo = "..."; ← ❌ COMPILE ERROR — private</span>
+    }
+
+    <span class="kw">void</span> <span class="fn">details</span>() {
+        <span class="fn">startEngine</span>();        <span class="cm">// ✅ protected method — accessible</span>
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Brand: "</span> + brand + <span class="st">"  Doors: "</span> + doors);
+    }
+}</pre>
+  </div>
+
+  <div class="etip fade-in">
+    <div class="etitle">⭐ Exam Tips — Member Access</div>
+    <ul>
+      <li><strong>private members are NEVER directly inherited</strong> — but they ARE present in the subclass object in memory; they are just not accessible directly. Use getters/setters.</li>
+      <li><code>protected</code> is the bridge — it's the right choice for fields you want subclasses to use without exposing to the world.</li>
+      <li>Constructors are NEVER inherited regardless of access modifier.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════
+     S4: METHOD OVERRIDING
+════════════════════════════════════ -->
+<section class="sec" id="s4">
+  <div class="sec-hd">
+    <span class="sec-num">04</span>
+    <h2 class="sec-title">Method Overriding &amp; Variable Redefinition</h2>
+  </div>
+
+  <p class="sec-intro">
+    A subclass can <strong>redefine</strong> (override) methods and variables inherited from its superclass to provide a specific implementation for its own type.
+  </p>
+
+  <div class="def fade-in">
+    <div class="dlabel">Method Overriding</div>
+    <div class="dtext">When a subclass provides its <strong>own implementation</strong> of a method that is already defined in its superclass — with the <em>same name, same return type, and same parameter list</em> — it is called <strong>method overriding</strong>. The subclass version replaces (overrides) the parent version for objects of the subclass type.</div>
+  </div>
+
+  <div class="cw fade-in">
+    <div class="ch">
+      <div class="cd"><span></span><span></span><span></span></div>
+      <span class="cf">Method Overriding</span>
+      <span class="cl">Java</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="cn">Employee</span> {
+    <span class="tp">String</span> name;
+    <span class="tp">double</span> basicSalary;
+
+    <span class="cn">Employee</span>(<span class="tp">String</span> name, <span class="tp">double</span> basic) {
+        <span class="kw">this</span>.name        = name;
+        <span class="kw">this</span>.basicSalary = basic;
+    }
+
+    <span class="kw">double</span> <span class="fn">calculateBonus</span>() {
+        <span class="kw">return</span> basicSalary * <span class="nm">0.10</span>; <span class="cm">// 10% bonus for all employees</span>
+    }
+
+    <span class="kw">void</span> <span class="fn">display</span>() {
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Name: "</span> + name + <span class="st">"  Bonus: "</span> + <span class="fn">calculateBonus</span>());
+    }
+}
+
+<span class="cm">// Manager IS-A Employee (specialisation)</span>
+<span class="kw">class</span> <span class="cn">Manager</span> <span class="kw">extends</span> <span class="cn">Employee</span> {
+    <span class="tp">int</span> teamSize;
+
+    <span class="cn">Manager</span>(<span class="tp">String</span> name, <span class="tp">double</span> basic, <span class="tp">int</span> teamSize) {
+        <span class="kw">super</span>(name, basic);
+        <span class="kw">this</span>.teamSize = teamSize;
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">double</span> <span class="fn">calculateBonus</span>() {         <span class="cm">// OVERRIDES Employee.calculateBonus()</span>
+        <span class="kw">return</span> basicSalary * <span class="nm">0.20</span>      <span class="cm">// 20% base bonus</span>
+             + teamSize * <span class="nm">1000</span>;       <span class="cm">// extra per team member</span>
+    }
+}
+
+<span class="kw">class</span> <span class="cn">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="tp">String</span>[] args) {
+        <span class="cn">Employee</span> e = <span class="kw">new</span> <span class="cn">Employee</span>(<span class="st">"Aarav"</span>, <span class="nm">30000</span>);
+        <span class="cn">Manager</span>  m = <span class="kw">new</span> <span class="cn">Manager</span>(<span class="st">"Priya"</span>, <span class="nm">50000</span>, <span class="nm">8</span>);
+
+        e.<span class="fn">display</span>();   <span class="cm">// bonus = 3000   (Employee version)</span>
+        m.<span class="fn">display</span>();   <span class="cm">// bonus = 18000  (Manager version — overridden)</span>
+    }
+}</pre>
+  </div>
+
+  <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--text);margin:2rem 0 1rem;">Overriding vs Overloading</h3>
+
+  <div class="tw fade-in">
+    <table>
+      <tr><th>Feature</th><th>Method Overriding</th><th>Method Overloading</th></tr>
+      <tr><td>Class</td><td>Two different classes (parent &amp; child)</td><td>Same class</td></tr>
+      <tr><td>Signature</td><td>Same name, same parameters, same return type</td><td>Same name, different parameters</td></tr>
+      <tr><td>Resolved at</td><td><strong>Runtime</strong> (dynamic binding)</td><td><strong>Compile time</strong> (static binding)</td></tr>
+      <tr><td>Keyword</td><td><code>@Override</code> (annotation, recommended)</td><td>No special keyword</td></tr>
+      <tr><td>Purpose</td><td>Change inherited behaviour for a subtype</td><td>Multiple versions of same task</td></tr>
+      <tr><td>Polymorphism</td><td>Runtime polymorphism</td><td>Compile-time polymorphism</td></tr>
+    </table>
+  </div>
+
+  <div class="hl hl-rose fade-in">
+    <div class="hl-icon">🚫</div>
+    <div class="hl-body">
+      <strong>Rules for Method Overriding</strong>
+      <p>
+        The overriding method CANNOT have more restrictive access (e.g., if parent is <code>public</code>, child cannot be <code>private</code>). You CANNOT override <code>final</code> methods, <code>static</code> methods (that's method hiding, not overriding), or constructors. The <code>@Override</code> annotation is optional but strongly recommended — it catches errors at compile time.
+      </p>
+    </div>
+  </div>
+
+  <div class="hl hl-violet fade-in">
+    <div class="hl-icon">🔢</div>
+    <div class="hl-body">
+      <strong>Variable Hiding (Redefinition of Variables)</strong>
+      <p>If a subclass declares a variable with the <strong>same name</strong> as a superclass variable, the superclass variable is <em>hidden</em> (not overridden). The subclass variable shadows the parent's. Use <code>super.varName</code> to access the parent's version. Unlike method overriding, variable resolution is based on the <strong>reference type</strong> (compile time), not the object type.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════
+     S5: ABSTRACT CLASSES
+════════════════════════════════════ -->
+<section class="sec" id="s5">
+  <div class="sec-hd">
+    <span class="sec-num">05</span>
+    <h2 class="sec-title">Abstract Classes</h2>
+  </div>
+
+  <p class="sec-intro">
+    Sometimes a superclass is so general that it doesn't make sense to create objects directly from it. Abstract classes enforce a contract — subclasses MUST provide the implementation.
+  </p>
+
+  <div class="def fade-in">
+    <div class="dlabel">Definition — Abstract Class</div>
+    <div class="dtext">An <strong>abstract class</strong> is a class declared with the <code>abstract</code> keyword. It <em>cannot be instantiated</em> (you cannot create objects of it directly). It may contain <strong>abstract methods</strong> (methods without a body — only signature) that MUST be overridden in non-abstract subclasses.</div>
+  </div>
+
+  <div class="def fade-in">
+    <div class="dlabel">Definition — Abstract Method</div>
+    <div class="dtext">An <strong>abstract method</strong> is a method declared with <code>abstract</code> and has <em>no body</em> — only a method signature ending with a semicolon. Any class containing at least one abstract method MUST itself be declared abstract.</div>
+  </div>
+
+  <div class="cw fade-in">
+    <div class="ch">
+      <div class="cd"><span></span><span></span><span></span></div>
+      <span class="cf">Abstract Class — Shape Example</span>
+      <span class="cl">Java</span>
+    </div>
+    <pre><span class="cm">// ABSTRACT CLASS — cannot instantiate directly</span>
+<span class="kw">abstract class</span> <span class="cn">Shape</span> {
+    <span class="tp">String</span> color;
+
+    <span class="cn">Shape</span>(<span class="tp">String</span> color) {
+        <span class="kw">this</span>.color = color;
+    }
+
+    <span class="cm">// ABSTRACT METHODS — no body, must be overridden</span>
+    <span class="kw">abstract double</span> <span class="fn">area</span>();
+    <span class="kw">abstract double</span> <span class="fn">perimeter</span>();
+
+    <span class="cm">// CONCRETE METHOD — has a body, inherited as-is</span>
+    <span class="kw">void</span> <span class="fn">display</span>() {
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Color: "</span> + color
+            + <span class="st">"  Area: "</span> + <span class="fn">area</span>()
+            + <span class="st">"  Perimeter: "</span> + <span class="fn">perimeter</span>());
+    }
+}
+
+<span class="cm">// Concrete subclass — MUST implement all abstract methods</span>
+<span class="kw">class</span> <span class="cn">Circle</span> <span class="kw">extends</span> <span class="cn">Shape</span> {
+    <span class="tp">double</span> radius;
+
+    <span class="cn">Circle</span>(<span class="tp">String</span> color, <span class="tp">double</span> radius) {
+        <span class="kw">super</span>(color);
+        <span class="kw">this</span>.radius = radius;
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">double</span> <span class="fn">area</span>()      { <span class="kw">return</span> <span class="cn">Math</span>.PI * radius * radius; }
+
+    <span class="an">@Override</span>
+    <span class="kw">double</span> <span class="fn">perimeter</span>() { <span class="kw">return</span> <span class="nm">2</span> * <span class="cn">Math</span>.PI * radius; }
+}
+
+<span class="cm">// Another concrete subclass</span>
+<span class="kw">class</span> <span class="cn">Rectangle</span> <span class="kw">extends</span> <span class="cn">Shape</span> {
+    <span class="tp">double</span> length, width;
+
+    <span class="cn">Rectangle</span>(<span class="tp">String</span> color, <span class="tp">double</span> l, <span class="tp">double</span> w) {
+        <span class="kw">super</span>(color);
+        <span class="kw">this</span>.length = l; <span class="kw">this</span>.width = w;
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">double</span> <span class="fn">area</span>()      { <span class="kw">return</span> length * width; }
+
+    <span class="an">@Override</span>
+    <span class="kw">double</span> <span class="fn">perimeter</span>() { <span class="kw">return</span> <span class="nm">2</span> * (length + width); }
+}
+
+<span class="kw">class</span> <span class="cn">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="tp">String</span>[] args) {
+        <span class="cm">// Shape s = new Shape("Red"); ← ❌ COMPILE ERROR: cannot instantiate abstract</span>
+        <span class="cn">Shape</span> c = <span class="kw">new</span> <span class="cn">Circle</span>(<span class="st">"Blue"</span>, <span class="nm">5.0</span>);     <span class="cm">// ✅ polymorphic reference</span>
+        <span class="cn">Shape</span> r = <span class="kw">new</span> <span class="cn">Rectangle</span>(<span class="st">"Red"</span>, <span class="nm">4.0</span>, <span class="nm">6.0</span>); <span class="cm">// ✅</span>
+        c.<span class="fn">display</span>();
+        r.<span class="fn">display</span>();
+    }
+}</pre>
+  </div>
+
+  <div class="tw fade-in">
+    <table>
+      <tr><th>Feature</th><th>Abstract Class</th><th>Concrete Class</th></tr>
+      <tr><td>Instantiation</td><td>❌ Cannot create objects</td><td>✅ Can create objects</td></tr>
+      <tr><td>Abstract methods</td><td>Can have (0 or more)</td><td>Cannot have</td></tr>
+      <tr><td>Concrete methods</td><td>Can have</td><td>Can have</td></tr>
+      <tr><td>Constructor</td><td>Can have (called via <code>super()</code>)</td><td>Can have</td></tr>
+      <tr><td>Subclass obligation</td><td>Must implement all abstract methods</td><td>No obligation</td></tr>
+    </table>
+  </div>
+
+  <div class="etip fade-in">
+    <div class="etitle">⭐ Exam Tips — Abstract Classes</div>
+    <ul>
+      <li><strong>Abstract class CAN have constructors</strong> — called indirectly via <code>super()</code> from subclass.</li>
+      <li>If a subclass does NOT implement all abstract methods, it must also be declared <code>abstract</code>.</li>
+      <li>An abstract class can have <em>zero</em> abstract methods — that's valid (prevents instantiation without forcing override).</li>
+      <li><strong>abstract + final</strong> is illegal — final prevents subclassing, abstract requires it.</li>
+      <li><strong>abstract + static</strong> for a method is also illegal.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════
+     S6: CLASS OBJECT
+════════════════════════════════════ -->
+<section class="sec" id="s6">
+  <div class="sec-hd">
+    <span class="sec-num">06</span>
+    <h2 class="sec-title">The <code>Object</code> Class</h2>
+  </div>
+
+  <p class="sec-intro">
+    Every class in Java implicitly extends <code>java.lang.Object</code>. This is the root of the entire Java class hierarchy — every object you ever create is ultimately an instance of <code>Object</code>.
+  </p>
+
+  <div class="def fade-in">
+    <div class="dlabel">java.lang.Object</div>
+    <div class="dtext"><code>Object</code> is the ultimate superclass of every Java class. If a class does not explicitly extend any class, it automatically extends <code>Object</code>. This means all classes inherit a common set of methods from <code>Object</code>.</div>
+  </div>
+
+  <div class="tw fade-in">
+    <table>
+      <tr><th>Method in Object</th><th>Signature</th><th>Purpose (ISC Relevant)</th></tr>
+      <tr><td><code>toString()</code></td><td><code>public String toString()</code></td><td>Returns a String representation. Override to give meaningful output.</td></tr>
+      <tr><td><code>equals()</code></td><td><code>public boolean equals(Object obj)</code></td><td>Checks logical equality. Default: reference equality (same as ==). Override for value equality.</td></tr>
+      <tr><td><code>hashCode()</code></td><td><code>public int hashCode()</code></td><td>Returns hash code — linked to equals(). Override together.</td></tr>
+      <tr><td><code>getClass()</code></td><td><code>public final Class getClass()</code></td><td>Returns the runtime class of the object. Cannot override.</td></tr>
+      <tr><td><code>clone()</code></td><td><code>protected Object clone()</code></td><td>Creates a copy of the object.</td></tr>
+    </table>
+  </div>
+
+  <div class="cw fade-in">
+    <div class="ch">
+      <div class="cd"><span></span><span></span><span></span></div>
+      <span class="cf">Overriding toString() and equals()</span>
+      <span class="cl">Java</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="cn">Point</span> {  <span class="cm">// implicitly extends Object</span>
+    <span class="tp">int</span> x, y;
+
+    <span class="cn">Point</span>(<span class="tp">int</span> x, <span class="tp">int</span> y) { <span class="kw">this</span>.x = x; <span class="kw">this</span>.y = y; }
+
+    <span class="an">@Override</span>
+    <span class="kw">public</span> <span class="tp">String</span> <span class="fn">toString</span>() {       <span class="cm">// overrides Object.toString()</span>
+        <span class="kw">return</span> <span class="st">"("</span> + x + <span class="st">", "</span> + y + <span class="st">")"</span>;
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public boolean</span> <span class="fn">equals</span>(<span class="cn">Object</span> obj) {   <span class="cm">// overrides Object.equals()</span>
+        <span class="kw">if</span> (<span class="kw">this</span> == obj) <span class="kw">return true</span>;
+        <span class="kw">if</span> (!(obj <span class="kw">instanceof</span> <span class="cn">Point</span>)) <span class="kw">return false</span>;
+        <span class="cn">Point</span> other = (<span class="cn">Point</span>) obj;
+        <span class="kw">return this</span>.x == other.x &amp;&amp; <span class="kw">this</span>.y == other.y;
+    }
+}
+
+<span class="kw">class</span> <span class="cn">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="tp">String</span>[] args) {
+        <span class="cn">Point</span> p1 = <span class="kw">new</span> <span class="cn">Point</span>(<span class="nm">3</span>, <span class="nm">4</span>);
+        <span class="cn">Point</span> p2 = <span class="kw">new</span> <span class="cn">Point</span>(<span class="nm">3</span>, <span class="nm">4</span>);
+        <span class="cn">System</span>.out.<span class="fn">println</span>(p1);            <span class="cm">// calls toString() → (3, 4)</span>
+        <span class="cn">System</span>.out.<span class="fn">println</span>(p1.<span class="fn">equals</span>(p2)); <span class="cm">// → true (value equality)</span>
+        <span class="cn">System</span>.out.<span class="fn">println</span>(p1 == p2);       <span class="cm">// → false (reference equality)</span>
+        <span class="cn">System</span>.out.<span class="fn">println</span>(p1.<span class="fn">getClass</span>().<span class="fn">getName</span>()); <span class="cm">// → "Point"</span>
+    }
+}</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════
+     S7: POLYMORPHISM & DYNAMIC BINDING
+════════════════════════════════════ -->
+<section class="sec" id="s7">
+  <div class="sec-hd">
+    <span class="sec-num">07</span>
+    <h2 class="sec-title">Polymorphism &amp; Dynamic Binding</h2>
+  </div>
+
+  <p class="sec-intro">
+    Polymorphism — "many forms" — is the ability of an object to take on many forms. It is the third pillar of OOP (after Encapsulation and Inheritance). Java supports two types.
+  </p>
+
+  <div class="g2 fade-in">
+    <div class="card">
+      <h3>🕐 Compile-time Polymorphism</h3>
+      <p>Also called <strong>static binding</strong> or <strong>method overloading</strong>. The method call is resolved by the compiler at <em>compile time</em> based on method signatures. Less flexible — binding is fixed before runtime.</p>
+      <br><p><span class="badge b-sky">Resolved at: COMPILE TIME</span></p>
+    </div>
+    <div class="card">
+      <h3>⚡ Runtime Polymorphism</h3>
+      <p>Also called <strong>dynamic binding</strong> or <strong>method overriding</strong>. The method call is resolved at <em>runtime</em> based on the <strong>actual type of the object</strong> (not the reference type). This is the heart of OOP power.</p>
+      <br><p><span class="badge b-teal">Resolved at: RUNTIME</span></p>
+    </div>
+  </div>
+
+  <div class="def fade-in">
+    <div class="dlabel">Dynamic Binding (Late Binding)</div>
+    <div class="dtext">In Java, when an overridden method is called through a <strong>superclass reference</strong>, Java determines at <strong>runtime</strong> which version to execute — based on the <em>actual object type</em>, not the declared reference type. This is called <strong>dynamic dispatch</strong> or <strong>late binding</strong>.</div>
+  </div>
+
+  <div class="cw fade-in">
+    <div class="ch">
+      <div class="cd"><span></span><span></span><span></span></div>
+      <span class="cf">Subclass Polymorphism + Dynamic Binding</span>
+      <span class="cl">Java</span>
+    </div>
+    <pre><span class="kw">abstract class</span> <span class="cn">Shape</span> {
+    <span class="kw">abstract void</span> <span class="fn">draw</span>();
+    <span class="kw">void</span> <span class="fn">describe</span>() { <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"I am a shape."</span>); }
+}
+
+<span class="kw">class</span> <span class="cn">Circle</span>    <span class="kw">extends</span> <span class="cn">Shape</span> {
+    <span class="an">@Override</span> <span class="kw">void</span> <span class="fn">draw</span>() { <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Drawing CIRCLE"</span>); }
+}
+<span class="kw">class</span> <span class="cn">Rectangle</span> <span class="kw">extends</span> <span class="cn">Shape</span> {
+    <span class="an">@Override</span> <span class="kw">void</span> <span class="fn">draw</span>() { <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Drawing RECTANGLE"</span>); }
+}
+<span class="kw">class</span> <span class="cn">Triangle</span>  <span class="kw">extends</span> <span class="cn">Shape</span> {
+    <span class="an">@Override</span> <span class="kw">void</span> <span class="fn">draw</span>() { <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Drawing TRIANGLE"</span>); }
+}
+
+<span class="kw">class</span> <span class="cn">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="tp">String</span>[] args) {
+
+        <span class="cm">// POLYMORPHIC array — Shape ref, different object types</span>
+        <span class="cn">Shape</span>[] shapes = {
+            <span class="kw">new</span> <span class="cn">Circle</span>(),
+            <span class="kw">new</span> <span class="cn">Rectangle</span>(),
+            <span class="kw">new</span> <span class="cn">Triangle</span>(),
+            <span class="kw">new</span> <span class="cn">Circle</span>()
+        };
+
+        <span class="cm">// Same call → different results based on ACTUAL object type</span>
+        <span class="cm">// This is DYNAMIC BINDING in action!</span>
+        <span class="kw">for</span> (<span class="cn">Shape</span> s : shapes) {
+            s.<span class="fn">draw</span>();   <span class="cm">// resolved at runtime — which draw() to call?</span>
+        }
+
+        <span class="cm">// OUTPUT:
+        // Drawing CIRCLE
+        // Drawing RECTANGLE
+        // Drawing TRIANGLE
+        // Drawing CIRCLE</span>
+
+        <span class="cm">// Upcasting (implicit) — always safe</span>
+        <span class="cn">Shape</span> ref = <span class="kw">new</span> <span class="cn">Circle</span>();   <span class="cm">// Circle IS-A Shape ✅</span>
+        ref.<span class="fn">draw</span>();                   <span class="cm">// calls Circle.draw() at runtime</span>
+
+        <span class="cm">// Downcasting (explicit) — needs instanceof check</span>
+        <span class="kw">if</span> (ref <span class="kw">instanceof</span> <span class="cn">Circle</span>) {
+            <span class="cn">Circle</span> c = (<span class="cn">Circle</span>) ref;  <span class="cm">// safe downcast</span>
+        }
+    }
+}</pre>
+  </div>
+
+  <div class="hl hl-teal fade-in">
+    <div class="hl-icon">🎯</div>
+    <div class="hl-body">
+      <strong>The Golden Rule of Dynamic Binding</strong>
+      <p>The <strong>reference type</strong> determines what methods you can <em>call</em> (compile-time check). The <strong>object type</strong> (actual runtime type) determines which <em>version</em> of that method runs. This is the essence of runtime polymorphism.</p>
+    </div>
+  </div>
+
+  <div class="tw fade-in">
+    <table>
+      <tr><th>Concept</th><th>Upcasting</th><th>Downcasting</th></tr>
+      <tr><td>Direction</td><td>Subclass → Superclass reference</td><td>Superclass ref → Subclass reference</td></tr>
+      <tr><td>Safety</td><td>Always safe (implicit)</td><td>May throw ClassCastException</td></tr>
+      <tr><td>Cast keyword</td><td>Not needed</td><td>Explicit: <code>(SubclassName)</code></td></tr>
+      <tr><td>Best practice</td><td>Used widely in polymorphism</td><td>Always use <code>instanceof</code> first</td></tr>
+      <tr><td>Example</td><td><code>Shape s = new Circle();</code></td><td><code>Circle c = (Circle) s;</code></td></tr>
+    </table>
+  </div>
+
+  <div class="etip fade-in">
+    <div class="etitle">⭐ Exam Tips — Polymorphism</div>
+    <ul>
+      <li><strong>Key rule:</strong> Method resolution in dynamic binding: reference type for compile-time check; object type for runtime execution.</li>
+      <li>Variable access (fields) uses the <strong>reference type</strong> — NOT the object type. This is the difference between method overriding and variable hiding.</li>
+      <li><code>instanceof</code> tests whether an object is an instance of a given class or its subclass.</li>
+      <li>Polymorphic arrays (<code>Animal[] arr = {new Dog(), new Cat()}</code>) are a classic ISC exam pattern — study them well.</li>
+      <li>Dynamic binding only applies to <strong>instance methods</strong> — NOT static methods, NOT variables.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════
+     S8: INTERFACES
+════════════════════════════════════ -->
+<section class="sec" id="s8">
+  <div class="sec-hd">
+    <span class="sec-num">08</span>
+    <h2 class="sec-title">Interfaces in Java</h2>
+  </div>
+
+  <p class="sec-intro">
+    Interfaces solve a critical design problem: sometimes a class designer wants to enforce a <em>contract</em> (what methods must exist) without dictating <em>how</em> they work. Interfaces are Java's way of achieving this — and also of enabling multiple inheritance.
+  </p>
+
+  <div class="def fade-in">
+    <div class="dlabel">Definition — Interface</div>
+    <div class="dtext">An <strong>interface</strong> in Java is a <em>completely abstract type</em> that specifies a set of method signatures (contracts) that a class must implement. It defines WHAT to do, not HOW to do it. Declared with keyword <code>interface</code>. A class <em>implements</em> an interface using the keyword <code>implements</code>.</div>
+  </div>
+
+  <div class="hl hl-sky fade-in">
+    <div class="hl-icon">💡</div>
+    <div class="hl-body">
+      <strong>ISC Motivation for Interfaces — CRITICAL CONCEPT</strong>
+      <p>When creating a reusable <code>Sorter</code> class, the class designer knows <em>how</em> to sort, but doesn't know <em>what criterion</em> to use (which field? ascending or descending?). By using an interface (e.g., <code>Comparable</code>), the designer delegates the comparison logic to the <em>end user</em> of the class — who knows the business rules. This is the defining motivation for interfaces.</p>
+    </div>
+  </div>
+
+  <!-- INTERFACE DIAGRAM -->
+  <div class="iface-diagram fade-in" style="text-align:center;">
+    <div class="iface-box">
+      <div class="ilabel">«interface»</div>
+      <div class="iname">Drawable</div>
+      <div class="imethods">+ draw() : void<br>+ getArea() : double</div>
+    </div>
+    <div style="font-size:1.5rem;color:var(--border2);margin:.5rem 0;">↓ implements</div>
+    <div class="impl-row">
+      <div class="impl-box"><div class="imlabel">Implements</div><div class="imname">Circle</div></div>
+      <div class="impl-box"><div class="imlabel">Implements</div><div class="imname">Rectangle</div></div>
+      <div class="impl-box"><div class="imlabel">Implements</div><div class="imname">Triangle</div></div>
+    </div>
+  </div>
+
+  <div class="cw fade-in">
+    <div class="ch">
+      <div class="cd"><span></span><span></span><span></span></div>
+      <span class="cf">Interface Declaration + Implementation</span>
+      <span class="cl">Java</span>
+    </div>
+    <pre><span class="cm">// INTERFACE — defines a contract</span>
+<span class="kw">interface</span> <span class="cn">Drawable</span> {
+    <span class="cm">// All methods are implicitly public abstract</span>
+    <span class="kw">void</span> <span class="fn">draw</span>();
+    <span class="kw">double</span> <span class="fn">getArea</span>();
+
+    <span class="cm">// All fields are implicitly public static final (constants)</span>
+    <span class="tp">double</span> PI = <span class="nm">3.14159</span>;  <span class="cm">// same as: public static final double PI = 3.14159</span>
+}
+
+<span class="cm">// Another interface</span>
+<span class="kw">interface</span> <span class="cn">Resizable</span> {
+    <span class="kw">void</span> <span class="fn">resize</span>(<span class="tp">double</span> factor);
+}
+
+<span class="cm">// CLASS implementing ONE interface</span>
+<span class="kw">class</span> <span class="cn">Circle</span> <span class="kw">implements</span> <span class="cn">Drawable</span> {
+    <span class="tp">double</span> radius;
+
+    <span class="cn">Circle</span>(<span class="tp">double</span> r) { <span class="kw">this</span>.radius = r; }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">draw</span>() {
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Drawing circle with radius "</span> + radius);
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public double</span> <span class="fn">getArea</span>() { <span class="kw">return</span> PI * radius * radius; }
+}
+
+<span class="cm">// CLASS implementing MULTIPLE interfaces (solves diamond problem!)</span>
+<span class="kw">class</span> <span class="cn">Square</span> <span class="kw">implements</span> <span class="cn">Drawable</span>, <span class="cn">Resizable</span> {
+    <span class="tp">double</span> side;
+
+    <span class="cn">Square</span>(<span class="tp">double</span> s) { <span class="kw">this</span>.side = s; }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">draw</span>()    { <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Drawing square, side "</span> + side); }
+
+    <span class="an">@Override</span>
+    <span class="kw">public double</span> <span class="fn">getArea</span>() { <span class="kw">return</span> side * side; }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">resize</span>(<span class="tp">double</span> factor) {
+        side *= factor;
+        <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Square resized to side: "</span> + side);
+    }
+}
+
+<span class="kw">class</span> <span class="cn">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="tp">String</span>[] args) {
+        <span class="cn">Drawable</span>[] shapes = { <span class="kw">new</span> <span class="cn">Circle</span>(<span class="nm">5</span>), <span class="kw">new</span> <span class="cn">Square</span>(<span class="nm">4</span>) };
+        <span class="kw">for</span> (<span class="cn">Drawable</span> d : shapes) {
+            d.<span class="fn">draw</span>();
+            <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Area: "</span> + d.<span class="fn">getArea</span>());
+        }
+
+        <span class="cn">Square</span> sq = <span class="kw">new</span> <span class="cn">Square</span>(<span class="nm">3</span>);
+        sq.<span class="fn">resize</span>(<span class="nm">2.0</span>);  <span class="cm">// from Resizable</span>
+        sq.<span class="fn">draw</span>();       <span class="cm">// from Drawable</span>
+    }
+}</pre>
+  </div>
+
+  <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--text);margin:2rem 0 1rem;">Practical Interface — Comparable (User-defined sorting)</h3>
+
+  <div class="cw fade-in">
+    <div class="ch">
+      <div class="cd"><span></span><span></span><span></span></div>
+      <span class="cf">Comparable Interface — ISC Motivation Example</span>
+      <span class="cl">Java</span>
+    </div>
+    <pre><span class="cm">// Interface for comparing — end user defines the logic</span>
+<span class="kw">interface</span> <span class="cn">Comparable</span> {
+    <span class="kw">int</span> <span class="fn">compareTo</span>(<span class="cn">Object</span> other);
+    <span class="cm">// Returns: negative if this &lt; other, 0 if equal, positive if this &gt; other</span>
+}
+
+<span class="cm">// Student class — USER decides: compare by marks</span>
+<span class="kw">class</span> <span class="cn">Student</span> <span class="kw">implements</span> <span class="cn">Comparable</span> {
+    <span class="tp">String</span> name;
+    <span class="tp">int</span>    marks;
+
+    <span class="cn">Student</span>(<span class="tp">String</span> n, <span class="tp">int</span> m) { name = n; marks = m; }
+
+    <span class="an">@Override</span>
+    <span class="kw">public int</span> <span class="fn">compareTo</span>(<span class="cn">Object</span> other) {
+        <span class="cn">Student</span> s = (<span class="cn">Student</span>) other;
+        <span class="kw">return this</span>.marks - s.marks; <span class="cm">// ascending by marks</span>
+    }
+}
+
+<span class="cm">// Reusable Sorter — works for ANY Comparable class!</span>
+<span class="kw">class</span> <span class="cn">Sorter</span> {
+    <span class="kw">static void</span> <span class="fn">bubbleSort</span>(<span class="cn">Comparable</span>[] arr) {
+        <span class="tp">int</span> n = arr.length;
+        <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; n-<span class="nm">1</span>; i++) {
+            <span class="kw">for</span> (<span class="tp">int</span> j = <span class="nm">0</span>; j &lt; n-i-<span class="nm">1</span>; j++) {
+                <span class="kw">if</span> (arr[j].<span class="fn">compareTo</span>(arr[j+<span class="nm">1</span>]) > <span class="nm">0</span>) {
+                    <span class="cn">Comparable</span> tmp = arr[j];
+                    arr[j] = arr[j+<span class="nm">1</span>]; arr[j+<span class="nm">1</span>] = tmp;
+                }
+            }
+        }
+    }
+}
+
+<span class="kw">class</span> <span class="cn">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="tp">String</span>[] args) {
+        <span class="cn">Student</span>[] students = {
+            <span class="kw">new</span> <span class="cn">Student</span>(<span class="st">"Priya"</span>, <span class="nm">87</span>),
+            <span class="kw">new</span> <span class="cn">Student</span>(<span class="st">"Aarav"</span>, <span class="nm">92</span>),
+            <span class="kw">new</span> <span class="cn">Student</span>(<span class="st">"Rahul"</span>, <span class="nm">75</span>)
+        };
+        <span class="cn">Sorter</span>.<span class="fn">bubbleSort</span>(students);
+        <span class="kw">for</span> (<span class="cn">Student</span> s : students)
+            <span class="cn">System</span>.out.<span class="fn">println</span>(s.name + <span class="st">": "</span> + s.marks);
+        <span class="cm">// Output: Rahul: 75, Priya: 87, Aarav: 92</span>
+    }
+}</pre>
+  </div>
+
+  <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--text);margin:2rem 0 1rem;">Interface vs Abstract Class vs Concrete Class</h3>
+
+  <div class="tw fade-in">
+    <table>
+      <tr><th>Feature</th><th>Interface</th><th>Abstract Class</th><th>Concrete Class</th></tr>
+      <tr><td>Keyword</td><td><code>interface</code></td><td><code>abstract class</code></td><td><code>class</code></td></tr>
+      <tr><td>Instantiation</td><td>❌</td><td>❌</td><td>✅</td></tr>
+      <tr><td>Methods</td><td>Abstract only (default: public abstract)</td><td>Both abstract + concrete</td><td>Concrete only</td></tr>
+      <tr><td>Fields</td><td>Constants only (public static final)</td><td>Both constants + instance vars</td><td>Instance variables</td></tr>
+      <tr><td>Constructor</td><td>❌ None</td><td>✅ Yes</td><td>✅ Yes</td></tr>
+      <tr><td>Multiple inheritance</td><td>✅ A class can implement many</td><td>❌ Only one</td><td>❌ Only one</td></tr>
+      <tr><td>Access modifiers (methods)</td><td>Always public</td><td>Any modifier</td><td>Any modifier</td></tr>
+      <tr><td>Used for</td><td>Contract / Capability</td><td>Partial implementation</td><td>Full implementation</td></tr>
+    </table>
+  </div>
+
+  <div class="hl hl-lime fade-in">
+    <div class="hl-icon">📝</div>
+    <div class="hl-body">
+      <strong>Interface Word — Two Different Meanings (ISC Emphasis)</strong>
+      <p>The word <strong>"interface"</strong> has two meanings: (1) In everyday English, it means the set of method prototypes of a class — what a class exposes publicly. (2) In Java, <code>interface</code> is a specific language construct that defines a pure abstract type with no implementation. The ISC exam explicitly asks you to distinguish these two — always clarify which you mean.</p>
+    </div>
+  </div>
+
+  <div class="cw fade-in">
+    <div class="ch">
+      <div class="cd"><span></span><span></span><span></span></div>
+      <span class="cf">Interface Extending Interface</span>
+      <span class="cl">Java</span>
+    </div>
+    <pre><span class="cm">// Interfaces can extend other interfaces using 'extends'</span>
+<span class="kw">interface</span> <span class="cn">Printable</span> {
+    <span class="kw">void</span> <span class="fn">print</span>();
+}
+
+<span class="kw">interface</span> <span class="cn">Saveable</span> <span class="kw">extends</span> <span class="cn">Printable</span> {  <span class="cm">// interface extends interface</span>
+    <span class="kw">void</span> <span class="fn">save</span>(<span class="tp">String</span> filename);
+}
+
+<span class="kw">class</span> <span class="cn">Document</span> <span class="kw">implements</span> <span class="cn">Saveable</span> {    <span class="cm">// must implement both print() AND save()</span>
+    <span class="tp">String</span> content;
+
+    <span class="cn">Document</span>(<span class="tp">String</span> c) { content = c; }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">print</span>()                     { <span class="cn">System</span>.out.<span class="fn">println</span>(content); }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">save</span>(<span class="tp">String</span> filename)       { <span class="cn">System</span>.out.<span class="fn">println</span>(<span class="st">"Saving to: "</span> + filename); }
+}</pre>
+  </div>
+
+  <div class="etip fade-in">
+    <div class="etitle">⭐ Exam Tips — Interfaces</div>
+    <ul>
+      <li><strong>All methods in an interface are <em>implicitly</em> public and abstract</strong> — you don't need to write these modifiers (but you can).</li>
+      <li><strong>All fields in an interface are <em>implicitly</em> public, static, and final</strong> — i.e., constants.</li>
+      <li>A class can implement <strong>multiple interfaces</strong>: <code>class X implements A, B, C { ... }</code></li>
+      <li>An interface can extend <strong>multiple interfaces</strong>: <code>interface C extends A, B { }</code></li>
+      <li>If a class doesn't implement all interface methods, it must be declared <code>abstract</code>.</li>
+      <li><strong>Interfaces cannot have constructors</strong> — they are not classes.</li>
+      <li>The key motivation: interfaces allow <em>unrelated classes</em> to share a common behaviour contract without forcing them into the same inheritance hierarchy.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ QUICK REFERENCE ═══ -->
+<div class="qref fade-in">
+  <h2>⚡ Quick Reference — Revision Card</h2>
+  <div class="qref-grid">
+    <div class="qi"><div class="qk">extends</div><div class="qv">Class inherits from another class. Single or multilevel only.</div></div>
+    <div class="qi"><div class="qk">implements</div><div class="qv">Class implements an interface. Can implement multiple.</div></div>
+    <div class="qi"><div class="qk">super()</div><div class="qv">Calls parent constructor — MUST be first line in constructor.</div></div>
+    <div class="qi"><div class="qk">super.method()</div><div class="qv">Calls overridden method of parent class from subclass.</div></div>
+    <div class="qi"><div class="qk">@Override</div><div class="qv">Annotation to confirm method overriding. Recommended always.</div></div>
+    <div class="qi"><div class="qk">abstract class</div><div class="qv">Cannot instantiate. Can have abstract + concrete methods.</div></div>
+    <div class="qi"><div class="qk">abstract method</div><div class="qv">No body. Subclass MUST implement. Class must also be abstract.</div></div>
+    <div class="qi"><div class="qk">protected</div><div class="qv">Accessible in same package + all subclasses. Best for inheritance fields.</div></div>
+    <div class="qi"><div class="qk">Dynamic binding</div><div class="qv">Runtime resolution of overridden methods based on OBJECT type (not reference type).</div></div>
+    <div class="qi"><div class="qk">Upcasting</div><div class="qv">Subclass → Superclass ref. Always safe, implicit. Enables polymorphism.</div></div>
+    <div class="qi"><div class="qk">instanceof</div><div class="qv">Tests if object is of a given type. Use before downcasting.</div></div>
+    <div class="qi"><div class="qk">Interface fields</div><div class="qv">Always public + static + final (constants). No instance variables.</div></div>
+    <div class="qi"><div class="qk">Interface methods</div><div class="qv">Always public + abstract (unless default/static in Java 8+).</div></div>
+    <div class="qi"><div class="qk">Object class</div><div class="qv">Root of all Java classes. toString(), equals(), hashCode(), getClass().</div></div>
+    <div class="qi"><div class="qk">IS-A test</div><div class="qv">Use inheritance only when child IS-A parent. Otherwise use composition (HAS-A).</div></div>
+    <div class="qi"><div class="qk">Multiple inheritance</div><div class="qv">Not via classes in Java. Achievable via interfaces.</div></div>
+  </div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<section class="quiz-wrap" id="quiz">
+  <h2>🎯 Practice Quiz</h2>
+  <p class="quiz-sub">10 carefully curated questions — covering all ISC exam patterns for this topic.</p>
+
+  <div class="qcard">
+    <div class="qnum">Q1 / 10</div>
+    <div class="qtext">What does the <code>super()</code> call inside a subclass constructor do?</div>
+    <div class="opts">
+      <button class="opt" onclick="qa(this,false,'super() calls the parent constructor. super.method() calls the parent version of a method.')">Calls the parent class method</button>
+      <button class="opt" onclick="qa(this,true,'✅ Correct! super() explicitly calls the superclass constructor and MUST be the first statement in the subclass constructor.')">Calls the superclass constructor — must be the first statement</button>
+      <button class="opt" onclick="qa(this,false,'super() is NOT used to access parent fields — that is super.fieldName.')">Accesses the parent class fields</button>
+      <button class="opt" onclick="qa(this,false,'super() does not create a superclass object separately — it initialises the superclass portion of the current object.')">Creates a new object of the superclass</button>
+    </div>
+    <div class="qfb"></div>
+  </div>
+
+  <div class="qcard">
+    <div class="qnum">Q2 / 10</div>
+    <div class="qtext">Which access modifier makes a member accessible in the same package AND in subclasses from different packages?</div>
+    <div class="opts">
+      <button class="opt" onclick="qa(this,false,'private is only accessible within the same class — not even subclasses.')"><code>private</code></button>
+      <button class="opt" onclick="qa(this,false,'default (no modifier) is accessible in the same package only — not in subclasses from different packages.')">default (no modifier)</button>
+      <button class="opt" onclick="qa(this,true,'✅ Correct! protected is the bridge between private and public — it gives subclasses access without fully exposing the member.')"><code>protected</code></button>
+      <button class="opt" onclick="qa(this,false,'public is accessible everywhere — not just subclasses. protected is the more specific answer.')"><code>public</code></button>
+    </div>
+    <div class="qfb"></div>
+  </div>
+
+  <div class="qcard">
+    <div class="qnum">Q3 / 10</div>
+    <div class="qtext">Which of the following statements about abstract classes is INCORRECT?</div>
+    <div class="opts">
+      <button class="opt" onclick="qa(this,false,'This statement is actually CORRECT — abstract classes can have both abstract and concrete methods.')">An abstract class can have both abstract and concrete methods</button>
+      <button class="opt" onclick="qa(this,false,'This is CORRECT — abstract classes can have constructors (called via super()).')">An abstract class can have a constructor</button>
+      <button class="opt" onclick="qa(this,true,'✅ You found the INCORRECT statement! An abstract class CANNOT be instantiated — you cannot write new AbstractClass(). That is the whole point.')">An abstract class can be directly instantiated using <code>new</code></button>
+      <button class="opt" onclick="qa(this,false,'This is CORRECT — if a subclass doesn\'t implement all abstract methods, it too must be abstract.')">If a subclass doesn't implement all abstract methods, it must be declared abstract</button>
+    </div>
+    <div class="qfb"></div>
+  </div>
+
+  <div class="qcard">
+    <div class="qnum">Q4 / 10</div>
+    <div class="qtext">What is dynamic binding (runtime polymorphism)?</div>
+    <div class="opts">
+      <button class="opt" onclick="qa(this,false,'Compile-time binding happens with method overloading — that is static/compile-time polymorphism.')">Method calls resolved at compile time based on method signatures</button>
+      <button class="opt" onclick="qa(this,true,'✅ Correct! In dynamic binding, the JVM decides at runtime which overridden method to call, based on the actual object type (not the reference type).')">Method calls resolved at runtime based on the actual object type</button>
+      <button class="opt" onclick="qa(this,false,'Dynamic binding is NOT about static methods — static methods use static binding.')">Only applies to static methods</button>
+      <button class="opt" onclick="qa(this,false,'Dynamic binding is about method calls, not field access. Fields use compile-time (static) binding.')">Determines which variable is accessed at runtime</button>
+    </div>
+    <div class="qfb"></div>
+  </div>
+
+  <div class="qcard">
+    <div class="qnum">Q5 / 10</div>
+    <div class="qtext">Which of the following is TRUE about interfaces in Java?</div>
+    <div class="opts">
+      <button class="opt" onclick="qa(this,false,'Interfaces CANNOT have constructors. Only classes (including abstract classes) can.')">Interfaces can have constructors</button>
+      <button class="opt" onclick="qa(this,false,'Interface fields are public + static + final — they are class-level constants, not instance variables.')">Interface fields are instance variables</button>
+      <button class="opt" onclick="qa(this,true,'✅ Correct! A class can implement multiple interfaces separated by commas — this is how Java achieves a form of multiple inheritance.')">A class can implement multiple interfaces</button>
+      <button class="opt" onclick="qa(this,false,'Interfaces CANNOT extend abstract classes. But a class can implement an interface AND extend an abstract class.')">An interface can extend an abstract class</button>
+    </div>
+    <div class="qfb"></div>
+  </div>
+
+  <div class="qcard">
+    <div class="qnum">Q6 / 10</div>
+    <div class="qtext">Consider: <code>Animal a = new Dog();</code> When <code>a.sound()</code> is called (method overridden in Dog), which version runs?</div>
+    <div class="opts">
+      <button class="opt" onclick="qa(this,false,'Animal.sound() would run if there was NO overriding (or if it was a static method). But since sound() is overridden in Dog, the Dog version runs due to dynamic binding.')">Animal's <code>sound()</code></button>
+      <button class="opt" onclick="qa(this,true,'✅ Correct! The reference is of type Animal, but the object is a Dog. Dynamic binding resolves to the Dog version at runtime.')">Dog's <code>sound()</code> — due to dynamic binding</button>
+      <button class="opt" onclick="qa(this,false,'Both versions do not run simultaneously — only one is selected by the JVM.')">Both versions run</button>
+      <button class="opt" onclick="qa(this,false,'This compiles fine — Animal is a valid reference type for a Dog object (upcasting).')">Compile error — incompatible types</button>
+    </div>
+    <div class="qfb"></div>
+  </div>
+
+  <div class="qcard">
+    <div class="qnum">Q7 / 10</div>
+    <div class="qtext">Why does Java NOT support multiple inheritance through classes?</div>
+    <div class="opts">
+      <button class="opt" onclick="qa(this,false,'Java is very high performance and memory is not the reason for this design decision.')">Java classes use too much memory</button>
+      <button class="opt" onclick="qa(this,true,'✅ Correct! Multiple inheritance through classes can cause the Diamond Problem — ambiguity when two parent classes have a method with the same name. Java avoids this by allowing multiple inheritance only through interfaces.')">To avoid the Diamond Problem — ambiguity from two parents with the same method</button>
+      <button class="opt" onclick="qa(this,false,'This is false — Java supports many complex constructs. The restriction is a deliberate design decision.')">Java syntax is too simple to handle it</button>
+      <button class="opt" onclick="qa(this,false,'The restriction has nothing to do with constructor calls.')">Because constructors would conflict</button>
+    </div>
+    <div class="qfb"></div>
+  </div>
+
+  <div class="qcard">
+    <div class="qnum">Q8 / 10</div>
+    <div class="qtext">What happens if a class implements an interface but does NOT provide the implementation for one of its methods?</div>
+    <div class="opts">
+      <button class="opt" onclick="qa(this,false,'It does NOT compile with a runtime error — the compiler catches this.')">Runtime error when the method is called</button>
+      <button class="opt" onclick="qa(this,false,'Java does not auto-implement interface methods — it throws a compile error.')">Java auto-generates an empty implementation</button>
+      <button class="opt" onclick="qa(this,true,'✅ Correct! If a class partially implements an interface, it must be declared abstract. If it is not declared abstract, the compiler throws an error.')">The class must be declared <code>abstract</code>, otherwise compile error</button>
+      <button class="opt" onclick="qa(this,false,'It does NOT compile silently — this is a compile-time error.')">Compiles fine, method is treated as abstract automatically</button>
+    </div>
+    <div class="qfb"></div>
+  </div>
+
+  <div class="qcard">
+    <div class="qnum">Q9 / 10</div>
+    <div class="qtext">Which method from the <code>Object</code> class is AUTOMATICALLY called when an object is used in a <code>System.out.println()</code>?</div>
+    <div class="opts">
+      <button class="opt" onclick="qa(this,false,'display() is not a method in java.lang.Object — it is a user-defined method.')"><code>display()</code></button>
+      <button class="opt" onclick="qa(this,false,'print() is not in java.lang.Object.')"><code>print()</code></button>
+      <button class="opt" onclick="qa(this,true,'✅ Correct! System.out.println(obj) automatically calls obj.toString() to get the String representation. That is why overriding toString() is so useful.')"><code>toString()</code></button>
+      <button class="opt" onclick="qa(this,false,'hashCode() returns an int — not used in println for string representation.')"><code>hashCode()</code></button>
+    </div>
+    <div class="qfb"></div>
+  </div>
+
+  <div class="qcard">
+    <div class="qnum">Q10 / 10</div>
+    <div class="qtext">You have <code>Shape s = new Circle();</code>. Which operation requires an explicit cast?</div>
+    <div class="opts">
+      <button class="opt" onclick="qa(this,false,'Calling a Shape method on s is fine — s is declared as Shape, so Shape methods are accessible.')">Calling a method defined in <code>Shape</code> on <code>s</code></button>
+      <button class="opt" onclick="qa(this,false,'Passing s to a method that accepts a Shape parameter is fine — it is a Shape reference.')">Passing <code>s</code> to a method accepting a <code>Shape</code> parameter</button>
+      <button class="opt" onclick="qa(this,true,'✅ Correct! To call a Circle-specific method on s, you must downcast: Circle c = (Circle) s; — because s is declared as Shape, the compiler doesn\'t know about Circle-only methods.')">Calling a method defined only in <code>Circle</code> (not in <code>Shape</code>) on <code>s</code></button>
+      <button class="opt" onclick="qa(this,false,'Assigning a Circle to a Shape reference is upcasting — always implicit and safe. No cast needed.')">Assigning <code>new Circle()</code> to a <code>Shape</code> reference</button>
+    </div>
+    <div class="qfb"></div>
+  </div>
+
+</section>
+
+</main>
+
+<footer>
+  <strong>ISC Computer Science — Inheritance, Interfaces &amp; Polymorphism</strong>
+  <div style="margin-top:.5rem;opacity:.5;font-size:.75rem;">Prepared for ISC Class XII · Complete theory, all exam patterns · Exam on 27th March · You've got this! 🚀</div>
+</footer>
+
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  document.getElementById('progress').style.width = Math.min(pct, 100) + '%';
+});
+
+// Nav active
+const navLinks = document.querySelectorAll('.tnav');
+const sections = document.querySelectorAll('.sec');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id; });
+  navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + cur));
+});
+
+// Scroll animation
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.06 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Quiz
+function qa(btn, correct, msg) {
+  const optsEl = btn.parentElement;
+  if (optsEl.querySelector('.correct, .wrong')) return;
+  const fb = btn.closest('.qcard').querySelector('.qfb');
+  if (correct) {
+    btn.classList.add('correct');
+    fb.textContent = msg; fb.className = 'qfb show correct';
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = msg; fb.className = 'qfb show wrong';
+    optsEl.querySelectorAll('.opt').forEach(o => {
+      if (o !== btn && o.getAttribute('onclick').includes('true')) o.classList.add('reveal');
+    });
+  }
+}
+</script>
+</body>
+</html>

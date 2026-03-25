@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big O Notation — ISC Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #16161f;
+    --surface: #1c1c28;
+    --surface2: #22222f;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8e8f0;
+    --muted: #7a7a99;
+    --accent: #7c6fff;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --accent4: #fb923c;
+    --accent5: #f472b6;
+    --accent6: #38bdf8;
+    --danger: #f87171;
+    --glow: rgba(124,111,255,0.15);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    padding: 120px 40px 80px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 500px;
+    background: radial-gradient(ellipse, rgba(124,111,255,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    border: 1px solid rgba(124,111,255,0.3);
+    padding: 5px 16px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(48px, 8vw, 90px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+  }
+  .hero h1 span.grad {
+    background: linear-gradient(135deg, var(--accent2) 0%, var(--accent6) 60%, var(--accent3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--muted);
+    max-width: 560px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+  }
+  .hero-pills {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  }
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+  }
+  .pill:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; align-items: center; gap: 4px;
+    overflow-x: auto;
+  }
+  .nav-item {
+    font-size: 13px; font-weight: 500;
+    padding: 16px 16px;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav-item:hover, .nav-item.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* MAIN LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 40px; }
+  section { padding: 80px 0; border-bottom: 1px solid var(--border); }
+
+  /* SECTION HEADERS */
+  .sec-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .sec-title {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700; letter-spacing: -0.02em;
+    line-height: 1.15; margin-bottom: 16px;
+  }
+  .sec-desc {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--muted); font-size: 17px;
+    line-height: 1.7; max-width: 650px;
+    margin-bottom: 48px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .card p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+  /* COMPLEXITY TABLE */
+  .complexity-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+    font-size: 14px;
+  }
+  .complexity-table th {
+    text-align: left; padding: 10px 16px;
+    color: var(--muted); font-size: 12px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    font-weight: 500;
+  }
+  .complexity-table td {
+    padding: 14px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    transition: background 0.2s;
+  }
+  .complexity-table td:first-child { border-left: 1px solid var(--border); border-radius: 10px 0 0 10px; }
+  .complexity-table td:last-child { border-right: 1px solid var(--border); border-radius: 0 10px 10px 0; }
+  .complexity-table tr:hover td { background: var(--surface2); }
+  .mono { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 6px; font-family: 'Syne', sans-serif;
+  }
+  .t-green { background: rgba(52,211,153,0.15); color: #34d399; }
+  .t-teal  { background: rgba(56,189,248,0.12); color: #38bdf8; }
+  .t-amber { background: rgba(251,146,60,0.15);  color: #fb923c; }
+  .t-red   { background: rgba(248,113,113,0.15); color: #f87171; }
+  .t-purple{ background: rgba(167,139,250,0.15); color: #a78bfa; }
+
+  /* CHART SECTION */
+  #chart-canvas-wrap {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 24px 24px;
+  }
+  #chartCanvas { width: 100%; height: 340px; display: block; }
+  .chart-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 20px; align-items: center;
+  }
+  .curve-toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; padding: 6px 14px;
+    border-radius: 8px; border: 1px solid var(--border2);
+    background: var(--surface2); color: var(--muted);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .curve-toggle.on { color: var(--text); border-color: currentColor; }
+  .slider-wrap { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+  .slider-wrap label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .slider-wrap input[type=range] {
+    flex: 1; accent-color: var(--accent);
+    height: 4px; border-radius: 2px;
+  }
+  .slider-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: var(--accent);
+    min-width: 36px; text-align: right;
+  }
+
+  /* ALGO SECTION */
+  .algo-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+  .algo-tab {
+    font-size: 13px; font-weight: 500;
+    padding: 8px 20px; border-radius: 10px;
+    border: 1px solid var(--border2);
+    background: var(--surface); color: var(--muted);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .algo-tab:hover { color: var(--text); border-color: var(--accent); }
+  .algo-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .algo-panel { display: none; }
+  .algo-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width:680px){ .algo-panel.active { grid-template-columns: 1fr; } }
+  .code-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: #c9d1d9;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .kw { color: #ff7b72; }
+  .fn { color: #d2a8ff; }
+  .cm { color: #555f77; font-style: italic; }
+  .nm { color: #79c0ff; }
+  .st { color: #a5d6ff; }
+  .info-block { display: flex; flex-direction: column; gap: 14px; }
+  .info-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .info-row .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 6px; }
+  .info-row .value { font-size: 15px; font-weight: 600; }
+  .info-row p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 6px; }
+  .big-o-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 36px; font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  /* CASES SECTION */
+  .cases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px; }
+  @media(max-width:680px){ .cases-grid { grid-template-columns: 1fr; } }
+  .case-card {
+    border-radius: 16px; padding: 24px;
+    border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .case-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+  .case-best::before { background: var(--accent3); }
+  .case-avg::before  { background: var(--accent4); }
+  .case-worst::before{ background: var(--danger); }
+  .case-card .symbol {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-size: 42px;
+    opacity: 0.15; position: absolute;
+    right: 16px; top: 12px; line-height: 1;
+    color: var(--text);
+  }
+  .case-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .case-card p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .case-card .notation {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; margin-top: 12px;
+    opacity: 0.7;
+  }
+
+  /* DOMINANT TERM DEMO */
+  .dom-demo {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 32px;
+  }
+  .term-row {
+    display: flex; align-items: center;
+    gap: 16px; margin-bottom: 16px;
+  }
+  .term-box {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px; padding: 10px 16px;
+    border-radius: 10px; border: 1px solid var(--border2);
+    background: var(--bg2); min-width: 100px;
+    text-align: center; font-weight: 500;
+    transition: all 0.3s;
+  }
+  .term-bar-wrap { flex: 1; }
+  .term-bar {
+    height: 10px; border-radius: 5px;
+    transition: width 0.5s ease, background 0.3s;
+    min-width: 4px;
+  }
+  .term-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .dom-n-input {
+    display: flex; gap: 12px; align-items: center;
+    margin-bottom: 28px;
+  }
+  .dom-n-input label { font-size: 13px; color: var(--muted); }
+  .dom-n-input input { width: 80px; }
+
+  /* QUIZ */
+  .quiz-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 32px;
+    margin-bottom: 16px;
+  }
+  .quiz-q { font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+  .quiz-q .mono { font-size: 15px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-btn {
+    text-align: left; padding: 13px 18px;
+    border: 1px solid var(--border2);
+    border-radius: 10px; background: var(--bg2);
+    color: var(--text); font-size: 14px;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    font-weight: 400;
+  }
+  .quiz-btn:hover:not(:disabled) { background: var(--surface2); border-color: var(--accent); }
+  .quiz-btn.correct { background: rgba(52,211,153,0.12); border-color: #34d399; color: #34d399; }
+  .quiz-btn.wrong   { background: rgba(248,113,113,0.1);  border-color: #f87171; color: #f87171; }
+  .quiz-btn.reveal  { background: rgba(52,211,153,0.08);  border-color: rgba(52,211,153,0.3); color: #34d399; opacity: 0.6; }
+  .quiz-feedback {
+    margin-top: 14px; font-size: 14px; line-height: 1.6;
+    padding: 12px 16px; border-radius: 10px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: rgba(52,211,153,0.1); color: #34d399; }
+  .quiz-feedback.no { background: rgba(248,113,113,0.1); color: #f87171; }
+  .quiz-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }
+  .quiz-score { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); }
+  .btn-next {
+    font-family: 'Syne', sans-serif; font-weight: 600;
+    font-size: 13px; padding: 9px 22px;
+    border-radius: 10px; border: 1px solid var(--accent);
+    background: var(--accent); color: #fff;
+    cursor: pointer; transition: all 0.2s; display: none;
+  }
+  .btn-next:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-next.show { display: inline-block; }
+  .progress-bar {
+    width: 100%; height: 3px;
+    background: var(--border);
+    border-radius: 2px; margin-bottom: 28px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent);
+    border-radius: 2px; transition: width 0.4s ease;
+  }
+
+  /* SEARCH VISUALIZER */
+  .vis-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px;
+    margin-bottom: 20px;
+  }
+  .vis-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--muted); }
+  .arr-vis { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .arr-cell {
+    width: 46px; height: 46px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500;
+    border: 1px solid var(--border2);
+    background: var(--bg2); color: var(--text);
+    transition: all 0.3s;
+    position: relative;
+  }
+  .arr-cell.active   { background: rgba(124,111,255,0.25); border-color: var(--accent); color: var(--accent2); }
+  .arr-cell.found    { background: rgba(52,211,153,0.2);  border-color: var(--accent3); color: var(--accent3); }
+  .arr-cell.checked  { background: rgba(255,255,255,0.04); opacity: 0.4; }
+  .arr-cell .idx {
+    position: absolute; bottom: -18px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .vis-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 28px; }
+  .vis-btn {
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600;
+    padding: 8px 18px; border-radius: 9px;
+    border: 1px solid var(--border2); background: var(--surface2);
+    color: var(--text); cursor: pointer; transition: all 0.2s;
+  }
+  .vis-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .vis-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .vis-btn.primary:hover { opacity: 0.88; }
+  .vis-log {
+    margin-top: 16px; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--muted); min-height: 18px;
+    line-height: 1.6;
+  }
+  .vis-ops {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: var(--accent4);
+  }
+  .target-input {
+    width: 70px; font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; padding: 7px 12px;
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 8px; color: var(--text); outline: none;
+  }
+  .target-input:focus { border-color: var(--accent); }
+
+  /* SORT VIS */
+  .sort-bars { display: flex; gap: 5px; align-items: flex-end; height: 120px; margin-bottom: 16px; }
+  .sort-bar {
+    flex: 1; border-radius: 4px 4px 0 0;
+    background: var(--accent); opacity: 0.7;
+    transition: height 0.2s, background 0.2s, opacity 0.2s;
+  }
+  .sort-bar.comparing { background: var(--accent4); opacity: 1; }
+  .sort-bar.sorted    { background: var(--accent3); opacity: 0.9; }
+  .sort-bar.pivot     { background: var(--accent5); opacity: 1; }
+
+  /* FORMULA CARDS */
+  .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  .formula-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px;
+    text-align: center; transition: all 0.2s;
+    cursor: pointer;
+  }
+  .formula-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .formula-card .f-name { font-size: 12px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .formula-card .f-expr { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500; margin-bottom: 8px; }
+  .formula-card .f-eg { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .formula-card .f-detail {
+    font-size: 12px; color: var(--muted);
+    margin-top: 10px; line-height: 1.6;
+    display: none;
+  }
+  .formula-card.open .f-detail { display: block; }
+  .formula-card.open { border-color: var(--accent2); background: var(--surface2); }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 60px 40px;
+    border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 13px;
+  }
+  footer span { color: var(--accent); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.5s ease forwards; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .pulse { animation: pulse 1.5s ease-in-out infinite; }
+
+  .divider { height: 1px; background: var(--border); margin: 40px 0; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div style="position:relative;z-index:1">
+    <div class="hero-tag">ISC Computer Science — Exam Ready</div>
+    <h1>Big O <span class="grad">Notation</span><br>& Complexity</h1>
+    <p>An interactive guide to mastering computational complexity — from O(1) to O(n!) — built for your ISC exam.</p>
+    <div class="hero-pills">
+      <a class="pill" href="#concepts">Core Concepts</a>
+      <a class="pill" href="#chart">Growth Chart</a>
+      <a class="pill" href="#algorithms">Algorithms</a>
+      <a class="pill" href="#visualizer">Visualizer</a>
+      <a class="pill" href="#quiz">Quiz</a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-item active" onclick="setNav(this,'concepts')">Concepts</div>
+  <div class="nav-item" onclick="setNav(this,'chart')">Growth Chart</div>
+  <div class="nav-item" onclick="setNav(this,'dominant')">Dominant Term</div>
+  <div class="nav-item" onclick="setNav(this,'cases')">Best/Worst/Avg</div>
+  <div class="nav-item" onclick="setNav(this,'algorithms')">Algorithms</div>
+  <div class="nav-item" onclick="setNav(this,'visualizer')">Visualizer</div>
+  <div class="nav-item" onclick="setNav(this,'quiz')">Quiz</div>
+</nav>
+
+<div class="container">
+
+<!-- SECTION 1: CONCEPTS -->
+<section id="concepts">
+  <div class="sec-label">Section 01</div>
+  <div class="sec-title">What is Big O Notation?</div>
+  <div class="sec-desc">Big O describes how an algorithm's time or space requirements scale with input size n. It gives us a language to compare algorithms — independent of hardware or implementation.</div>
+
+  <div class="card-grid" style="margin-bottom:40px">
+    <div class="card">
+      <div style="font-size:28px;margin-bottom:12px">📐</div>
+      <h3>Input Size <span class="mono" style="font-size:14px">n</span></h3>
+      <p>The measure of how much data the algorithm processes. Could be array length, number of nodes in a tree, digits in a number, or rows in a matrix. As <span class="mono">n</span> grows, runtime changes.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:28px;margin-bottom:12px">🎯</div>
+      <h3>Computational Complexity</h3>
+      <p>The number of elementary operations (comparisons, assignments, arithmetic) an algorithm performs. We express this as a function of <span class="mono">n</span> and classify it using Big O.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:28px;margin-bottom:12px">⚡</div>
+      <h3>Why It Matters</h3>
+      <p>An O(n²) algorithm on 1 million elements takes ~10¹² operations. An O(n log n) sort takes ~20 million. Choosing the right algorithm is often more important than faster hardware.</p>
+    </div>
+  </div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:32px">
+    <h3 style="font-size:17px;font-weight:600;margin-bottom:20px">The Big O Classes — from fastest to slowest</h3>
+    <table class="complexity-table">
+      <thead>
+        <tr>
+          <th>Notation</th><th>Name</th><th>Rating</th><th>n=10</th><th>n=100</th><th>n=1000</th><th>Example</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="mono" style="color:#34d399">O(1)</span></td>
+          <td>Constant</td>
+          <td><span class="tag t-green">Excellent</span></td>
+          <td class="mono">1</td><td class="mono">1</td><td class="mono">1</td>
+          <td>Array access by index</td>
+        </tr>
+        <tr>
+          <td><span class="mono" style="color:#38bdf8">O(log n)</span></td>
+          <td>Logarithmic</td>
+          <td><span class="tag t-teal">Great</span></td>
+          <td class="mono">3</td><td class="mono">7</td><td class="mono">10</td>
+          <td>Binary Search</td>
+        </tr>
+        <tr>
+          <td><span class="mono" style="color:#a78bfa">O(n)</span></td>
+          <td>Linear</td>
+          <td><span class="tag t-purple">Good</span></td>
+          <td class="mono">10</td><td class="mono">100</td><td class="mono">1,000</td>
+          <td>Linear Search</td>
+        </tr>
+        <tr>
+          <td><span class="mono" style="color:#a78bfa">O(n log n)</span></td>
+          <td>Linearithmic</td>
+          <td><span class="tag t-purple">Fair</span></td>
+          <td class="mono">33</td><td class="mono">664</td><td class="mono">9,966</td>
+          <td>Merge Sort, Quick Sort (avg)</td>
+        </tr>
+        <tr>
+          <td><span class="mono" style="color:#fb923c">O(n²)</span></td>
+          <td>Quadratic</td>
+          <td><span class="tag t-amber">Poor</span></td>
+          <td class="mono">100</td><td class="mono">10,000</td><td class="mono">1,000,000</td>
+          <td>Bubble Sort, Selection Sort</td>
+        </tr>
+        <tr>
+          <td><span class="mono" style="color:#f87171">O(2ⁿ)</span></td>
+          <td>Exponential</td>
+          <td><span class="tag t-red">Terrible</span></td>
+          <td class="mono">1,024</td><td class="mono">10³⁰</td><td class="mono">10³⁰¹</td>
+          <td>Recursive Fibonacci (naive)</td>
+        </tr>
+        <tr>
+          <td><span class="mono" style="color:#f87171">O(n!)</span></td>
+          <td>Factorial</td>
+          <td><span class="tag t-red">Unusable</span></td>
+          <td class="mono">3.6M</td><td class="mono">∞</td><td class="mono">∞</td>
+          <td>Brute-force permutations</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 2: GROWTH CHART -->
+<section id="chart">
+  <div class="sec-label">Section 02</div>
+  <div class="sec-title">Interactive Growth Chart</div>
+  <div class="sec-desc">Toggle complexity classes on and off. Drag the slider to zoom in on small values of n. Watch how each curve behaves differently.</div>
+
+  <div id="chart-canvas-wrap">
+    <div class="chart-controls">
+      <button class="curve-toggle on" style="color:#34d399;border-color:#34d399" data-curve="0" onclick="toggleCurve(this,0)">O(1)</button>
+      <button class="curve-toggle on" style="color:#38bdf8;border-color:#38bdf8" data-curve="1" onclick="toggleCurve(this,1)">O(log n)</button>
+      <button class="curve-toggle on" style="color:#a78bfa;border-color:#a78bfa" data-curve="2" onclick="toggleCurve(this,2)">O(n)</button>
+      <button class="curve-toggle on" style="color:#818cf8;border-color:#818cf8" data-curve="3" onclick="toggleCurve(this,3)">O(n log n)</button>
+      <button class="curve-toggle on" style="color:#fb923c;border-color:#fb923c" data-curve="4" onclick="toggleCurve(this,4)">O(n²)</button>
+      <button class="curve-toggle on" style="color:#f472b6;border-color:#f472b6" data-curve="5" onclick="toggleCurve(this,5)">O(2ⁿ)</button>
+    </div>
+    <canvas id="chartCanvas"></canvas>
+    <div class="slider-wrap">
+      <label>Max n =</label>
+      <input type="range" id="maxN" min="5" max="30" value="15" step="1" oninput="updateChart()">
+      <span class="slider-val" id="maxNVal">15</span>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: DOMINANT TERM -->
+<section id="dominant">
+  <div class="sec-label">Section 03</div>
+  <div class="sec-title">The Dominant Term</div>
+  <div class="sec-desc">As n grows large, one term swamps all others. Constants and lower-order terms become irrelevant. Big O keeps only the dominant term.</div>
+
+  <div class="dom-demo">
+    <h3 style="font-size:16px;font-weight:600;margin-bottom:6px">Expression: <span class="mono" style="color:var(--accent2)">T(n) = 3n³ + 5n² + 100n + 500</span></h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:24px">Drag n to see which term dominates the total count</p>
+    <div class="dom-n-input">
+      <label>n =</label>
+      <input type="range" id="domN" min="1" max="50" value="5" step="1" oninput="updateDom()" style="width:200px;accent-color:var(--accent)">
+      <span class="slider-val" id="domNVal">5</span>
+      <span style="font-size:13px;color:var(--muted);margin-left:16px">Total: <span class="mono" id="domTotal" style="color:var(--accent2)">0</span></span>
+    </div>
+    <div id="domBars"></div>
+    <div style="margin-top:24px;padding:16px 20px;background:var(--bg2);border-radius:12px;border:1px solid var(--border)">
+      <p style="font-size:13px;color:var(--muted);line-height:1.7">
+        <span style="color:var(--accent3);font-weight:600">Big O rule:</span> Drop constants and lower-order terms.<br>
+        <span class="mono">3n³ + 5n² + 100n + 500</span> → <span class="mono" style="color:var(--accent2)">O(n³)</span>
+        because for large n, the n³ term is overwhelmingly dominant.
+      </p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3 style="font-size:17px;font-weight:600;margin-bottom:20px">How to read Big O expressions</h3>
+  <div class="formula-grid" id="formulaGrid">
+    <div class="formula-card" onclick="toggleFormula(this)">
+      <div class="f-name">Constant</div>
+      <div class="f-expr" style="color:#34d399">O(1)</div>
+      <div class="f-eg">e.g. arr[5]</div>
+      <div class="f-detail">Time does not change with input size. Accessing any array element by index always takes the same number of operations, regardless of array length.</div>
+    </div>
+    <div class="formula-card" onclick="toggleFormula(this)">
+      <div class="f-name">Logarithmic</div>
+      <div class="f-expr" style="color:#38bdf8">O(log n)</div>
+      <div class="f-eg">e.g. Binary Search</div>
+      <div class="f-detail">Input is halved each step. If n = 1 million, only ~20 steps needed. log₂(1,000,000) ≈ 20. Extremely efficient.</div>
+    </div>
+    <div class="formula-card" onclick="toggleFormula(this)">
+      <div class="f-name">Linear</div>
+      <div class="f-expr" style="color:#a78bfa">O(n)</div>
+      <div class="f-eg">e.g. Linear Search</div>
+      <div class="f-detail">One operation per element. If n doubles, time doubles. A single for-loop over n elements is always O(n).</div>
+    </div>
+    <div class="formula-card" onclick="toggleFormula(this)">
+      <div class="f-name">Linearithmic</div>
+      <div class="f-expr" style="color:#818cf8">O(n log n)</div>
+      <div class="f-eg">e.g. Merge Sort</div>
+      <div class="f-detail">Divide-and-conquer algorithms. Split the problem (log n levels) and do O(n) work at each level. The best possible for comparison-based sorting.</div>
+    </div>
+    <div class="formula-card" onclick="toggleFormula(this)">
+      <div class="f-name">Quadratic</div>
+      <div class="f-expr" style="color:#fb923c">O(n²)</div>
+      <div class="f-eg">e.g. Bubble Sort</div>
+      <div class="f-detail">A nested loop — for every element, iterate all elements again. If n = 1000, roughly 1 million operations. Avoid for large inputs.</div>
+    </div>
+    <div class="formula-card" onclick="toggleFormula(this)">
+      <div class="f-name">Exponential</div>
+      <div class="f-expr" style="color:#f87171">O(2ⁿ)</div>
+      <div class="f-eg">e.g. Naive Fibonacci</div>
+      <div class="f-detail">Each additional element doubles the operations. n=50 means over a quadrillion operations. Only feasible for very small inputs.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: BEST/AVG/WORST -->
+<section id="cases">
+  <div class="sec-label">Section 04</div>
+  <div class="sec-title">Best, Average & Worst Case</div>
+  <div class="sec-desc">The same algorithm can behave very differently depending on the input. We analyse all three scenarios for a complete picture.</div>
+
+  <div class="cases-grid">
+    <div class="case-card case-best" style="background:var(--surface)">
+      <div class="symbol">Ω</div>
+      <h3 style="color:#34d399">Best Case — Omega (Ω)</h3>
+      <p>The minimum number of operations needed. Occurs when the input is perfectly arranged for the algorithm. Rare in practice.</p>
+      <div class="notation" style="color:#34d399">Ω(f(n)) — lower bound</div>
+    </div>
+    <div class="case-card case-avg" style="background:var(--surface)">
+      <div class="symbol">Θ</div>
+      <h3 style="color:#fb923c">Average Case — Theta (Θ)</h3>
+      <p>Expected performance over all possible inputs. Usually requires probability analysis. Most realistic measure for real-world use.</p>
+      <div class="notation" style="color:#fb923c">Θ(f(n)) — tight bound</div>
+    </div>
+    <div class="case-card case-worst" style="background:var(--surface)">
+      <div class="symbol">O</div>
+      <h3 style="color:#f87171">Worst Case — Big O</h3>
+      <p>The maximum operations needed. Guaranteed upper bound — algorithm never performs worse than this. Most commonly used in analysis.</p>
+      <div class="notation" style="color:#f87171">O(f(n)) — upper bound</div>
+    </div>
+  </div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px">
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:20px">Linear Search — All Three Cases</h3>
+    <table class="complexity-table">
+      <thead><tr><th>Case</th><th>Scenario</th><th>Operations</th><th>Big O / Notation</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span style="color:#34d399;font-weight:600">Best</span></td>
+          <td>Target is at index 0 (first element)</td>
+          <td class="mono">1 comparison</td>
+          <td><span class="mono" style="color:#34d399">Ω(1)</span></td>
+        </tr>
+        <tr>
+          <td><span style="color:#fb923c;font-weight:600">Average</span></td>
+          <td>Target found somewhere in middle</td>
+          <td class="mono">n/2 comparisons</td>
+          <td><span class="mono" style="color:#fb923c">Θ(n)</span></td>
+        </tr>
+        <tr>
+          <td><span style="color:#f87171;font-weight:600">Worst</span></td>
+          <td>Target at last position or not found</td>
+          <td class="mono">n comparisons</td>
+          <td><span class="mono" style="color:#f87171">O(n)</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="background:var(--bg2);border-radius:12px;padding:16px 20px;border:1px solid var(--border);margin-top:4px">
+      <p style="font-size:13px;color:var(--muted);line-height:1.7">
+        <strong style="color:var(--text);font-weight:500">ISC Exam tip:</strong> When asked for the complexity of an algorithm, always state the <em>worst case</em> using Big O unless specifically asked for best or average case. For Linear Search, the answer is <span class="mono" style="color:var(--accent2)">O(n)</span>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: ALGORITHMS -->
+<section id="algorithms">
+  <div class="sec-label">Section 05</div>
+  <div class="sec-title">Algorithm Complexity Analysis</div>
+  <div class="sec-desc">Every ISC searching and sorting algorithm with its Java code, step-by-step complexity analysis, and all three cases.</div>
+
+  <div class="algo-tabs">
+    <button class="algo-tab active" onclick="showAlgo('linear')">Linear Search</button>
+    <button class="algo-tab" onclick="showAlgo('binary')">Binary Search</button>
+    <button class="algo-tab" onclick="showAlgo('bubble')">Bubble Sort</button>
+    <button class="algo-tab" onclick="showAlgo('selection')">Selection Sort</button>
+    <button class="algo-tab" onclick="showAlgo('insertion')">Insertion Sort</button>
+    <button class="algo-tab" onclick="showAlgo('merge')">Merge Sort</button>
+  </div>
+
+  <!-- LINEAR SEARCH -->
+  <div class="algo-panel active" id="algo-linear">
+    <div class="code-block"><span class="kw">int</span> <span class="fn">linearSearch</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> target) {
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">0</span>; i &lt; arr.length; i++) { <span class="cm">// n iterations max</span>
+    <span class="kw">if</span> (arr[i] == target)   <span class="cm">// 1 comparison per step</span>
+      <span class="kw">return</span> i;             <span class="cm">// found!</span>
+  }
+  <span class="kw">return</span> -<span class="nm">1</span>;               <span class="cm">// not found</span>
+}</div>
+    <div class="info-block">
+      <div class="info-row">
+        <div class="label">Worst case complexity</div>
+        <div class="big-o-display" style="color:#f87171">O(n)</div>
+        <p>Target not found — must check all n elements. The loop runs n times.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Best / Average / Worst</div>
+        <div class="value"><span class="mono" style="color:#34d399">Ω(1)</span> &nbsp;/&nbsp; <span class="mono" style="color:#fb923c">Θ(n/2)</span> &nbsp;/&nbsp; <span class="mono" style="color:#f87171">O(n)</span></div>
+        <p>Best: first element. Average: middle. Worst: last or not present.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Space complexity</div>
+        <div class="value"><span class="mono">O(1)</span> — constant extra space</div>
+        <p>No auxiliary data structure needed. Only a loop variable.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Key property</div>
+        <div class="value">Works on unsorted arrays</div>
+        <p>Does not require the array to be sorted. Simple but inefficient for large datasets.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BINARY SEARCH -->
+  <div class="algo-panel" id="algo-binary">
+    <div class="code-block"><span class="kw">int</span> <span class="fn">binarySearch</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> target) {
+  <span class="kw">int</span> low = <span class="nm">0</span>, high = arr.length - <span class="nm">1</span>;
+  <span class="kw">while</span> (low &lt;= high) {           <span class="cm">// log₂n iterations</span>
+    <span class="kw">int</span> mid = (low + high) / <span class="nm">2</span>;
+    <span class="kw">if</span> (arr[mid] == target)
+      <span class="kw">return</span> mid;               <span class="cm">// found</span>
+    <span class="kw">else if</span> (arr[mid] &lt; target)
+      low = mid + <span class="nm">1</span>;             <span class="cm">// search right half</span>
+    <span class="kw">else</span>
+      high = mid - <span class="nm">1</span>;            <span class="cm">// search left half</span>
+  }
+  <span class="kw">return</span> -<span class="nm">1</span>;
+}</div>
+    <div class="info-block">
+      <div class="info-row">
+        <div class="label">Worst case complexity</div>
+        <div class="big-o-display" style="color:#38bdf8">O(log n)</div>
+        <p>Each iteration halves the search space. For n=1024, only 10 comparisons needed.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Best / Average / Worst</div>
+        <div class="value"><span class="mono" style="color:#34d399">Ω(1)</span> &nbsp;/&nbsp; <span class="mono" style="color:#fb923c">Θ(log n)</span> &nbsp;/&nbsp; <span class="mono" style="color:#38bdf8">O(log n)</span></div>
+        <p>Best: target is the midpoint on first try. Worst: keep halving until 1 element.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Precondition — very important!</div>
+        <div class="value" style="color:#fb923c">Array MUST be sorted</div>
+        <p>Binary search only works on sorted data. Sorting first = O(n log n) + O(log n) = O(n log n) overall.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Why log n?</div>
+        <div class="value">n → n/2 → n/4 → ... → 1</div>
+        <p>After k steps, n/2ᵏ = 1, so k = log₂(n). The search space halves each time.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUBBLE SORT -->
+  <div class="algo-panel" id="algo-bubble">
+    <div class="code-block"><span class="kw">void</span> <span class="fn">bubbleSort</span>(<span class="kw">int</span>[] arr) {
+  <span class="kw">int</span> n = arr.length;
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">0</span>; i &lt; n-<span class="nm">1</span>; i++) {        <span class="cm">// n passes</span>
+    <span class="kw">for</span> (<span class="kw">int</span> j = <span class="nm">0</span>; j &lt; n-i-<span class="nm">1</span>; j++) {  <span class="cm">// n-i-1 comparisons</span>
+      <span class="kw">if</span> (arr[j] &gt; arr[j+<span class="nm">1</span>]) {
+        <span class="kw">int</span> temp = arr[j];   <span class="cm">// swap</span>
+        arr[j] = arr[j+<span class="nm">1</span>];
+        arr[j+<span class="nm">1</span>] = temp;
+      }
+    }
+  }
+}</div>
+    <div class="info-block">
+      <div class="info-row">
+        <div class="label">Worst case complexity</div>
+        <div class="big-o-display" style="color:#fb923c">O(n²)</div>
+        <p>Two nested loops: outer runs n−1 times, inner runs n−i−1 times. Total ≈ n(n−1)/2 comparisons.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Best / Average / Worst</div>
+        <div class="value"><span class="mono" style="color:#34d399">Ω(n)</span> &nbsp;/&nbsp; <span class="mono" style="color:#fb923c">Θ(n²)</span> &nbsp;/&nbsp; <span class="mono" style="color:#fb923c">O(n²)</span></div>
+        <p>Best (already sorted, with flag optimization): O(n). Without flag: always O(n²).</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Why n²?</div>
+        <div class="value">n + (n−1) + (n−2) + ... + 1 = n(n−1)/2</div>
+        <p>n(n−1)/2 is a quadratic expression. Drop constants → O(n²).</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Stability</div>
+        <div class="value" style="color:#34d399">Stable sort</div>
+        <p>Equal elements maintain their original relative order after sorting.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELECTION SORT -->
+  <div class="algo-panel" id="algo-selection">
+    <div class="code-block"><span class="kw">void</span> <span class="fn">selectionSort</span>(<span class="kw">int</span>[] arr) {
+  <span class="kw">int</span> n = arr.length;
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">0</span>; i &lt; n-<span class="nm">1</span>; i++) {    <span class="cm">// n-1 passes</span>
+    <span class="kw">int</span> minIdx = i;
+    <span class="kw">for</span> (<span class="kw">int</span> j = i+<span class="nm">1</span>; j &lt; n; j++) { <span class="cm">// find minimum</span>
+      <span class="kw">if</span> (arr[j] &lt; arr[minIdx])
+        minIdx = j;
+    }
+    <span class="kw">int</span> temp = arr[minIdx];  <span class="cm">// swap minimum to position i</span>
+    arr[minIdx] = arr[i];
+    arr[i] = temp;
+  }
+}</div>
+    <div class="info-block">
+      <div class="info-row">
+        <div class="label">Worst case complexity</div>
+        <div class="big-o-display" style="color:#fb923c">O(n²)</div>
+        <p>Always performs n(n−1)/2 comparisons regardless of input. No early exit possible.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Best / Average / Worst</div>
+        <div class="value"><span class="mono" style="color:#fb923c">Ω(n²)</span> &nbsp;/&nbsp; <span class="mono" style="color:#fb923c">Θ(n²)</span> &nbsp;/&nbsp; <span class="mono" style="color:#fb923c">O(n²)</span></div>
+        <p>Unlike Bubble Sort, Selection Sort is always O(n²) — even on sorted arrays.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Advantage over Bubble Sort</div>
+        <div class="value">Fewer swaps</div>
+        <p>At most n−1 swaps (one per pass) vs Bubble Sort's O(n²) swaps. Better when swaps are expensive.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Stability</div>
+        <div class="value" style="color:#f87171">Not stable</div>
+        <p>Long-range swaps can disrupt the relative order of equal elements.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSERTION SORT -->
+  <div class="algo-panel" id="algo-insertion">
+    <div class="code-block"><span class="kw">void</span> <span class="fn">insertionSort</span>(<span class="kw">int</span>[] arr) {
+  <span class="kw">int</span> n = arr.length;
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">1</span>; i &lt; n; i++) {  <span class="cm">// start from 2nd element</span>
+    <span class="kw">int</span> key = arr[i];
+    <span class="kw">int</span> j = i - <span class="nm">1</span>;
+    <span class="kw">while</span> (j &gt;= <span class="nm">0</span> &amp;&amp; arr[j] &gt; key) { <span class="cm">// shift larger elements</span>
+      arr[j+<span class="nm">1</span>] = arr[j];
+      j--;
+    }
+    arr[j+<span class="nm">1</span>] = key;  <span class="cm">// place key in correct position</span>
+  }
+}</div>
+    <div class="info-block">
+      <div class="info-row">
+        <div class="label">Worst case complexity</div>
+        <div class="big-o-display" style="color:#fb923c">O(n²)</div>
+        <p>Worst case: reverse-sorted array. Each element must shift all the way to the beginning.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Best / Average / Worst</div>
+        <div class="value"><span class="mono" style="color:#34d399">Ω(n)</span> &nbsp;/&nbsp; <span class="mono" style="color:#fb923c">Θ(n²)</span> &nbsp;/&nbsp; <span class="mono" style="color:#fb923c">O(n²)</span></div>
+        <p>Best case (already sorted): inner while never executes → O(n). Excellent for nearly-sorted data!</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Practical use</div>
+        <div class="value" style="color:#34d399">Great for small / nearly-sorted arrays</div>
+        <p>Used in hybrid algorithms (like TimSort) for small subarrays. Low overhead, stable, in-place.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MERGE SORT -->
+  <div class="algo-panel" id="algo-merge">
+    <div class="code-block"><span class="kw">void</span> <span class="fn">mergeSort</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> l, <span class="kw">int</span> r) {
+  <span class="kw">if</span> (l &lt; r) {
+    <span class="kw">int</span> mid = (l + r) / <span class="nm">2</span>;
+    <span class="fn">mergeSort</span>(arr, l, mid);     <span class="cm">// sort left half  → T(n/2)</span>
+    <span class="fn">mergeSort</span>(arr, mid+<span class="nm">1</span>, r); <span class="cm">// sort right half → T(n/2)</span>
+    <span class="fn">merge</span>(arr, l, mid, r);     <span class="cm">// merge           → O(n)</span>
+  }
+}
+<span class="cm">// Recurrence: T(n) = 2T(n/2) + O(n) → O(n log n)</span></div>
+    <div class="info-block">
+      <div class="info-row">
+        <div class="label">Worst case complexity</div>
+        <div class="big-o-display" style="color:#a78bfa">O(n log n)</div>
+        <p>Always O(n log n) — even for worst-case input. Derived from recurrence T(n) = 2T(n/2) + n.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Best / Average / Worst</div>
+        <div class="value"><span class="mono" style="color:#a78bfa">Ω(n log n)</span> &nbsp;/&nbsp; <span class="mono" style="color:#a78bfa">Θ(n log n)</span> &nbsp;/&nbsp; <span class="mono" style="color:#a78bfa">O(n log n)</span></div>
+        <p>All three cases are the same — guaranteed O(n log n). More predictable than Quick Sort.</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Recurrence relation — ISC key point</div>
+        <div class="value mono">T(n) = 2T(n/2) + n</div>
+        <p>Split into 2 halves [2T(n/2)] + merge step [O(n)]. Master theorem → O(n log n).</p>
+      </div>
+      <div class="info-row">
+        <div class="label">Space complexity</div>
+        <div class="value" style="color:#fb923c">O(n) — needs auxiliary array</div>
+        <p>Unlike Bubble/Selection/Insertion, Merge Sort needs extra space for the merge step.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: VISUALIZER -->
+<section id="visualizer">
+  <div class="sec-label">Section 06</div>
+  <div class="sec-title">Algorithm Visualizer</div>
+  <div class="sec-desc">Watch the algorithms search and sort in real time. Step through each operation and count comparisons.</div>
+
+  <!-- SEARCH VISUALIZER -->
+  <div class="vis-wrap">
+    <div class="vis-title">Search Visualizer — enter target and choose algorithm</div>
+    <div id="searchArr" class="arr-vis"></div>
+    <div class="vis-controls">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:13px;color:var(--muted)">Target:</span>
+        <input class="target-input" type="number" id="searchTarget" value="42" min="1" max="99">
+      </div>
+      <button class="vis-btn primary" onclick="startLinearSearch()">Linear Search</button>
+      <button class="vis-btn primary" onclick="startBinarySearch()">Binary Search</button>
+      <button class="vis-btn" onclick="resetSearch()">Reset</button>
+      <span class="vis-ops" id="searchOps"></span>
+    </div>
+    <div class="vis-log" id="searchLog">Press a search button to start</div>
+  </div>
+
+  <!-- SORT VISUALIZER -->
+  <div class="vis-wrap">
+    <div class="vis-title">Sort Visualizer — watch comparisons happen live</div>
+    <div class="sort-bars" id="sortBars"></div>
+    <div class="vis-controls">
+      <button class="vis-btn primary" onclick="startSort('bubble')">Bubble Sort</button>
+      <button class="vis-btn primary" onclick="startSort('selection')">Selection Sort</button>
+      <button class="vis-btn primary" onclick="startSort('insertion')">Insertion Sort</button>
+      <button class="vis-btn" onclick="resetSort()">Shuffle</button>
+      <span class="vis-ops" id="sortOps"></span>
+    </div>
+    <div class="vis-log" id="sortLog">Press a sort button to start</div>
+  </div>
+</section>
+
+<!-- SECTION 7: QUICK REFERENCE -->
+<section id="reference" style="border-bottom:none">
+  <div class="sec-label">Section 07</div>
+  <div class="sec-title">ISC Exam Quick Reference</div>
+  <div class="sec-desc">Every algorithm you need to know — with worst-case complexity and exam notes. Memorise this table.</div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:40px">
+    <table class="complexity-table">
+      <thead><tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable?</th></tr></thead>
+      <tbody>
+        <tr><td><strong style="font-weight:600">Linear Search</strong></td><td class="mono t" style="color:#34d399">Ω(1)</td><td class="mono" style="color:#fb923c">Θ(n)</td><td class="mono" style="color:#f87171">O(n)</td><td class="mono">O(1)</td><td><span class="tag t-green">—</span></td></tr>
+        <tr><td><strong style="font-weight:600">Binary Search</strong></td><td class="mono" style="color:#34d399">Ω(1)</td><td class="mono" style="color:#38bdf8">Θ(log n)</td><td class="mono" style="color:#38bdf8">O(log n)</td><td class="mono">O(1)</td><td><span class="tag t-green">—</span></td></tr>
+        <tr><td><strong style="font-weight:600">Bubble Sort</strong></td><td class="mono" style="color:#34d399">Ω(n)</td><td class="mono" style="color:#fb923c">Θ(n²)</td><td class="mono" style="color:#fb923c">O(n²)</td><td class="mono">O(1)</td><td><span class="tag t-green">Yes</span></td></tr>
+        <tr><td><strong style="font-weight:600">Selection Sort</strong></td><td class="mono" style="color:#fb923c">Ω(n²)</td><td class="mono" style="color:#fb923c">Θ(n²)</td><td class="mono" style="color:#fb923c">O(n²)</td><td class="mono">O(1)</td><td><span class="tag t-red">No</span></td></tr>
+        <tr><td><strong style="font-weight:600">Insertion Sort</strong></td><td class="mono" style="color:#34d399">Ω(n)</td><td class="mono" style="color:#fb923c">Θ(n²)</td><td class="mono" style="color:#fb923c">O(n²)</td><td class="mono">O(1)</td><td><span class="tag t-green">Yes</span></td></tr>
+        <tr><td><strong style="font-weight:600">Merge Sort</strong></td><td class="mono" style="color:#a78bfa">Ω(n log n)</td><td class="mono" style="color:#a78bfa">Θ(n log n)</td><td class="mono" style="color:#a78bfa">O(n log n)</td><td class="mono">O(n)</td><td><span class="tag t-green">Yes</span></td></tr>
+        <tr><td><strong style="font-weight:600">Quick Sort</strong></td><td class="mono" style="color:#a78bfa">Ω(n log n)</td><td class="mono" style="color:#a78bfa">Θ(n log n)</td><td class="mono" style="color:#fb923c">O(n²)</td><td class="mono">O(log n)</td><td><span class="tag t-red">No</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz">
+  <div class="sec-label" style="margin-top:20px">Section 08</div>
+  <div class="sec-title">Test Yourself — Quiz</div>
+  <div class="sec-desc">10 ISC-style questions on Big O and complexity. Aim for a perfect score before your exam!</div>
+
+  <div class="progress-bar"><div class="progress-fill" id="quizProgress" style="width:0%"></div></div>
+  <div class="quiz-card" id="quizCard">
+    <div class="quiz-q" id="quizQ"></div>
+    <div class="quiz-options" id="quizOpts"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <div class="quiz-nav">
+      <span class="quiz-score" id="quizScore">Question 1 of 10</span>
+      <button class="btn-next" id="btnNext" onclick="nextQuestion()">Next question →</button>
+    </div>
+  </div>
+  <div id="quizResult" style="display:none;text-align:center;padding:40px">
+    <div style="font-size:56px;margin-bottom:16px" id="resultEmoji">🎉</div>
+    <div style="font-size:32px;font-weight:700;margin-bottom:8px" id="resultScore"></div>
+    <div style="font-size:16px;color:var(--muted);margin-bottom:28px" id="resultMsg"></div>
+    <button class="vis-btn primary" onclick="restartQuiz()">Retake Quiz</button>
+  </div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<footer>
+  <p style="margin-bottom:6px">Built for ISC Computer Science — Exam 27th March</p>
+  <p>Big O Notation & Complexity · <span>Study hard, score 100 ✦</span></p>
+</footer>
+
+<script>
+// ═══════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════
+function setNav(el, sec) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(sec).scrollIntoView({behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════
+// GROWTH CHART
+// ═══════════════════════════════════════
+const curves = [
+  { fn: n => 1,                    color: '#34d399', label: 'O(1)',       on: true },
+  { fn: n => Math.log2(n),         color: '#38bdf8', label: 'O(log n)',   on: true },
+  { fn: n => n,                    color: '#a78bfa', label: 'O(n)',       on: true },
+  { fn: n => n * Math.log2(n),     color: '#818cf8', label: 'O(n log n)', on: true },
+  { fn: n => n * n,                color: '#fb923c', label: 'O(n²)',      on: true },
+  { fn: n => Math.min(Math.pow(2,n), 10000), color: '#f472b6', label: 'O(2ⁿ)', on: true },
+];
+function toggleCurve(btn, idx) {
+  curves[idx].on = !curves[idx].on;
+  btn.classList.toggle('on', curves[idx].on);
+  updateChart();
+}
+function updateChart() {
+  const maxN = parseInt(document.getElementById('maxN').value);
+  document.getElementById('maxNVal').textContent = maxN;
+  const canvas = document.getElementById('chartCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth, H = 340;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const pad = {l:50, r:20, t:20, b:40};
+  const cW = W - pad.l - pad.r, cH = H - pad.t - pad.b;
+
+  // compute max y
+  let maxY = 0;
+  for (let n = 1; n <= maxN; n++) {
+    curves.forEach(c => { if(c.on) maxY = Math.max(maxY, c.fn(n)); });
+  }
+  maxY = Math.max(maxY, 1) * 1.1;
+
+  // grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 5; i++) {
+    const y = pad.t + cH * (1 - i/5);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l+cW, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(Math.round(maxY * i/5), pad.l - 6, y + 4);
+  }
+  for (let n = 1; n <= maxN; n += Math.max(1, Math.floor(maxN/8))) {
+    const x = pad.l + cW * (n-1)/(maxN-1);
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t+cH); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.textAlign = 'center';
+    ctx.fillText(n, x, pad.t + cH + 16);
+  }
+
+  // axis labels
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = '11px Syne, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('n (input size)', pad.l + cW/2, H - 4);
+
+  // curves
+  curves.forEach(c => {
+    if (!c.on) return;
+    ctx.beginPath();
+    ctx.strokeStyle = c.color;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    for (let n = 1; n <= maxN; n++) {
+      const x = pad.l + cW * (n-1)/(maxN-1);
+      const val = Math.min(c.fn(n), maxY);
+      const y = pad.t + cH * (1 - val/maxY);
+      n === 1 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // label at end
+    const lastN = maxN;
+    const lx = pad.l + cW;
+    const val = Math.min(c.fn(lastN), maxY);
+    const ly = pad.t + cH * (1 - val/maxY);
+    ctx.fillStyle = c.color;
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.textAlign = 'left';
+    if (lx + 60 < W) ctx.fillText(c.label, lx + 4, Math.max(pad.t + 8, Math.min(pad.t+cH-4, ly)));
+  });
+}
+window.addEventListener('load', () => { setTimeout(updateChart, 100); });
+window.addEventListener('resize', updateChart);
+
+// ═══════════════════════════════════════
+// DOMINANT TERM DEMO
+// ═══════════════════════════════════════
+const terms = [
+  { label: '3n³', fn: n => 3*n*n*n, color: '#f87171' },
+  { label: '5n²', fn: n => 5*n*n,   color: '#fb923c' },
+  { label: '100n', fn: n => 100*n,  color: '#a78bfa' },
+  { label: '500',  fn: n => 500,    color: '#38bdf8' },
+];
+function updateDom() {
+  const n = parseInt(document.getElementById('domN').value);
+  document.getElementById('domNVal').textContent = n;
+  const vals = terms.map(t => t.fn(n));
+  const total = vals.reduce((a,b) => a+b, 0);
+  document.getElementById('domTotal').textContent = total.toLocaleString();
+  const maxV = Math.max(...vals);
+  const html = terms.map((t, i) => {
+    const pct = Math.round(vals[i]/total*100);
+    const w = Math.round(vals[i]/maxV * 100);
+    return `<div class="term-row">
+      <div class="term-box" style="color:${t.color}">${t.label}</div>
+      <div class="term-bar-wrap">
+        <div class="term-bar" style="width:${w}%;background:${t.color}"></div>
+        <div class="term-label">${vals[i].toLocaleString()} — <strong>${pct}%</strong> of total</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('domBars').innerHTML = html;
+}
+updateDom();
+
+// ═══════════════════════════════════════
+// FORMULA CARDS TOGGLE
+// ═══════════════════════════════════════
+function toggleFormula(el) { el.classList.toggle('open'); }
+
+// ═══════════════════════════════════════
+// ALGO TABS
+// ═══════════════════════════════════════
+function showAlgo(name) {
+  document.querySelectorAll('.algo-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.algo-panel').forEach(p => p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('algo-' + name).classList.add('active');
+}
+
+// ═══════════════════════════════════════
+// SEARCH VISUALIZER
+// ═══════════════════════════════════════
+const searchData = [3,7,12,19,24,31,42,55,63,71,88,95];
+let searchAnimating = false;
+
+function buildSearchArr(highlighted = {}) {
+  const arr = document.getElementById('searchArr');
+  arr.innerHTML = searchData.map((v,i) => {
+    let cls = 'arr-cell';
+    if (highlighted[i] === 'active') cls += ' active';
+    else if (highlighted[i] === 'found') cls += ' found';
+    else if (highlighted[i] === 'checked') cls += ' checked';
+    return `<div class="${cls}">${v}<span class="idx">${i}</span></div>`;
+  }).join('');
+}
+buildSearchArr();
+
+function resetSearch() {
+  searchAnimating = false;
+  buildSearchArr();
+  document.getElementById('searchLog').textContent = 'Press a search button to start';
+  document.getElementById('searchOps').textContent = '';
+}
+
+async function startLinearSearch() {
+  if (searchAnimating) return;
+  searchAnimating = true;
+  const target = parseInt(document.getElementById('searchTarget').value);
+  let ops = 0;
+  const checked = {};
+  document.getElementById('searchLog').textContent = `Searching for ${target}...`;
+  for (let i = 0; i < searchData.length; i++) {
+    if (!searchAnimating) return;
+    ops++;
+    const h = {...checked}; h[i] = 'active';
+    buildSearchArr(h);
+    document.getElementById('searchOps').textContent = `Comparisons: ${ops}`;
+    await delay(350);
+    if (searchData[i] === target) {
+      const f = {...checked}; f[i] = 'found';
+      buildSearchArr(f);
+      document.getElementById('searchLog').textContent = `Found ${target} at index ${i}! — O(n): ${ops} comparison${ops>1?'s':''}`;
+      searchAnimating = false; return;
+    }
+    checked[i] = 'checked';
+  }
+  buildSearchArr(checked);
+  document.getElementById('searchLog').textContent = `${target} not found. Checked all ${ops} elements — O(n) worst case`;
+  searchAnimating = false;
+}
+
+async function startBinarySearch() {
+  if (searchAnimating) return;
+  searchAnimating = true;
+  const target = parseInt(document.getElementById('searchTarget').value);
+  let ops = 0, low = 0, high = searchData.length - 1;
+  const checked = {};
+  document.getElementById('searchLog').textContent = `Binary search for ${target}...`;
+  while (low <= high) {
+    if (!searchAnimating) return;
+    const mid = Math.floor((low + high) / 2);
+    ops++;
+    const h = {...checked}; h[mid] = 'active';
+    buildSearchArr(h);
+    document.getElementById('searchOps').textContent = `Comparisons: ${ops}`;
+    await delay(500);
+    if (searchData[mid] === target) {
+      const f = {...checked}; f[mid] = 'found';
+      buildSearchArr(f);
+      document.getElementById('searchLog').textContent = `Found ${target} at index ${mid}! — O(log n): only ${ops} comparison${ops>1?'s':''}`;
+      searchAnimating = false; return;
+    } else if (searchData[mid] < target) {
+      for (let k = low; k <= mid; k++) checked[k] = 'checked';
+      low = mid + 1;
+    } else {
+      for (let k = mid; k <= high; k++) checked[k] = 'checked';
+      high = mid - 1;
+    }
+  }
+  buildSearchArr(checked);
+  document.getElementById('searchLog').textContent = `${target} not found. O(log n): only ${ops} step${ops>1?'s':''}`;
+  searchAnimating = false;
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ═══════════════════════════════════════
+// SORT VISUALIZER
+// ═══════════════════════════════════════
+let sortData = [], sortAnimating = false;
+
+function initSort() {
+  sortData = Array.from({length: 16}, () => Math.floor(Math.random()*90)+10);
+  renderSort(sortData, {}, {});
+}
+
+function renderSort(arr, comparing = {}, sorted = {}, pivot = -1) {
+  const maxV = Math.max(...arr);
+  document.getElementById('sortBars').innerHTML = arr.map((v,i) => {
+    let cls = 'sort-bar';
+    if (comparing[i]) cls += ' comparing';
+    else if (sorted[i]) cls += ' sorted';
+    else if (i === pivot) cls += ' pivot';
+    return `<div class="${cls}" style="height:${Math.round(v/maxV*110)}px"></div>`;
+  }).join('');
+}
+
+function resetSort() { sortAnimating = false; initSort(); document.getElementById('sortLog').textContent = 'Press a sort button to start'; document.getElementById('sortOps').textContent = ''; }
+
+async function startSort(type) {
+  if (sortAnimating) return;
+  sortAnimating = true;
+  const arr = [...sortData];
+  let ops = 0;
+  document.getElementById('sortLog').textContent = `Running ${type} sort...`;
+
+  if (type === 'bubble') {
+    const n = arr.length;
+    const sortedSet = {};
+    for (let i = 0; i < n-1; i++) {
+      for (let j = 0; j < n-i-1; j++) {
+        if (!sortAnimating) return;
+        ops++;
+        renderSort(arr, {[j]:true,[j+1]:true}, sortedSet);
+        document.getElementById('sortOps').textContent = `Comparisons: ${ops}`;
+        await delay(60);
+        if (arr[j] > arr[j+1]) { [arr[j], arr[j+1]] = [arr[j+1], arr[j]]; }
+      }
+      sortedSet[n-1-i] = true;
+    }
+    sortedSet[0] = true;
+    renderSort(arr, {}, sortedSet);
+  } else if (type === 'selection') {
+    const n = arr.length;
+    const sortedSet = {};
+    for (let i = 0; i < n-1; i++) {
+      let minIdx = i;
+      for (let j = i+1; j < n; j++) {
+        if (!sortAnimating) return;
+        ops++;
+        renderSort(arr, {[j]:true, [minIdx]:true}, sortedSet);
+        document.getElementById('sortOps').textContent = `Comparisons: ${ops}`;
+        await delay(60);
+        if (arr[j] < arr[minIdx]) minIdx = j;
+      }
+      if (minIdx !== i) [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+      sortedSet[i] = true;
+    }
+    sortedSet[arr.length-1] = true;
+    renderSort(arr, {}, sortedSet);
+  } else if (type === 'insertion') {
+    const n = arr.length;
+    const sortedSet = {0:true};
+    for (let i = 1; i < n; i++) {
+      let j = i;
+      while (j > 0) {
+        if (!sortAnimating) return;
+        ops++;
+        renderSort(arr, {[j]:true, [j-1]:true}, sortedSet);
+        document.getElementById('sortOps').textContent = `Comparisons: ${ops}`;
+        await delay(70);
+        if (arr[j] < arr[j-1]) { [arr[j], arr[j-1]] = [arr[j-1], arr[j]]; j--; }
+        else break;
+      }
+      sortedSet[i] = true;
+    }
+    renderSort(arr, {}, sortedSet);
+  }
+
+  const allSorted = {};
+  arr.forEach((_,i) => allSorted[i] = true);
+  renderSort(arr, {}, allSorted);
+  document.getElementById('sortLog').textContent = `Done! Total comparisons: ${ops} — confirms O(n²) behaviour`;
+  sortData = arr;
+  sortAnimating = false;
+}
+
+initSort();
+
+// ═══════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════
+const questions = [
+  { q: 'What is the time complexity of Binary Search?', opts: ['O(n)', 'O(log n)', 'O(n²)', 'O(n log n)'], ans: 1, exp: 'Binary Search halves the search space each step. After k steps, n/2ᵏ = 1 → k = log₂n. So worst case is O(log n).' },
+  { q: 'Which sorting algorithm has the best worst-case time complexity?', opts: ['Bubble Sort', 'Selection Sort', 'Insertion Sort', 'Merge Sort'], ans: 3, exp: 'Merge Sort guarantees O(n log n) even in the worst case. Bubble, Selection, and Insertion Sort are all O(n²) in the worst case.' },
+  { q: 'What is the Big O of: T(n) = 7n³ + 3n² + 100n + 50?', opts: ['O(n)', 'O(n²)', 'O(n³)', 'O(7n³)'], ans: 2, exp: 'Keep only the dominant (fastest-growing) term and drop constants. 7n³ dominates → O(n³). Never include constants in Big O.' },
+  { q: 'If Binary Search requires the array to be sorted, what is the total complexity of sorting + searching?', opts: ['O(log n)', 'O(n)', 'O(n log n)', 'O(n²)'], ans: 2, exp: 'Sorting with Merge Sort = O(n log n). Then binary searching = O(log n). Total = O(n log n) + O(log n) = O(n log n) — dominated by the sort.' },
+  { q: 'An algorithm with a single for-loop inside another for-loop over n elements has complexity:', opts: ['O(n)', 'O(2n)', 'O(n²)', 'O(log n)'], ans: 2, exp: 'Two nested loops each running n times give n × n = n² operations total. This is the classic O(n²) pattern — Bubble Sort and Selection Sort follow this.' },
+  { q: 'What is the BEST case time complexity of Insertion Sort?', opts: ['O(n²)', 'O(n log n)', 'O(n)', 'O(1)'], ans: 2, exp: 'When the array is already sorted, the inner while loop never executes. Only the outer loop runs n times → O(n). This makes Insertion Sort excellent for nearly-sorted data.' },
+  { q: 'Which notation describes the LOWER BOUND (best case) of an algorithm?', opts: ['O (Big O)', 'Θ (Theta)', 'Ω (Omega)', 'Σ (Sigma)'], ans: 2, exp: 'Omega Ω represents the best-case (lower bound). Big O represents worst-case (upper bound). Theta Θ represents the average/tight bound.' },
+  { q: 'The recurrence T(n) = 2T(n/2) + n solves to:', opts: ['O(n)', 'O(n²)', 'O(n log n)', 'O(log n)'], ans: 2, exp: 'This is the recurrence for Merge Sort. Each level does O(n) work and there are log n levels (the array is halved each time). Total = O(n log n).' },
+  { q: 'Which algorithm has the SAME complexity for best, average, and worst case?', opts: ['Bubble Sort', 'Insertion Sort', 'Selection Sort', 'Merge Sort'], ans: 3, exp: 'Merge Sort always divides and merges regardless of input → always O(n log n). Selection Sort is also always O(n²). But Merge Sort\'s consistent O(n log n) is its key advantage.' },
+  { q: 'If an algorithm takes O(1) time, doubling the input size will:', opts: ['Double the time', 'Quadruple the time', 'Have no effect on time', 'Halve the time'], ans: 2, exp: 'O(1) means constant time — the algorithm takes the same number of operations regardless of input size. Accessing arr[0] is O(1) whether the array has 10 or 10 million elements.' },
+];
+let qIdx = 0, score = 0, answered = false;
+
+function loadQuestion() {
+  answered = false;
+  const q = questions[qIdx];
+  document.getElementById('quizQ').innerHTML = q.q;
+  document.getElementById('quizProgress').style.width = (qIdx/questions.length*100) + '%';
+  document.getElementById('quizScore').textContent = `Question ${qIdx+1} of ${questions.length}`;
+  document.getElementById('quizFeedback').className = 'quiz-feedback';
+  document.getElementById('btnNext').className = 'btn-next';
+  document.getElementById('quizOpts').innerHTML = q.opts.map((o,i) =>
+    `<button class="quiz-btn" onclick="checkAnswer(this,${i})">${String.fromCharCode(65+i)}. ${o}</button>`
+  ).join('');
+}
+
+function checkAnswer(btn, idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[qIdx];
+  const btns = document.querySelectorAll('.quiz-btn');
+  btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById('quizFeedback');
+  if (idx === q.ans) {
+    score++;
+    btn.classList.add('correct');
+    fb.className = 'quiz-feedback show ok';
+    fb.textContent = '✓ Correct! ' + q.exp;
+  } else {
+    btn.classList.add('wrong');
+    btns[q.ans].classList.add('reveal');
+    fb.className = 'quiz-feedback show no';
+    fb.textContent = '✗ Not quite. ' + q.exp;
+  }
+  document.getElementById('btnNext').className = 'btn-next show';
+}
+
+function nextQuestion() {
+  qIdx++;
+  if (qIdx >= questions.length) {
+    showResult(); return;
+  }
+  loadQuestion();
+}
+
+function showResult() {
+  document.getElementById('quizCard').style.display = 'none';
+  document.getElementById('quizResult').style.display = 'block';
+  document.getElementById('quizProgress').style.width = '100%';
+  const pct = Math.round(score/questions.length*100);
+  document.getElementById('resultScore').textContent = `${score} / ${questions.length} — ${pct}%`;
+  if (pct === 100) {
+    document.getElementById('resultEmoji').textContent = '🏆';
+    document.getElementById('resultMsg').textContent = 'Perfect score! You\'re fully ready for the ISC exam. Go crush it!';
+  } else if (pct >= 70) {
+    document.getElementById('resultEmoji').textContent = '🎯';
+    document.getElementById('resultMsg').textContent = 'Great work! Review the ones you missed and you\'ll nail it.';
+  } else {
+    document.getElementById('resultEmoji').textContent = '📚';
+    document.getElementById('resultMsg').textContent = 'Keep studying! Go back through the sections and retake the quiz.';
+  }
+}
+
+function restartQuiz() {
+  qIdx = 0; score = 0;
+  document.getElementById('quizCard').style.display = 'block';
+  document.getElementById('quizResult').style.display = 'none';
+  loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>

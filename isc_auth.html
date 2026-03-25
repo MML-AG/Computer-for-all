@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Computer For All</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════
+     STEP 1: Replace these values with yours
+     See FIREBASE SETUP GUIDE at bottom of this file
+═══════════════════════════════════════════════ -->
+<meta name="google-signin-client_id" content="620297356458-bksjrttl48qgg58bpabqpcknvaogp2pn.apps.googleusercontent.com">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<!-- Firebase SDK (v9 compat mode — works in plain HTML) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STEP 2: Paste your Firebase config object here
+//  From: Firebase Console → Project Settings → Your Apps → Web App → SDK setup
+// ═══════════════════════════════════════════════
+ const firebaseConfig = {
+    apiKey: "AIzaSyDLQswmyCRp_xx0AE5OrwRDOMW5v2Mdy88",
+    authDomain: "computer-for-all-ef511.firebaseapp.com",
+    projectId: "computer-for-all-ef511",
+    storageBucket: "computer-for-all-ef511.firebasestorage.app",
+    messagingSenderId: "520598999745",
+    appId: "1:520598999745:web:6f27a0273cf59cfc2dfa40",
+    measurementId: "G-NSMNF1JGJV"
+  };
+
+firebase.initializeApp(firebaseConfig);
+const db   = firebase.firestore();
+const auth = firebase.auth();
+</script>
+
+<style>
+:root{
+  --bg:#04060e;--bg2:#080c18;--card:#0c1120;
+  --b1:#1a2240;--b2:#243060;
+  --c1:#00f5c8;--c2:#7b61ff;--c3:#ff5f7e;--c4:#ffd060;
+  --t1:#f0f6ff;--t2:#8899bb;--t3:#2a3a5a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;overflow-x:hidden}
+
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,245,200,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,200,.018) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+
+.orb{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none}
+.orb1{width:500px;height:500px;background:rgba(123,97,255,.1);top:-100px;left:-100px}
+.orb2{width:400px;height:400px;background:rgba(0,245,200,.07);bottom:-100px;right:-50px}
+
+/* BACK LINK */
+.back-link{position:fixed;top:24px;left:24px;display:flex;align-items:center;gap:8px;color:var(--t2);font-size:.85rem;text-decoration:none;transition:color .2s;z-index:10}
+.back-link:hover{color:var(--c1)}
+
+/* AUTH BOX */
+.auth-container{position:relative;z-index:1;width:100%;max-width:460px;padding:24px}
+.auth-box{background:var(--card);border:1px solid var(--b2);border-radius:24px;padding:44px 40px}
+
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:36px;justify-content:center}
+.logo-mark{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--c1),var(--c2));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:#000}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.08em;color:var(--t1)}
+.brand span{color:var(--c1)}
+
+/* TABS */
+.tabs{display:flex;background:var(--bg2);border-radius:10px;padding:4px;margin-bottom:28px}
+.tab{flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;color:var(--t2);background:transparent;transition:all .2s}
+.tab.active{background:var(--b2);color:var(--t1)}
+
+/* FORM */
+.form-section{display:none}
+.form-section.active{display:block}
+.form-group{margin-bottom:16px}
+label{display:block;font-size:.78rem;font-weight:600;color:var(--t2);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+input{width:100%;padding:12px 16px;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s}
+input:focus{border-color:var(--c1)}
+input::placeholder{color:var(--t3)}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--b1)}
+.divider span{font-size:.75rem;color:var(--t3);font-family:'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
+
+/* GOOGLE BUTTON */
+.google-btn{
+  width:100%;padding:13px;border-radius:10px;border:1px solid var(--b2);
+  background:var(--bg2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;color:var(--t1);
+  transition:all .2s;position:relative;overflow:hidden
+}
+.google-btn:hover{border-color:var(--c1);background:rgba(0,245,200,.05)}
+.google-btn svg{flex-shrink:0}
+
+/* DEV BYPASS */
+.dev-bypass{
+  width:100%;padding:12px;border-radius:10px;border:2px dashed rgba(255,208,96,.3);
+  background:rgba(255,208,96,.05);cursor:pointer;margin-top:10px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:700;color:var(--c4);
+  transition:all .2s;letter-spacing:.04em
+}
+.dev-bypass:hover{border-color:rgba(255,208,96,.6);background:rgba(255,208,96,.1)}
+.dev-note{text-align:center;font-size:.7rem;color:var(--t3);margin-top:6px;font-family:'JetBrains Mono',monospace}
+
+/* PRIMARY BTN */
+.auth-btn{
+  width:100%;padding:13px;border-radius:10px;border:none;cursor:pointer;
+  background:var(--c1);color:#000;font-family:'DM Sans',sans-serif;
+  font-size:.9rem;font-weight:700;transition:all .2s;margin-top:4px
+}
+.auth-btn:hover{background:#00ddb4;transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,245,200,.25)}
+
+/* FREE TRIAL CHIP */
+.trial-chip{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(0,245,200,.06);border:1px solid rgba(0,245,200,.2);border-radius:100px;
+  padding:6px 14px;margin:0 auto 24px;
+  font-size:.75rem;color:var(--c1);width:fit-content;font-family:'JetBrains Mono',monospace;
+  letter-spacing:.06em;text-transform:uppercase
+}
+.trial-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--c1);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ERROR / SUCCESS */
+.msg{padding:10px 14px;border-radius:8px;font-size:.82rem;margin-bottom:14px;display:none}
+.msg.error{background:rgba(255,95,126,.1);border:1px solid rgba(255,95,126,.3);color:#ff8fa3}
+.msg.success{background:rgba(0,245,200,.1);border:1px solid rgba(0,245,200,.3);color:var(--c1)}
+.msg.show{display:block}
+
+/* LOADING */
+.loading-overlay{position:fixed;inset:0;background:rgba(4,6,14,.95);z-index:1000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-overlay.show{display:flex}
+.spinner{width:44px;height:44px;border:3px solid var(--b2);border-top-color:var(--c1);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--t2)}
+
+/* GIS container hidden */
+#g_id_onload{display:none}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<a href="index.html" class="back-link">← Back to Home</a>
+
+<!-- GOOGLE ONE TAP (hidden, handles callback) -->
+<div id="g_id_onload"
+  data-client_id="620297356458-bksjrttl48qgg58bpabqpcknvaogp2pn.apps.googleusercontent.com"
+  data-callback="handleGoogleCredential"
+  data-auto_prompt="false">
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Signing you in...</div>
+</div>
+
+<div class="auth-container">
+  <div class="auth-box">
+
+    <div class="auth-logo">
+      <div class="logo-mark">C</div>
+      <span class="brand">Computer<span>ForAll</span></span>
+    </div>
+
+    <div class="trial-chip"><span class="dot"></span>1 Hour Free Trial on Sign Up</div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">Log In</button>
+      <button class="tab" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- LOGIN SECTION -->
+    <div class="form-section active" id="loginSection">
+      <div class="msg" id="loginMsg"></div>
+
+      <!-- Google Sign In Button -->
+      <button class="google-btn" onclick="triggerGoogleSignIn()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.01c-.72.48-1.63.77-2.7.77-2.08 0-3.84-1.4-4.47-3.29H1.84v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.51 10.53c-.16-.48-.25-.99-.25-1.53s.09-1.05.25-1.53V5.4H1.84A8 8 0 0 0 .98 9c0 1.29.31 2.51.86 3.6l2.67-2.07z"/><path fill="#EA4335" d="M8.98 3.58c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 8.98 1 8 8 0 0 0 1.84 5.4l2.67 2.07c.63-1.89 2.39-3.29 4.47-3.29z"/></svg>
+        Continue with Google
+      </button>
+
+      <!-- Developer Bypass -->
+      <button class="dev-bypass" onclick="devBypass()">
+        🔧 DEV BYPASS — Skip Auth (Testing Only)
+      </button>
+      <div class="dev-note">Remove before production · For local testing</div>
+
+      <div class="divider"><span>or login with email</span></div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="you@gmail.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+      </div>
+      <button class="auth-btn" onclick="doLogin()">Log In →</button>
+    </div>
+
+    <!-- SIGNUP SECTION -->
+    <div class="form-section" id="signupSection">
+      <div class="msg" id="signupMsg"></div>
+
+      <button class="google-btn" onclick="triggerGoogleSignIn()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.01c-.72.48-1.63.77-2.7.77-2.08 0-3.84-1.4-4.47-3.29H1.84v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.51 10.53c-.16-.48-.25-.99-.25-1.53s.09-1.05.25-1.53V5.4H1.84A8 8 0 0 0 .98 9c0 1.29.31 2.51.86 3.6l2.67-2.07z"/><path fill="#EA4335" d="M8.98 3.58c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 8.98 1 8 8 0 0 0 1.84 5.4l2.67 2.07c.63-1.89 2.39-3.29 4.47-3.29z"/></svg>
+        Sign Up with Google
+      </button>
+
+      <button class="dev-bypass" onclick="devBypass()">
+        🔧 DEV BYPASS — Skip Auth (Testing Only)
+      </button>
+      <div class="dev-note">Remove before production · For local testing</div>
+
+      <div class="divider"><span>or sign up with email</span></div>
+
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="signupName" placeholder="Your Name" />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="signupEmail" placeholder="you@gmail.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signupPass" placeholder="Min. 6 characters" onkeydown="if(event.key==='Enter')doSignup()" />
+      </div>
+      <button class="auth-btn" onclick="doSignup()">Create Account →</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  FIREBASE AUTH + FIRESTORE — Computer For All
+//  Flow: Google Sign-In → save/fetch user doc in Firestore
+//        doc has fields: name, email, picture, plan, createdAt
+//        plan values: "free" (no timer, all unlocked) | "pro" (same) | "trial" (1hr timer)
+// ══════════════════════════════════════════════════════
+
+// ─── Save session to localStorage (used by platform page) ───
+function startSession(user) {
+  const session = {
+    uid:           user.uid   || '',
+    name:          user.name  || 'Student',
+    email:         user.email || '',
+    picture:       user.picture || '',
+    plan:          user.plan  || 'trial',   // "trial" | "free" | "pro"
+    loginTime:     Date.now(),
+    trialDuration: 3600000   // 1 hour — only used when plan === "trial"
+  };
+  localStorage.setItem('cfa_session', JSON.stringify(session));
+}
+
+// ─── Create or fetch user document in Firestore ───
+async function syncUserWithFirestore(firebaseUser) {
+  const uid  = firebaseUser.uid;
+  const ref  = db.collection('users').doc(uid);
+  const snap = await ref.get();
+
+  if (!snap.exists) {
+    // New user — create doc with plan = "trial"
+    const newDoc = {
+      uid,
+      name:      firebaseUser.displayName || 'Student',
+      email:     firebaseUser.email,
+      picture:   firebaseUser.photoURL || '',
+      plan:      'trial',   // default: trial
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    await ref.set(newDoc);
+    return newDoc;
+  } else {
+    // Existing user — return stored data (plan may have been upgraded by you)
+    return snap.data();
+  }
+}
+
+function showLoading(text) {
+  document.getElementById('loadingText').textContent = text || 'Signing you in...';
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = `msg ${type} show`;
+}
+
+// ══════════════════════════════════════════════════════
+//  GOOGLE SIGN-IN (GIS → Firebase credential)
+// ══════════════════════════════════════════════════════
+function triggerGoogleSignIn() {
+  showLoading('Connecting to Google...');
+  try {
+    google.accounts.id.initialize({
+      client_id: document.querySelector('[data-client_id]')?.getAttribute('data-client_id') || '',
+      callback:  handleGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        hideLoading();
+        googlePopupFallback();
+      }
+    });
+  } catch(e) {
+    hideLoading();
+    const activeMsg = document.getElementById('loginSection').classList.contains('active') ? 'loginMsg' : 'signupMsg';
+    showMsg(activeMsg, '⚠️ Google Auth needs a hosted domain. Use Dev Bypass for local testing.', 'error');
+  }
+}
+
+function googlePopupFallback() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2000;display:flex;align-items:center;justify-content:center';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#0c1120;border:1px solid #243060;border-radius:16px;padding:32px;text-align:center;max-width:360px;width:90%';
+  box.innerHTML = `<p style="margin-bottom:20px;font-family:DM Sans,sans-serif;color:#8899bb">Sign in with your Google account</p>
+    <div id="googleBtnMount"></div>
+    <button onclick="this.closest('div[style]').remove()" style="margin-top:16px;background:transparent;border:1px solid #243060;color:#8899bb;padding:8px 20px;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif">Cancel</button>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  google.accounts.id.renderButton(document.getElementById('googleBtnMount'), { theme:'filled_black', size:'large', width:280 });
+}
+
+// Called by Google GIS after user selects account
+async function handleGoogleCredential(response) {
+  showLoading('Signing in with Google...');
+  try {
+    // Exchange GIS credential for Firebase credential
+    const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
+    const result     = await auth.signInWithCredential(credential);
+    const fbUser     = result.user;
+
+    showLoading('Fetching your profile...');
+    const userData = await syncUserWithFirestore(fbUser);
+
+    startSession({
+      uid:     fbUser.uid,
+      name:    userData.name    || fbUser.displayName,
+      email:   userData.email   || fbUser.email,
+      picture: userData.picture || fbUser.photoURL || '',
+      plan:    userData.plan    || 'trial'
+    });
+
+    hideLoading();
+    window.location.href = 'isc_cs_platform.html';
+  } catch(e) {
+    hideLoading();
+    console.error('Google auth error:', e);
+    const activeMsg = document.getElementById('loginSection').classList.contains('active') ? 'loginMsg' : 'signupMsg';
+    showMsg(activeMsg, 'Sign-in failed: ' + (e.message || 'Please try again.'), 'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  DEVELOPER BYPASS (creates a fake Firestore-free session)
+// ══════════════════════════════════════════════════════
+function devBypass() {
+  showLoading('Dev bypass — entering platform...');
+  setTimeout(() => {
+    startSession({
+      uid:     'dev-bypass-uid',
+      name:    'Dev User',
+      email:   'dev@computerforall.local',
+      picture: '',
+      plan:    'free'    // ← change to "trial" or "pro" to test different states
+    });
+    hideLoading();
+    window.location.href = 'isc_cs_platform.html';
+  }, 600);
+}
+
+// ══════════════════════════════════════════════════════
+//  EMAIL / PASSWORD AUTH (via Firebase Auth)
+// ══════════════════════════════════════════════════════
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  if (!email || !pass) { showMsg('loginMsg', 'Please fill in all fields.', 'error'); return; }
+  showLoading('Logging in...');
+  try {
+    const result = await auth.signInWithEmailAndPassword(email, pass);
+    const userData = await syncUserWithFirestore(result.user);
+    startSession({
+      uid:     result.user.uid,
+      name:    userData.name,
+      email:   userData.email,
+      picture: userData.picture || '',
+      plan:    userData.plan || 'trial'
+    });
+    hideLoading();
+    window.location.href = 'isc_cs_platform.html';
+  } catch(e) {
+    hideLoading();
+    showMsg('loginMsg', e.code === 'auth/user-not-found' ? 'No account found. Please sign up.' :
+      e.code === 'auth/wrong-password' ? 'Incorrect password.' : e.message, 'error');
+  }
+}
+
+async function doSignup() {
+  const name  = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pass  = document.getElementById('signupPass').value;
+  if (!name || !email || !pass) { showMsg('signupMsg', 'Please fill in all fields.', 'error'); return; }
+  if (pass.length < 6) { showMsg('signupMsg', 'Password must be at least 6 characters.', 'error'); return; }
+  showLoading('Creating your account...');
+  try {
+    const result = await auth.createUserWithEmailAndPassword(email, pass);
+    await result.user.updateProfile({ displayName: name });
+    // Create Firestore doc manually since displayName isn't set before syncUser
+    await db.collection('users').doc(result.user.uid).set({
+      uid:       result.user.uid,
+      name,
+      email,
+      picture:   '',
+      plan:      'trial',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    startSession({ uid: result.user.uid, name, email, picture: '', plan: 'trial' });
+    hideLoading();
+    window.location.href = 'isc_cs_platform.html';
+  } catch(e) {
+    hideLoading();
+    showMsg('signupMsg', e.code === 'auth/email-already-in-use' ? 'Account already exists. Please log in.' : e.message, 'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  TAB SWITCH
+// ══════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) =>
+    t.classList.toggle('active', (tab==='login' && i===0) || (tab==='signup' && i===1)));
+  document.getElementById('loginSection').classList.toggle('active', tab==='login');
+  document.getElementById('signupSection').classList.toggle('active', tab==='signup');
+}
+
+// ══════════════════════════════════════════════════════
+//  AUTO-REDIRECT IF ALREADY LOGGED IN (Firebase listener)
+// ══════════════════════════════════════════════════════
+auth.onAuthStateChanged(async (firebaseUser) => {
+  if (firebaseUser) {
+    // User is already signed in to Firebase — re-sync and redirect
+    const sess = localStorage.getItem('cfa_session');
+    if (sess) {
+      // Session already set by a previous login, just redirect
+      window.location.href = 'isc_cs_platform.html';
+    } else {
+      // Firebase session exists but localStorage cleared — re-fetch Firestore doc
+      const userData = await syncUserWithFirestore(firebaseUser);
+      startSession({
+        uid:     firebaseUser.uid,
+        name:    userData.name,
+        email:   userData.email,
+        picture: userData.picture || '',
+        plan:    userData.plan || 'trial'
+      });
+      window.location.href = 'isc_cs_platform.html';
+    }
+  }
+});
+</script>
+</body>
+</html>

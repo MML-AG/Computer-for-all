@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boolean Algebra — ISC Computer Science</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fraunces:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #161820;
+    --bg3: #1e2030;
+    --card: #1a1d2e;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf2;
+    --text2: #9ea3bb;
+    --text3: #6b7094;
+    --accent: #7c6af7;
+    --accent2: #9d8fff;
+    --green: #4ade80;
+    --green2: #22c55e;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --teal: #2dd4bf;
+    --pink: #f472b6;
+    --mono: 'JetBrains Mono', monospace;
+    --serif: 'Fraunces', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.7; }
+
+  /* NAVIGATION */
+  .nav { position: sticky; top: 0; z-index: 100; background: rgba(15,17,23,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 0; overflow-x: auto; }
+  .nav a { padding: 1rem 1.25rem; font-size: 13px; font-weight: 500; color: var(--text3); text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .nav a:hover { color: var(--text); }
+  .nav a.active { color: var(--accent2); border-bottom-color: var(--accent); }
+  .nav .logo { font-family: var(--serif); font-size: 16px; font-weight: 900; color: var(--accent2); margin-right: 1rem; white-space: nowrap; padding: 1rem 0; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #0f1117 0%, #161228 50%, #0f1117 100%); padding: 4rem 2rem 3rem; text-align: center; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(124,106,247,0.12) 0%, transparent 70%); }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,106,247,0.12); border: 1px solid rgba(124,106,247,0.3); color: var(--accent2); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.5rem; }
+  .hero h1 { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 0.75rem; }
+  .hero h1 span { color: var(--accent2); }
+  .hero p { color: var(--text2); font-size: 1.05rem; max-width: 560px; margin: 0 auto 2rem; }
+  .hero-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .chip { background: var(--bg3); border: 1px solid var(--border); padding: 5px 14px; border-radius: 20px; font-size: 12px; color: var(--text2); }
+
+  /* SECTIONS */
+  .section { padding: 3.5rem 2rem; border-bottom: 1px solid var(--border); max-width: 960px; margin: 0 auto; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; }
+  .section-num { width: 36px; height: 36px; border-radius: 10px; background: rgba(124,106,247,0.15); border: 1px solid rgba(124,106,247,0.3); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent2); flex-shrink: 0; }
+  .section-title { font-family: var(--serif); font-size: 1.7rem; font-weight: 700; }
+  .section-sub { color: var(--text2); font-size: 0.9rem; margin-top: 2px; }
+
+  /* CARDS */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--accent2); }
+  .card p { color: var(--text2); font-size: 0.9rem; line-height: 1.6; }
+
+  /* FORMULA BOXES */
+  .formula { background: #0d0f1a; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 0.8rem 1.2rem; font-family: var(--mono); font-size: 0.88rem; color: var(--text); margin: 0.5rem 0; line-height: 1.6; overflow-x: auto; }
+  .formula .label { color: var(--text3); font-size: 0.78rem; margin-bottom: 4px; }
+  .formula .eq { color: var(--green); }
+  .formula .comment { color: var(--text3); }
+
+  /* TRUTH TABLES */
+  .truth-table-wrap { overflow-x: auto; margin: 1rem 0; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.85rem; }
+  th { background: rgba(124,106,247,0.1); color: var(--accent2); font-weight: 600; padding: 10px 14px; text-align: center; border: 1px solid var(--border2); }
+  td { padding: 8px 14px; text-align: center; border: 1px solid var(--border); color: var(--text); }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  .val-1 { color: var(--green); font-weight: 700; }
+  .val-0 { color: var(--red); }
+  .highlight-col { background: rgba(124,106,247,0.06) !important; }
+
+  /* TAGS & BADGES */
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-right: 4px; }
+  .tag-law { background: rgba(96,165,250,0.12); color: var(--blue); }
+  .tag-theorem { background: rgba(74,222,128,0.1); color: var(--green); }
+  .tag-important { background: rgba(251,191,36,0.1); color: var(--amber); }
+  .tag-exam { background: rgba(248,113,113,0.1); color: var(--red); }
+
+  /* LAW GRID */
+  .law-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  @media(max-width:600px) { .law-grid { grid-template-columns: 1fr; } }
+  .law-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1rem; }
+  .law-name { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .law-eq { font-family: var(--mono); font-size: 0.82rem; color: var(--text); }
+  .law-eq2 { font-family: var(--mono); font-size: 0.8rem; color: var(--text2); margin-top: 2px; }
+
+  /* KMAP */
+  .kmap-container { display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-start; margin: 1rem 0; }
+  .kmap { background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px; padding: 1.2rem; }
+  .kmap-title { font-size: 12px; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+  .kmap-grid { display: inline-grid; border: 2px solid var(--border2); border-radius: 6px; overflow: hidden; }
+  .kmap-cell { width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 1rem; font-weight: 700; border: 1px solid var(--border); transition: background 0.2s; }
+  .kmap-cell.header { background: rgba(124,106,247,0.1); font-size: 11px; font-weight: 600; color: var(--accent2); font-family: var(--sans); }
+  .kmap-cell.val-1 { color: var(--green); font-weight: 700; }
+  .kmap-cell.val-0 { color: var(--text3); }
+  .kmap-cell.grouped { background: rgba(74,222,128,0.08); outline: 2px solid rgba(74,222,128,0.4); outline-offset: -2px; }
+  .kmap-cell.grouped2 { background: rgba(251,191,36,0.08); outline: 2px solid rgba(251,191,36,0.4); outline-offset: -2px; }
+  .kmap-cell.grouped3 { background: rgba(248,113,113,0.08); outline: 2px solid rgba(248,113,113,0.4); outline-offset: -2px; }
+  .kmap-legend { margin-top: 0.75rem; }
+  .kmap-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); margin-bottom: 4px; font-family: var(--mono); }
+  .kmap-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+  /* CIRCUIT */
+  .circuit-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; background: var(--bg3); border-radius: 10px; padding: 4px; margin-bottom: 1.5rem; }
+  .tab-btn { flex: 1; padding: 7px 12px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; border: none; background: none; transition: all 0.2s; }
+  .tab-btn.active { background: var(--card); color: var(--text); border: 1px solid var(--border2); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* INTERACTIVE TRUTH TABLE BUILDER */
+  .tt-builder { background: var(--bg3); border: 1px solid var(--border2); border-radius: 12px; padding: 1.5rem; margin: 1rem 0; }
+  .tt-builder h4 { font-size: 14px; font-weight: 600; margin-bottom: 1rem; color: var(--accent2); }
+  .tt-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+  .op-btn { padding: 6px 16px; border-radius: 8px; font-family: var(--mono); font-size: 13px; font-weight: 600; border: 1px solid var(--border2); background: var(--bg); color: var(--text2); cursor: pointer; transition: all 0.2s; }
+  .op-btn:hover { border-color: var(--accent); color: var(--accent2); }
+  .op-btn.active { background: rgba(124,106,247,0.15); border-color: var(--accent); color: var(--accent2); }
+
+  /* ADDER CIRCUIT */
+  .adder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:600px) { .adder-grid { grid-template-columns: 1fr; } }
+
+  /* ALERT/NOTE BOXES */
+  .note { background: rgba(96,165,250,0.06); border: 1px solid rgba(96,165,250,0.2); border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; }
+  .note-title { color: var(--blue); font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .note p { color: var(--text2); font-size: 0.88rem; }
+  .exam-tip { background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.2); border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; }
+  .exam-tip .note-title { color: var(--amber); }
+  .danger { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2); border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; }
+  .danger .note-title { color: var(--red); }
+
+  /* MINTERMS MAXTERMS */
+  .term-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+  .term-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+  .term-card .title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .term-card .eq { font-family: var(--mono); font-size: 0.85rem; color: var(--text); margin-bottom: 4px; }
+  .term-card .desc { font-size: 12px; color: var(--text3); }
+
+  /* QUIZ */
+  .quiz-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin: 1.5rem 0; }
+  .quiz-q { font-size: 1rem; font-weight: 500; margin-bottom: 1.25rem; color: var(--text); }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .quiz-opt { padding: 10px 14px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-family: var(--mono); font-size: 0.88rem; transition: all 0.2s; color: var(--text2); text-align: left; }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { background: rgba(74,222,128,0.1); border-color: var(--green2); color: var(--green); }
+  .quiz-opt.wrong { background: rgba(248,113,113,0.1); border-color: var(--red); color: var(--red); }
+  .quiz-explain { background: var(--bg3); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.88rem; color: var(--text2); margin-top: 0.75rem; display: none; }
+
+  /* PROGRESS */
+  .progress-bar { width: 100%; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; margin-top: 2px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--teal)); border-radius: 2px; transition: width 0.4s; }
+
+  /* STEP DIAGRAM */
+  .steps { display: flex; flex-direction: column; gap: 0; margin: 1rem 0; }
+  .step { display: flex; gap: 1rem; }
+  .step-line { display: flex; flex-direction: column; align-items: center; }
+  .step-dot { width: 32px; height: 32px; border-radius: 50%; background: rgba(124,106,247,0.15); border: 1.5px solid rgba(124,106,247,0.4); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 12px; color: var(--accent2); font-weight: 700; flex-shrink: 0; }
+  .step-connector { width: 1.5px; background: var(--border); flex: 1; min-height: 20px; margin: 4px 0; }
+  .step-body { padding-bottom: 1.5rem; padding-top: 4px; }
+  .step-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+  .step-desc { color: var(--text2); font-size: 0.88rem; }
+
+  /* RESPONSIVE */
+  @media(max-width:768px) { .section { padding: 2.5rem 1rem; } .hero { padding: 3rem 1rem 2rem; } .card-grid { grid-template-columns: 1fr; } }
+  @media(max-width:480px) { .law-grid { grid-template-columns: 1fr; } }
+
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+  .sub-heading { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .sub-heading::before { content: ''; display: block; width: 4px; height: 16px; border-radius: 2px; background: var(--accent); }
+
+  .highlight { background: rgba(124,106,247,0.08); border: 1px solid rgba(124,106,247,0.2); border-radius: 6px; padding: 2px 8px; font-family: var(--mono); font-size: 0.88rem; color: var(--accent2); }
+
+  ul.list { list-style: none; padding: 0; }
+  ul.list li { padding: 5px 0 5px 1.5rem; position: relative; color: var(--text2); font-size: 0.9rem; }
+  ul.list li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); font-size: 0.75rem; top: 7px; }
+
+  /* STICKY SIDEBAR EFFECT ON TOC */
+  .toc-float { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200; }
+  .toc-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); border: none; cursor: pointer; color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(124,106,247,0.4); }
+  .scroll-top { display: none; }
+
+  footer { text-align: center; padding: 2rem; color: var(--text3); font-size: 0.8rem; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo">ISC CS</div>
+  <a href="#propositional" class="active">Propositional Logic</a>
+  <a href="#equivalence">Equivalence Laws</a>
+  <a href="#boolean-basics">Boolean Algebra</a>
+  <a href="#theorems">Theorems</a>
+  <a href="#sop-pos">SOP & POS</a>
+  <a href="#kmap">K-Maps</a>
+  <a href="#circuits">Circuits</a>
+  <a href="#quiz">Quick Quiz</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">📘 ISC Board · Topic 1</div>
+  <h1>Boolean <span>Algebra</span><br>Complete Theory</h1>
+  <p>Everything you need for a perfect 100/100. Propositional logic → Boolean algebra → K-Maps → Adder circuits.</p>
+  <div class="hero-chips">
+    <div class="chip">Propositional Logic</div>
+    <div class="chip">Truth Tables</div>
+    <div class="chip">Equivalence Laws</div>
+    <div class="chip">De Morgan's Theorem</div>
+    <div class="chip">SOP & POS</div>
+    <div class="chip">Karnaugh Maps</div>
+    <div class="chip">Half & Full Adder</div>
+  </div>
+</div>
+
+<div style="max-width:960px;margin:0 auto;">
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 1: PROPOSITIONAL LOGIC -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="propositional">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div>
+      <div class="section-title">Propositional Logic</div>
+      <div class="section-sub">WFFs, connectives, truth values, interpretation</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1.5rem;">Propositional logic deals with propositions — statements that are either <span class="highlight">TRUE</span> or <span class="highlight">FALSE</span>. We combine them using <strong>logical connectives</strong> to form compound statements called <em>Well-Formed Formulae (WFF)</em>.</p>
+
+  <div class="sub-heading">What is a Proposition?</div>
+  <div class="card-grid">
+    <div class="card">
+      <h3>✅ Valid Propositions</h3>
+      <ul class="list">
+        <li>"The sky is blue" — TRUE</li>
+        <li>"2 + 2 = 5" — FALSE</li>
+        <li>"It is raining" — TRUE/FALSE</li>
+        <li>"Delhi is the capital of India" — TRUE</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>❌ Not Propositions</h3>
+      <ul class="list">
+        <li>"Close the door!" (command)</li>
+        <li>"Are you ok?" (question)</li>
+        <li>"x + 2 = 5" (open sentence, value of x unknown)</li>
+        <li>"This statement is false" (paradox)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sub-heading">Logical Connectives (Operators)</div>
+  <div class="card">
+    <div style="overflow-x:auto;">
+      <table>
+        <tr>
+          <th>Symbol</th><th>Name</th><th>Read As</th><th>Example</th><th>Description</th>
+        </tr>
+        <tr><td>~&nbsp;or&nbsp;¬</td><td>Negation</td><td>NOT p</td><td>~p</td><td>Reverses truth value of p</td></tr>
+        <tr><td>∧</td><td>Conjunction</td><td>p AND q</td><td>p ∧ q</td><td>True only when BOTH are true</td></tr>
+        <tr><td>∨</td><td>Disjunction</td><td>p OR q</td><td>p ∨ q</td><td>True when AT LEAST ONE is true</td></tr>
+        <tr><td>⇒</td><td>Implication</td><td>p implies q</td><td>p ⇒ q</td><td>False ONLY when p=T, q=F</td></tr>
+        <tr><td>⇔</td><td>Biconditional</td><td>p if and only if q</td><td>p ⇔ q</td><td>True when BOTH have same value</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="sub-heading">Well-Formed Formulae (WFF)</div>
+  <div class="note">
+    <div class="note-title">📐 Definition</div>
+    <p>A WFF is a syntactically correct expression formed using propositional variables and logical connectives following precise grammar rules.</p>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1rem;font-size:0.9rem;">Formation rules:</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-line"><div class="step-dot">1</div><div class="step-connector"></div></div>
+      <div class="step-body"><div class="step-title">Atomic WFF</div><div class="step-desc">Any propositional variable (p, q, r, T, F) is a WFF by itself.</div></div>
+    </div>
+    <div class="step">
+      <div class="step-line"><div class="step-dot">2</div><div class="step-connector"></div></div>
+      <div class="step-body"><div class="step-title">Negation Rule</div><div class="step-desc">If P is a WFF, then ~P is also a WFF.</div></div>
+    </div>
+    <div class="step">
+      <div class="step-line"><div class="step-dot">3</div><div class="step-connector"></div></div>
+      <div class="step-body"><div class="step-title">Binary Connective Rule</div><div class="step-desc">If P and Q are WFFs, then (P ∧ Q), (P ∨ Q), (P ⇒ Q), (P ⇔ Q) are also WFFs.</div></div>
+    </div>
+    <div class="step">
+      <div class="step-line"><div class="step-dot">4</div><div class="step-connector"></div></div>
+      <div class="step-body"><div class="step-title">Nothing Else</div><div class="step-desc">Only expressions formed using rules 1–3 are WFFs.</div></div>
+    </div>
+  </div>
+
+  <div class="exam-tip">
+    <div class="note-title">⭐ Exam Tip — WFF Examples</div>
+    <p>Valid: (p ∧ q) ⇒ r, ~(p ∨ ~q), ((p ⇒ q) ∧ (q ⇒ r))<br>Invalid: p ∧ ∨ q, ⇒ p q, p q ∧</p>
+  </div>
+
+  <div class="sub-heading">Truth Tables for Basic Connectives</div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('tt1','basic')">NOT / AND / OR</button>
+    <button class="tab-btn" onclick="showTab('tt1','impl')">Implication (⇒)</button>
+    <button class="tab-btn" onclick="showTab('tt1','bicond')">Biconditional (⇔)</button>
+  </div>
+  <div id="tt1-basic" class="tab-content active">
+    <div class="truth-table-wrap">
+      <table>
+        <tr><th>p</th><th>q</th><th>~p</th><th>p ∧ q</th><th>p ∨ q</th></tr>
+        <tr><td class="val-1">T</td><td class="val-1">T</td><td class="val-0">F</td><td class="val-1">T</td><td class="val-1">T</td></tr>
+        <tr><td class="val-1">T</td><td class="val-0">F</td><td class="val-0">F</td><td class="val-0">F</td><td class="val-1">T</td></tr>
+        <tr><td class="val-0">F</td><td class="val-1">T</td><td class="val-1">T</td><td class="val-0">F</td><td class="val-1">T</td></tr>
+        <tr><td class="val-0">F</td><td class="val-0">F</td><td class="val-1">T</td><td class="val-0">F</td><td class="val-0">F</td></tr>
+      </table>
+    </div>
+  </div>
+  <div id="tt1-impl" class="tab-content">
+    <div class="truth-table-wrap">
+      <table>
+        <tr><th>p</th><th>q</th><th class="highlight-col">p ⇒ q</th><th>~p ∨ q</th></tr>
+        <tr><td class="val-1">T</td><td class="val-1">T</td><td class="highlight-col val-1">T</td><td class="val-1">T</td></tr>
+        <tr style="background:rgba(248,113,113,0.04);"><td class="val-1">T</td><td class="val-0">F</td><td class="highlight-col val-0">F</td><td class="val-0">F</td></tr>
+        <tr><td class="val-0">F</td><td class="val-1">T</td><td class="highlight-col val-1">T</td><td class="val-1">T</td></tr>
+        <tr><td class="val-0">F</td><td class="val-0">F</td><td class="highlight-col val-1">T</td><td class="val-1">T</td></tr>
+      </table>
+    </div>
+    <div class="note" style="margin-top:0.75rem;">
+      <div class="note-title">⚡ Key Insight</div>
+      <p>Implication (p ⇒ q) is <strong>FALSE</strong> ONLY when the premise p is TRUE and conclusion q is FALSE. All other cases are TRUE. Note: p ⇒ q ≡ ~p ∨ q (very important for simplification!)</p>
+    </div>
+  </div>
+  <div id="tt1-bicond" class="tab-content">
+    <div class="truth-table-wrap">
+      <table>
+        <tr><th>p</th><th>q</th><th class="highlight-col">p ⇔ q</th><th>(p⇒q)∧(q⇒p)</th></tr>
+        <tr><td class="val-1">T</td><td class="val-1">T</td><td class="highlight-col val-1">T</td><td class="val-1">T</td></tr>
+        <tr><td class="val-1">T</td><td class="val-0">F</td><td class="highlight-col val-0">F</td><td class="val-0">F</td></tr>
+        <tr><td class="val-0">F</td><td class="val-1">T</td><td class="highlight-col val-0">F</td><td class="val-0">F</td></tr>
+        <tr><td class="val-0">F</td><td class="val-0">F</td><td class="highlight-col val-1">T</td><td class="val-1">T</td></tr>
+      </table>
+    </div>
+    <div class="note" style="margin-top:0.75rem;">
+      <div class="note-title">⚡ Key Insight</div>
+      <p>Biconditional is TRUE when both p and q have the <strong>same truth value</strong>. It is equivalent to (p⇒q) ∧ (q⇒p).</p>
+    </div>
+  </div>
+
+  <div class="sub-heading">Types of Formulae</div>
+  <div class="card-grid">
+    <div class="card">
+      <h3 style="color:var(--green);">Tautology (Valid)</h3>
+      <p>A WFF that is <strong>TRUE for all</strong> possible interpretations (all rows in truth table = T).</p>
+      <div class="formula"><span class="eq">p ∨ ~p</span> <span class="comment">— always TRUE (Law of Excluded Middle)</span></div>
+      <div class="formula"><span class="eq">p ⇒ p</span> <span class="comment">— always TRUE</span></div>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--red);">Contradiction (Unsatisfiable)</h3>
+      <p>A WFF that is <strong>FALSE for all</strong> possible interpretations (all rows = F).</p>
+      <div class="formula"><span class="eq">p ∧ ~p</span> <span class="comment">— always FALSE (Law of Contradiction)</span></div>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--amber);">Contingency (Satisfiable)</h3>
+      <p>A WFF that is <strong>TRUE for at least one</strong> interpretation, but not all. Neither tautology nor contradiction.</p>
+      <div class="formula"><span class="eq">p ∧ q</span> <span class="comment">— TRUE only when both p,q = T</span></div>
+    </div>
+  </div>
+
+  <div class="sub-heading">Converse, Inverse, and Contrapositive</div>
+  <div class="card">
+    <p style="color:var(--text2);margin-bottom:1rem;">Given implication: <span class="highlight">p ⇒ q</span></p>
+    <div class="law-grid">
+      <div class="law-item">
+        <div class="law-name" style="color:var(--blue);">Original</div>
+        <div class="law-eq">p ⇒ q</div>
+        <div class="law-eq2" style="color:var(--text3);">"If p, then q"</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name" style="color:var(--green);">Converse</div>
+        <div class="law-eq">q ⇒ p</div>
+        <div class="law-eq2" style="color:var(--text3);">"If q, then p" — swap p and q</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name" style="color:var(--amber);">Inverse</div>
+        <div class="law-eq">~p ⇒ ~q</div>
+        <div class="law-eq2" style="color:var(--text3);">Negate both — equivalent to converse</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name" style="color:var(--teal);">Contrapositive</div>
+        <div class="law-eq">~q ⇒ ~p</div>
+        <div class="law-eq2" style="color:var(--text3);">Swap AND negate — EQUIVALENT to original!</div>
+      </div>
+    </div>
+    <div class="exam-tip" style="margin-top:1rem;">
+      <div class="note-title">⭐ Critical: p ⇒ q ≡ ~q ⇒ ~p (Contrapositive is logically equivalent!)</div>
+      <p>But p ⇒ q is NOT equivalent to q ⇒ p (converse) or ~p ⇒ ~q (inverse).</p>
+    </div>
+  </div>
+
+  <div class="sub-heading">Chain Rule & Modus Ponens</div>
+  <div class="card-grid">
+    <div class="card">
+      <h3>Modus Ponens (Law of Detachment)</h3>
+      <div class="formula">
+        <div>Premise 1: p ⇒ q</div>
+        <div>Premise 2: p &nbsp;&nbsp;&nbsp;&nbsp;(p is TRUE)</div>
+        <div>──────────</div>
+        <div class="eq">Conclusion: q</div>
+      </div>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.75rem;">If "if p then q" is true, and p is true, we can conclude q is true.</p>
+    </div>
+    <div class="card">
+      <h3>Chain Rule (Hypothetical Syllogism)</h3>
+      <div class="formula">
+        <div>Premise 1: p ⇒ q</div>
+        <div>Premise 2: q ⇒ r</div>
+        <div>──────────</div>
+        <div class="eq">Conclusion: p ⇒ r</div>
+      </div>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.75rem;">If p implies q, and q implies r, then p implies r (transitivity of implication).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 2: EQUIVALENCE LAWS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="equivalence">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div>
+      <div class="section-title">Equivalence Laws</div>
+      <div class="section-sub">All laws for simplifying WFFs — must memorise every one!</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1.5rem;">Two WFFs P and Q are <strong>logically equivalent</strong> (P ≡ Q) if they have identical truth values for all interpretations. These laws let us simplify and transform expressions.</p>
+
+  <div class="sub-heading">Complete List of Equivalence Laws</div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>1. Identity Laws</h3>
+    <div class="formula"><span class="eq">p ∧ T ≡ p</span> &nbsp;&nbsp;&nbsp; <span class="eq">p ∨ F ≡ p</span></div>
+    <p style="color:var(--text2);font-size:0.88rem;margin-top:0.5rem;">AND with TRUE and OR with FALSE leave the variable unchanged.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>2. Domination Laws (Null / Annihilation)</h3>
+    <div class="formula"><span class="eq">p ∨ T ≡ T</span> &nbsp;&nbsp;&nbsp; <span class="eq">p ∧ F ≡ F</span></div>
+    <p style="color:var(--text2);font-size:0.88rem;margin-top:0.5rem;">OR with TRUE always gives TRUE; AND with FALSE always gives FALSE.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>3. Idempotent Laws</h3>
+    <div class="formula"><span class="eq">p ∧ p ≡ p</span> &nbsp;&nbsp;&nbsp; <span class="eq">p ∨ p ≡ p</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>4. Commutative Laws</h3>
+    <div class="formula"><span class="eq">p ∧ q ≡ q ∧ p</span></div>
+    <div class="formula"><span class="eq">p ∨ q ≡ q ∨ p</span></div>
+    <p style="color:var(--text2);font-size:0.88rem;margin-top:0.5rem;">Order of operands doesn't matter for AND and OR.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>5. Associative Laws</h3>
+    <div class="formula"><span class="eq">(p ∧ q) ∧ r ≡ p ∧ (q ∧ r)</span></div>
+    <div class="formula"><span class="eq">(p ∨ q) ∨ r ≡ p ∨ (q ∨ r)</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>6. Distributive Laws</h3>
+    <div class="formula"><span class="eq">p ∧ (q ∨ r) ≡ (p ∧ q) ∨ (p ∧ r)</span> <span class="comment"> — AND distributes over OR</span></div>
+    <div class="formula"><span class="eq">p ∨ (q ∧ r) ≡ (p ∨ q) ∧ (p ∨ r)</span> <span class="comment"> — OR distributes over AND</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;border-color:rgba(248,113,113,0.3);">
+    <h3 style="color:var(--red);">7. De Morgan's Laws ⭐ (Most Important!)</h3>
+    <div class="formula"><span class="eq">~(p ∧ q) ≡ ~p ∨ ~q</span> <span class="comment"> — NOT of AND = OR of NOTs</span></div>
+    <div class="formula"><span class="eq">~(p ∨ q) ≡ ~p ∧ ~q</span> <span class="comment"> — NOT of OR = AND of NOTs</span></div>
+    <p style="color:var(--text2);font-size:0.88rem;margin-top:0.75rem;"><strong>Memory trick:</strong> "Break the bar, change the operator" — negate each variable and flip AND↔OR.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>8. Law of Implication</h3>
+    <div class="formula"><span class="eq">p ⇒ q ≡ ~p ∨ q</span></div>
+    <p style="color:var(--text2);font-size:0.88rem;margin-top:0.5rem;">Used to convert implications to OR form for simplification.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>9. Law of Biconditional</h3>
+    <div class="formula"><span class="eq">p ⇔ q ≡ (p ⇒ q) ∧ (q ⇒ p)</span></div>
+    <div class="formula"><span class="eq">p ⇔ q ≡ (p ∧ q) ∨ (~p ∧ ~q)</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>10. Law of Negation (Double Negation / Involution)</h3>
+    <div class="formula"><span class="eq">~(~p) ≡ p</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>11. Law of Excluded Middle (Tautology)</h3>
+    <div class="formula"><span class="eq">p ∨ ~p ≡ T</span> <span class="comment"> — Always TRUE</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>12. Law of Contradiction</h3>
+    <div class="formula"><span class="eq">p ∧ ~p ≡ F</span> <span class="comment"> — Always FALSE</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>13. Absorption Laws</h3>
+    <div class="formula"><span class="eq">p ∨ (p ∧ q) ≡ p</span></div>
+    <div class="formula"><span class="eq">p ∧ (p ∨ q) ≡ p</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>14. Simplification Rules (for AND)</h3>
+    <div class="formula"><span class="eq">p ∧ T ≡ p</span> &nbsp;&nbsp; <span class="eq">p ∧ F ≡ F</span> &nbsp;&nbsp; <span class="eq">p ∧ p ≡ p</span> &nbsp;&nbsp; <span class="eq">p ∧ ~p ≡ F</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3>15. Simplification Rules (for OR)</h3>
+    <div class="formula"><span class="eq">p ∨ T ≡ T</span> &nbsp;&nbsp; <span class="eq">p ∨ F ≡ p</span> &nbsp;&nbsp; <span class="eq">p ∨ p ≡ p</span> &nbsp;&nbsp; <span class="eq">p ∨ ~p ≡ T</span></div>
+  </div>
+
+  <div class="sub-heading">Worked Example: Simplify a WFF</div>
+  <div class="card">
+    <h3>Simplify: ~(p ∨ ~q) ∨ (p ∧ q)</h3>
+    <div class="formula">
+      <div class="label">Step 1: Apply De Morgan's to ~(p ∨ ~q)</div>
+      <div class="eq">= (~p ∧ ~~q) ∨ (p ∧ q)</div>
+    </div>
+    <div class="formula">
+      <div class="label">Step 2: Apply Double Negation (~~q = q)</div>
+      <div class="eq">= (~p ∧ q) ∨ (p ∧ q)</div>
+    </div>
+    <div class="formula">
+      <div class="label">Step 3: Factor out q (Distributive Law)</div>
+      <div class="eq">= q ∧ (~p ∨ p)</div>
+    </div>
+    <div class="formula">
+      <div class="label">Step 4: Apply Law of Excluded Middle (~p ∨ p = T)</div>
+      <div class="eq">= q ∧ T</div>
+    </div>
+    <div class="formula">
+      <div class="label">Step 5: Apply Identity Law</div>
+      <div class="eq">= q</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 3: BOOLEAN ALGEBRA BASICS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="boolean-basics">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div>
+      <div class="section-title">Boolean Algebra</div>
+      <div class="section-sub">Binary values, basic postulates, AND / OR / NOT</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1.5rem;">Boolean algebra is a mathematical system dealing with <strong>binary values</strong> — 0 (FALSE) and 1 (TRUE) — and the operations performed on them. It is the foundation of digital circuits and computing.</p>
+
+  <div class="sub-heading">Binary-Valued Quantities</div>
+  <div class="card-grid">
+    <div class="card">
+      <h3>Value 0 (FALSE)</h3>
+      <ul class="list">
+        <li>Switch is OFF</li>
+        <li>Voltage is LOW</li>
+        <li>Condition is False</li>
+        <li>Represented as 0</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Value 1 (TRUE)</h3>
+      <ul class="list">
+        <li>Switch is ON</li>
+        <li>Voltage is HIGH</li>
+        <li>Condition is True</li>
+        <li>Represented as 1</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sub-heading">Basic Postulates of Boolean Algebra</div>
+  <div class="card">
+    <div class="law-grid">
+      <div class="law-item">
+        <div class="law-name">AND with 0</div>
+        <div class="law-eq">0 · 0 = 0 &nbsp; 1 · 0 = 0</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">AND with 1</div>
+        <div class="law-eq">0 · 1 = 0 &nbsp; 1 · 1 = 1</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">OR with 0</div>
+        <div class="law-eq">0 + 0 = 0 &nbsp; 1 + 0 = 1</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">OR with 1</div>
+        <div class="law-eq">0 + 1 = 1 &nbsp; 1 + 1 = 1</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">NOT (Complement)</div>
+        <div class="law-eq">0̄ = 1 &nbsp;&nbsp;&nbsp; 1̄ = 0</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">Note</div>
+        <div class="law-eq" style="color:var(--text2);">· = AND, + = OR, overbar = NOT</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-heading">Truth Tables for Basic Boolean Operations</div>
+  <div class="card-grid">
+    <div class="card">
+      <h3>AND Gate (·)</h3>
+      <div class="truth-table-wrap">
+        <table>
+          <tr><th>A</th><th>B</th><th>A · B</th></tr>
+          <tr><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td></tr>
+          <tr><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td></tr>
+          <tr><td class="val-1">1</td><td class="val-0">0</td><td class="val-0">0</td></tr>
+          <tr><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3>OR Gate (+)</h3>
+      <div class="truth-table-wrap">
+        <table>
+          <tr><th>A</th><th>B</th><th>A + B</th></tr>
+          <tr><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td></tr>
+          <tr><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">1</td></tr>
+          <tr><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td></tr>
+          <tr><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3>NOT Gate (overbar)</h3>
+      <div class="truth-table-wrap">
+        <table>
+          <tr><th>A</th><th>Ā (NOT A)</th></tr>
+          <tr><td class="val-0">0</td><td class="val-1">1</td></tr>
+          <tr><td class="val-1">1</td><td class="val-0">0</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 4: THEOREMS OF BOOLEAN ALGEBRA -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="theorems">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div>
+      <div class="section-title">Theorems of Boolean Algebra</div>
+      <div class="section-sub">All theorems with proofs — duality, idempotence, De Morgan's, absorption...</div>
+    </div>
+  </div>
+
+  <div class="sub-heading">Principle of Duality</div>
+  <div class="note">
+    <div class="note-title">📐 Duality Principle</div>
+    <p>Every algebraic expression deducible from the postulates of Boolean algebra remains valid if the operators AND and OR are interchanged and the identity elements 0 and 1 are interchanged.</p>
+  </div>
+  <div class="card">
+    <div class="law-grid">
+      <div class="law-item">
+        <div class="law-name">Original</div>
+        <div class="law-eq">A + 0 = A</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">Dual</div>
+        <div class="law-eq">A · 1 = A</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">Original</div>
+        <div class="law-eq">A + A = A</div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">Dual</div>
+        <div class="law-eq">A · A = A</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-heading">Complete Theorem Reference</div>
+
+  <div class="card">
+    <h3>1. Identity Theorems</h3>
+    <div class="formula"><span class="eq">A + 0 = A</span> &nbsp;&nbsp;&nbsp; <span class="eq">A · 1 = A</span></div>
+    <div class="formula"><span class="eq">A + 1 = 1</span> &nbsp;&nbsp;&nbsp; <span class="eq">A · 0 = 0</span></div>
+    <p style="color:var(--text2);font-size:0.88rem;margin-top:0.5rem;">Proof (A + 0 = A): When A=0: 0+0=0 ✓; When A=1: 1+0=1 ✓</p>
+  </div>
+
+  <div class="card">
+    <h3>2. Idempotent Laws</h3>
+    <div class="formula"><span class="eq">A + A = A</span> &nbsp;&nbsp;&nbsp; <span class="eq">A · A = A</span></div>
+    <p style="color:var(--text2);font-size:0.88rem;margin-top:0.5rem;">Proof: OR table: 0+0=0=0, 1+1=1=1 ✓ | AND table: 0·0=0, 1·1=1 ✓</p>
+  </div>
+
+  <div class="card">
+    <h3>3. Commutative Laws</h3>
+    <div class="formula"><span class="eq">A + B = B + A</span></div>
+    <div class="formula"><span class="eq">A · B = B · A</span></div>
+  </div>
+
+  <div class="card">
+    <h3>4. Associative Laws</h3>
+    <div class="formula"><span class="eq">A + (B + C) = (A + B) + C</span></div>
+    <div class="formula"><span class="eq">A · (B · C) = (A · B) · C</span></div>
+  </div>
+
+  <div class="card">
+    <h3>5. Distributive Laws</h3>
+    <div class="formula"><span class="eq">A · (B + C) = A·B + A·C</span> <span class="comment"> — AND distributes over OR</span></div>
+    <div class="formula"><span class="eq">A + (B · C) = (A + B) · (A + C)</span> <span class="comment"> — OR distributes over AND</span></div>
+    <div class="exam-tip">
+      <div class="note-title">⭐ Note: Second law has NO analogy in ordinary algebra!</div>
+      <p>In normal algebra, a + (b·c) ≠ (a+b)·(a+c), but in Boolean algebra it is valid.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>6. Complement Laws (Operations with 0 and 1)</h3>
+    <div class="formula"><span class="eq">A + Ā = 1</span> <span class="comment"> — Complement OR = 1 (Tautology)</span></div>
+    <div class="formula"><span class="eq">A · Ā = 0</span> <span class="comment"> — Complement AND = 0 (Contradiction)</span></div>
+    <div class="formula"><span class="eq">Ā̄ = A</span> <span class="comment"> — Double complement = original (Involution)</span></div>
+  </div>
+
+  <div class="card">
+    <h3>7. Absorption Laws</h3>
+    <div class="formula"><span class="eq">A + A·B = A</span></div>
+    <div class="formula"><span class="eq">A · (A + B) = A</span></div>
+    <div class="card" style="background:var(--bg3);margin-top:0.75rem;">
+      <p style="font-size:0.88rem;color:var(--text2);">
+        <strong style="color:var(--accent2);">Proof of A + A·B = A:</strong><br>
+        = A·1 + A·B &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Identity: A = A·1)<br>
+        = A·(1 + B) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Distributive)<br>
+        = A·1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (1 + B = 1)<br>
+        = A &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Identity) ✓
+      </p>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:rgba(248,113,113,0.3);">
+    <h3 style="color:var(--red);">8. De Morgan's Theorems ⭐⭐⭐</h3>
+    <div class="formula"><span class="eq">̄(A·B) = Ā + B̄</span> <span class="comment"> — NOT(A AND B) = NOTA OR NOTB</span></div>
+    <div class="formula"><span class="eq">̄(A+B) = Ā · B̄</span> <span class="comment"> — NOT(A OR B) = NOTA AND NOTB</span></div>
+    <div class="card" style="background:var(--bg3);margin-top:0.75rem;">
+      <p style="font-size:0.88rem;color:var(--accent2);margin-bottom:0.5rem;"><strong>Proof by Truth Table: ̄(A·B) = Ā + B̄</strong></p>
+      <div class="truth-table-wrap">
+        <table>
+          <tr><th>A</th><th>B</th><th>A·B</th><th>̄(A·B)</th><th>Ā</th><th>B̄</th><th>Ā + B̄</th><th>Same?</th></tr>
+          <tr><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">✓</td></tr>
+          <tr><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">✓</td></tr>
+          <tr><td class="val-1">1</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">✓</td></tr>
+          <tr><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-1">✓</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 5: SOP & POS + MINTERMS & MAXTERMS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="sop-pos">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div>
+      <div class="section-title">SOP, POS, Minterms & Maxterms</div>
+      <div class="section-sub">Canonical & cardinal forms, sum of products, product of sums</div>
+    </div>
+  </div>
+
+  <div class="sub-heading">Minterms and Maxterms</div>
+  <div class="card-grid">
+    <div class="card" style="border-color:rgba(74,222,128,0.3);">
+      <h3 style="color:var(--green);">Minterm (mₙ)</h3>
+      <p style="color:var(--text2);font-size:0.9rem;margin-bottom:0.75rem;">A product (AND) term containing all n variables in true or complemented form. Evaluates to <strong>1 for exactly one</strong> input combination.</p>
+      <div class="formula" style="font-size:0.82rem;">
+        <div>For 2 variables A, B:</div>
+        <div class="eq">m₀ = Ā·B̄ (when A=0, B=0)</div>
+        <div class="eq">m₁ = Ā·B  (when A=0, B=1)</div>
+        <div class="eq">m₂ = A·B̄  (when A=1, B=0)</div>
+        <div class="eq">m₃ = A·B  (when A=1, B=1)</div>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(251,191,36,0.3);">
+      <h3 style="color:var(--amber);">Maxterm (Mₙ)</h3>
+      <p style="color:var(--text2);font-size:0.9rem;margin-bottom:0.75rem;">A sum (OR) term containing all n variables. Evaluates to <strong>0 for exactly one</strong> input combination.</p>
+      <div class="formula" style="font-size:0.82rem;">
+        <div>For 2 variables A, B:</div>
+        <div class="eq">M₀ = A+B  (0 when A=0, B=0)</div>
+        <div class="eq">M₁ = A+B̄  (0 when A=0, B=1)</div>
+        <div class="eq">M₂ = Ā+B  (0 when A=1, B=0)</div>
+        <div class="eq">M₃ = Ā+B̄  (0 when A=1, B=1)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-title">⚡ Key Relationship: Mₙ = complement of mₙ</div>
+    <p>For the same index n: Mₙ = m̄ₙ. Example: m₀ = Ā·B̄, so M₀ = A+B ✓</p>
+  </div>
+
+  <div class="sub-heading">SOP — Sum of Products</div>
+  <div class="card">
+    <p style="color:var(--text2);margin-bottom:0.75rem;">A Boolean expression where product (AND) terms are summed (OR). The <strong>Canonical SOP</strong> uses only minterms.</p>
+    <div class="formula">
+      <div class="label">Example: f(A,B,C) = ∑m(1,4,7) = m₁ + m₄ + m₇</div>
+      <div class="eq">= Ā·B̄·C + A·B̄·C̄ + A·B·C</div>
+    </div>
+    <div class="exam-tip">
+      <div class="note-title">✅ How to find SOP from a truth table</div>
+      <p>1. Find all rows where output = 1<br>2. Write the minterm for each (0→complement, 1→true variable)<br>3. OR all the minterms together</p>
+    </div>
+  </div>
+
+  <div class="sub-heading">POS — Product of Sums</div>
+  <div class="card">
+    <p style="color:var(--text2);margin-bottom:0.75rem;">A Boolean expression where sum (OR) terms are multiplied (AND). The <strong>Canonical POS</strong> uses only maxterms.</p>
+    <div class="formula">
+      <div class="label">Example: f(A,B,C) = ΠM(0,2,3,5,6) = M₀·M₂·M₃·M₅·M₆</div>
+      <div class="eq">= (A+B+C)·(A+B̄+C)·(A+B̄+C̄)·(Ā+B+C̄)·(Ā+B̄+C)</div>
+    </div>
+    <div class="exam-tip">
+      <div class="note-title">✅ How to find POS from a truth table</div>
+      <p>1. Find all rows where output = 0<br>2. Write the maxterm for each (0→true variable, 1→complement)<br>3. AND all the maxterms together</p>
+    </div>
+  </div>
+
+  <div class="sub-heading">Complete Example: 3-variable Function</div>
+  <div class="card">
+    <h3>Truth table for f(A,B,C)</h3>
+    <div class="truth-table-wrap">
+      <table>
+        <tr><th>Row</th><th>A</th><th>B</th><th>C</th><th class="highlight-col">f</th><th>Minterm</th><th>Maxterm</th></tr>
+        <tr><td>0</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td><td class="highlight-col val-0">0</td><td>m₀=Ā·B̄·C̄</td><td>M₀=A+B+C ←POS</td></tr>
+        <tr><td>1</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-1">1</td><td class="highlight-col val-1">1</td><td>m₁=Ā·B̄·C ←SOP</td><td>M₁=A+B+C̄</td></tr>
+        <tr><td>2</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td><td class="highlight-col val-0">0</td><td>m₂=Ā·B·C̄</td><td>M₂=A+B̄+C ←POS</td></tr>
+        <tr><td>3</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">1</td><td class="highlight-col val-1">1</td><td>m₃=Ā·B·C ←SOP</td><td>M₃=A+B̄+C̄</td></tr>
+        <tr><td>4</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-0">0</td><td class="highlight-col val-1">1</td><td>m₄=A·B̄·C̄ ←SOP</td><td>M₄=Ā+B+C</td></tr>
+        <tr><td>5</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td><td class="highlight-col val-0">0</td><td>m₅=A·B̄·C</td><td>M₅=Ā+B+C̄ ←POS</td></tr>
+        <tr><td>6</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-0">0</td><td class="highlight-col val-0">0</td><td>m₆=A·B·C̄</td><td>M₆=Ā+B̄+C ←POS</td></tr>
+        <tr><td>7</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td><td class="highlight-col val-1">1</td><td>m₇=A·B·C ←SOP</td><td>M₇=Ā+B̄+C̄</td></tr>
+      </table>
+    </div>
+    <div class="formula" style="margin-top:0.75rem;">
+      <div class="label">Canonical SOP (output=1 rows: 1,3,4,7):</div>
+      <div class="eq">f = ∑m(1,3,4,7) = Ā·B̄·C + Ā·B·C + A·B̄·C̄ + A·B·C</div>
+    </div>
+    <div class="formula">
+      <div class="label">Canonical POS (output=0 rows: 0,2,5,6):</div>
+      <div class="eq">f = ΠM(0,2,5,6) = (A+B+C)·(A+B̄+C)·(Ā+B+C̄)·(Ā+B̄+C)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 6: KARNAUGH MAPS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="kmap">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div>
+      <div class="section-title">Karnaugh Maps (K-Maps)</div>
+      <div class="section-sub">Systematic minimisation — 2, 3, and 4 variable maps</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text2);margin-bottom:1.5rem;">A Karnaugh Map is a graphical method for simplifying Boolean expressions. Adjacent cells differ by exactly one variable (Gray code ordering), allowing visual identification of groupings.</p>
+
+  <div class="sub-heading">Rules for Grouping (Implicants)</div>
+  <div class="card">
+    <ul class="list">
+      <li>Group only 1s (for SOP minimisation) or only 0s (for POS minimisation)</li>
+      <li>Group sizes must be <strong>powers of 2</strong>: 1, 2, 4, 8, 16...</li>
+      <li>Groups must be <strong>rectangular</strong> (including wrapping around edges)</li>
+      <li>Make groups as <strong>large as possible</strong> (larger groups = fewer literals)</li>
+      <li>Each group eliminates one variable per doubling in size</li>
+      <li>Every 1 must be covered by at least one group</li>
+      <li>Overlapping groups are allowed (same 1 can be in multiple groups)</li>
+      <li>Corners wrap around (top-bottom and left-right)</li>
+    </ul>
+  </div>
+
+  <div class="sub-heading">2-Variable K-Map</div>
+  <div class="kmap-container">
+    <div class="kmap">
+      <div class="kmap-title">f(A,B) — Layout</div>
+      <div class="kmap-grid" style="grid-template-columns:52px 52px 52px;">
+        <div class="kmap-cell header"></div>
+        <div class="kmap-cell header">B=0</div>
+        <div class="kmap-cell header">B=1</div>
+        <div class="kmap-cell header">A=0</div>
+        <div class="kmap-cell val-1 grouped">1</div>
+        <div class="kmap-cell val-0">0</div>
+        <div class="kmap-cell header">A=1</div>
+        <div class="kmap-cell val-1 grouped">1</div>
+        <div class="kmap-cell val-0">0</div>
+      </div>
+      <div class="kmap-legend" style="margin-top:0.75rem;">
+        <div class="kmap-legend-item"><div class="kmap-dot" style="background:rgba(74,222,128,0.4);border:1px solid var(--green2);"></div> Group of 2 → f = B̄</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-heading">3-Variable K-Map</div>
+  <div class="note">
+    <div class="note-title">⚡ Important: Column order in 3/4-variable K-Maps</div>
+    <p>Columns/rows must follow <strong>Gray code order</strong>: 00, 01, 11, 10 (NOT 00, 01, 10, 11). This ensures adjacent cells differ by only one bit.</p>
+  </div>
+  <div class="kmap-container">
+    <div class="kmap">
+      <div class="kmap-title">3-variable K-Map (A, BC)</div>
+      <div class="kmap-grid" style="grid-template-columns:52px 52px 52px 52px 52px;">
+        <div class="kmap-cell header">A\BC</div>
+        <div class="kmap-cell header">00</div>
+        <div class="kmap-cell header">01</div>
+        <div class="kmap-cell header">11</div>
+        <div class="kmap-cell header">10</div>
+        <div class="kmap-cell header">0</div>
+        <div class="kmap-cell val-0">0</div>
+        <div class="kmap-cell val-1 grouped">1</div>
+        <div class="kmap-cell val-1 grouped">1</div>
+        <div class="kmap-cell val-0">0</div>
+        <div class="kmap-cell header">1</div>
+        <div class="kmap-cell val-1 grouped2">1</div>
+        <div class="kmap-cell val-0">0</div>
+        <div class="kmap-cell val-1 grouped">1</div>
+        <div class="kmap-cell val-1 grouped2">1</div>
+      </div>
+      <div class="kmap-legend" style="margin-top:0.75rem;">
+        <div class="kmap-legend-item"><div class="kmap-dot" style="background:rgba(74,222,128,0.4);border:1px solid var(--green2);"></div> Green group (4 cells) → Ā·C ... wait: Ā·(B... )</div>
+        <div class="kmap-legend-item"><div class="kmap-dot" style="background:rgba(251,191,36,0.4);border:1px solid var(--amber);"></div> Amber group: A·B̄ (wraps left-right corners)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-heading">4-Variable K-Map — Detailed Example</div>
+  <div class="card">
+    <h3>f(A,B,C,D) = ∑m(0,1,4,5,6,7,8,9,14,15)</h3>
+    <div class="kmap-container" style="margin:1rem 0;">
+      <div class="kmap">
+        <div class="kmap-title">4-variable K-Map (AB rows, CD columns)</div>
+        <div class="kmap-grid" style="grid-template-columns:52px 52px 52px 52px 52px;">
+          <div class="kmap-cell header">AB\CD</div>
+          <div class="kmap-cell header">00</div>
+          <div class="kmap-cell header">01</div>
+          <div class="kmap-cell header">11</div>
+          <div class="kmap-cell header">10</div>
+          <div class="kmap-cell header">00</div>
+          <div class="kmap-cell val-1 grouped">1</div>
+          <div class="kmap-cell val-1 grouped">1</div>
+          <div class="kmap-cell val-0">0</div>
+          <div class="kmap-cell val-0">0</div>
+          <div class="kmap-cell header">01</div>
+          <div class="kmap-cell val-1 grouped">1</div>
+          <div class="kmap-cell val-1 grouped">1</div>
+          <div class="kmap-cell val-1 grouped2">1</div>
+          <div class="kmap-cell val-1 grouped2">1</div>
+          <div class="kmap-cell header">11</div>
+          <div class="kmap-cell val-0">0</div>
+          <div class="kmap-cell val-0">0</div>
+          <div class="kmap-cell val-1 grouped2">1</div>
+          <div class="kmap-cell val-0">0</div>
+          <div class="kmap-cell header">10</div>
+          <div class="kmap-cell val-1 grouped3">1</div>
+          <div class="kmap-cell val-1 grouped3">1</div>
+          <div class="kmap-cell val-0">0</div>
+          <div class="kmap-cell val-0">0</div>
+        </div>
+        <div class="kmap-legend" style="margin-top:0.75rem;">
+          <div class="kmap-legend-item"><div class="kmap-dot" style="background:rgba(74,222,128,0.4);border:1px solid var(--green2);"></div> Group 1 (4 cells rows 00,01 cols 00,01): B̄·D̄</div>
+          <div class="kmap-legend-item"><div class="kmap-dot" style="background:rgba(251,191,36,0.4);border:1px solid var(--amber);"></div> Group 2 (4 cells rows 01,11 cols 11): B·C</div>
+          <div class="kmap-legend-item"><div class="kmap-dot" style="background:rgba(248,113,113,0.4);border:1px solid var(--red);"></div> Group 3 (row 10 cols 00,01): A·B̄·D̄ ... wrap check</div>
+        </div>
+      </div>
+    </div>
+    <div class="exam-tip">
+      <div class="note-title">⭐ Step-by-step K-Map solving process</div>
+      <p>
+        1. Plot all 1s in the K-Map from the minterm list or truth table<br>
+        2. Identify all <strong>essential prime implicants</strong> (1s covered by only one group)<br>
+        3. Form the largest possible groups (prefer 8 > 4 > 2 > 1)<br>
+        4. Cover all 1s using minimum number of groups<br>
+        5. Write one term per group (variables that don't change within a group are eliminated)<br>
+        6. OR all the terms together (SOP form)
+      </p>
+    </div>
+  </div>
+
+  <div class="sub-heading">How to Read a Group (Extract the Term)</div>
+  <div class="card">
+    <p style="color:var(--text2);margin-bottom:0.75rem;">For each group of 1s, look at which variables stay <strong>constant</strong> across all cells in the group:</p>
+    <ul class="list">
+      <li>If variable stays at 0 throughout the group → include it <strong>complemented</strong> (e.g., Ā)</li>
+      <li>If variable stays at 1 throughout the group → include it <strong>true</strong> (e.g., A)</li>
+      <li>If variable changes (0 and 1 both appear) → <strong>eliminate</strong> that variable</li>
+    </ul>
+    <div class="formula">
+      <div class="label">Group of 4 spanning all values of D, but A=0, B=0, C=1:</div>
+      <div class="eq">Result = Ā · B̄ · C (D is eliminated)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 7: CIRCUITS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="circuits">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div>
+      <div class="section-title">Digital Circuits</div>
+      <div class="section-sub">Half adder, full adder, majority circuit — SOP realization</div>
+    </div>
+  </div>
+
+  <div class="sub-heading">Half Adder</div>
+  <div class="note">
+    <div class="note-title">📐 Definition</div>
+    <p>A Half Adder adds two 1-bit binary numbers A and B, producing a <strong>Sum (S)</strong> and a <strong>Carry (C)</strong>. It cannot accept a carry-in from a previous stage.</p>
+  </div>
+
+  <div class="adder-grid">
+    <div class="circuit-card">
+      <h3 style="color:var(--accent2);margin-bottom:1rem;">Half Adder Truth Table</h3>
+      <div class="truth-table-wrap">
+        <table>
+          <tr><th>A</th><th>B</th><th>Sum (S)</th><th>Carry (C)</th></tr>
+          <tr><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td></tr>
+          <tr><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-0">0</td></tr>
+          <tr><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td></tr>
+          <tr><td class="val-1">1</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="circuit-card">
+      <h3 style="color:var(--accent2);margin-bottom:1rem;">Boolean Expressions</h3>
+      <div class="formula">
+        <div class="label">Sum (S) — XOR</div>
+        <div class="eq">S = A ⊕ B = Ā·B + A·B̄</div>
+      </div>
+      <div class="formula">
+        <div class="label">Carry (C) — AND</div>
+        <div class="eq">C = A · B</div>
+      </div>
+      <div class="exam-tip" style="margin-top:0.75rem;">
+        <div class="note-title">⭐ Logic gates needed</div>
+        <p>Sum: 1 XOR gate (or 2 AND + 1 OR + 2 NOT)<br>Carry: 1 AND gate</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-heading">Full Adder</div>
+  <div class="note">
+    <div class="note-title">📐 Definition</div>
+    <p>A Full Adder adds three 1-bit inputs: A, B, and Carry-in (Cᵢₙ), producing Sum (S) and Carry-out (Cₒᵤₜ). It can be cascaded to add multi-bit numbers.</p>
+  </div>
+
+  <div class="circuit-card" style="margin-bottom:1rem;">
+    <h3 style="color:var(--accent2);margin-bottom:1rem;">Full Adder Truth Table</h3>
+    <div class="truth-table-wrap">
+      <table>
+        <tr><th>A</th><th>B</th><th>Cᵢₙ</th><th>Sum (S)</th><th>Carry-out (Cₒᵤₜ)</th></tr>
+        <tr><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td></tr>
+        <tr><td class="val-0">0</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-0">0</td></tr>
+        <tr><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td></tr>
+        <tr><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td></tr>
+        <tr><td class="val-1">1</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td></tr>
+        <tr><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td></tr>
+        <tr><td class="val-1">1</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-1">1</td></tr>
+        <tr><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="adder-grid">
+    <div class="circuit-card">
+      <h3 style="color:var(--accent2);margin-bottom:1rem;">SOP Expressions</h3>
+      <div class="formula">
+        <div class="label">Sum (S) = ∑m(1,2,4,7)</div>
+        <div class="eq">S = Ā·B̄·Cᵢₙ + Ā·B·C̄ᵢₙ + A·B̄·C̄ᵢₙ + A·B·Cᵢₙ</div>
+        <div class="eq" style="margin-top:4px;">S = A ⊕ B ⊕ Cᵢₙ (simplified)</div>
+      </div>
+      <div class="formula">
+        <div class="label">Carry-out = ∑m(3,5,6,7)</div>
+        <div class="eq">Cₒᵤₜ = A·B + B·Cᵢₙ + A·Cᵢₙ</div>
+        <div class="eq" style="margin-top:4px;">= A·B + Cᵢₙ·(A ⊕ B)</div>
+      </div>
+    </div>
+    <div class="circuit-card">
+      <h3 style="color:var(--accent2);margin-bottom:1rem;">Implementation</h3>
+      <p style="color:var(--text2);font-size:0.9rem;">A Full Adder can be built using:</p>
+      <ul class="list">
+        <li><strong>2 Half Adders + 1 OR gate</strong> (most common)</li>
+        <li>Direct gate implementation using SOP</li>
+      </ul>
+      <div class="formula" style="margin-top:0.75rem;">
+        <div class="label">Using two half adders:</div>
+        <div class="eq">HA1: S₁ = A ⊕ B, C₁ = A·B</div>
+        <div class="eq">HA2: S = S₁ ⊕ Cᵢₙ</div>
+        <div class="eq">Cₒᵤₜ = C₁ + (S₁ · Cᵢₙ)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-heading">Majority Circuit</div>
+  <div class="note">
+    <div class="note-title">📐 Definition</div>
+    <p>A Majority circuit outputs 1 when the <strong>majority of inputs</strong> are 1. For 3 inputs (A, B, C), output is 1 when 2 or more inputs are 1.</p>
+  </div>
+
+  <div class="adder-grid">
+    <div class="circuit-card">
+      <h3 style="color:var(--accent2);margin-bottom:1rem;">Majority Circuit (3-input)</h3>
+      <div class="truth-table-wrap">
+        <table>
+          <tr><th>A</th><th>B</th><th>C</th><th>Output (M)</th></tr>
+          <tr><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td></tr>
+          <tr><td class="val-0">0</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td></tr>
+          <tr><td class="val-0">0</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-0">0</td></tr>
+          <tr style="background:rgba(74,222,128,0.04);"><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td></tr>
+          <tr><td class="val-1">1</td><td class="val-0">0</td><td class="val-0">0</td><td class="val-0">0</td></tr>
+          <tr style="background:rgba(74,222,128,0.04);"><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td><td class="val-1">1</td></tr>
+          <tr style="background:rgba(74,222,128,0.04);"><td class="val-1">1</td><td class="val-1">1</td><td class="val-0">0</td><td class="val-1">1</td></tr>
+          <tr style="background:rgba(74,222,128,0.04);"><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td><td class="val-1">1</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="circuit-card">
+      <h3 style="color:var(--accent2);margin-bottom:1rem;">SOP Expression & Simplification</h3>
+      <div class="formula">
+        <div class="label">Canonical SOP (minterms 3,5,6,7):</div>
+        <div class="eq">M = Ā·B·C + A·B̄·C + A·B·C̄ + A·B·C</div>
+      </div>
+      <div class="formula">
+        <div class="label">After K-Map simplification:</div>
+        <div class="eq">M = A·B + B·C + A·C</div>
+      </div>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.75rem;">The simplified form needs only 3 AND gates and 1 three-input OR gate.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 8: QUICK QUIZ -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="section" id="quiz">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div>
+      <div class="section-title">Quick Quiz</div>
+      <div class="section-sub">Test yourself — ISC exam-level questions</div>
+    </div>
+  </div>
+
+  <div id="quiz-score" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;">
+    <span style="color:var(--text2);font-size:0.9rem;">Score</span>
+    <span id="score-text" style="font-family:var(--mono);font-weight:700;font-size:1.2rem;color:var(--accent2);">0 / 0</span>
+  </div>
+
+  <div class="quiz-card" id="q1">
+    <div class="quiz-q">Q1. Which of the following is logically equivalent to p ⇒ q?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQ('q1',this,'wrong')">q ⇒ p</button>
+      <button class="quiz-opt" onclick="checkQ('q1',this,'correct')">~p ∨ q</button>
+      <button class="quiz-opt" onclick="checkQ('q1',this,'wrong')">p ∧ ~q</button>
+      <button class="quiz-opt" onclick="checkQ('q1',this,'wrong')">~q ⇒ q</button>
+    </div>
+    <div class="quiz-explain" id="q1-exp">Law of Implication: p ⇒ q ≡ ~p ∨ q. This is a fundamental equivalence used in simplification.</div>
+  </div>
+
+  <div class="quiz-card" id="q2">
+    <div class="quiz-q">Q2. De Morgan's theorem states: ~(A + B) = ?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQ('q2',this,'wrong')">Ā + B̄</button>
+      <button class="quiz-opt" onclick="checkQ('q2',this,'wrong')">A · B</button>
+      <button class="quiz-opt" onclick="checkQ('q2',this,'correct')">Ā · B̄</button>
+      <button class="quiz-opt" onclick="checkQ('q2',this,'wrong')">~A + ~B</button>
+    </div>
+    <div class="quiz-explain" id="q2-exp">~(A + B) = Ā · B̄. De Morgan's: NOT of OR = AND of NOTs. "Break the bar, change the operator."</div>
+  </div>
+
+  <div class="quiz-card" id="q3">
+    <div class="quiz-q">Q3. Which type of formula is TRUE for ALL possible interpretations?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQ('q3',this,'wrong')">Contingency</button>
+      <button class="quiz-opt" onclick="checkQ('q3',this,'wrong')">Contradiction</button>
+      <button class="quiz-opt" onclick="checkQ('q3',this,'correct')">Tautology</button>
+      <button class="quiz-opt" onclick="checkQ('q3',this,'wrong')">Satisfiable</button>
+    </div>
+    <div class="quiz-explain" id="q3-exp">A Tautology is a WFF that is TRUE under all interpretations. Example: p ∨ ~p. A Contradiction is always FALSE. A Contingency can be either.</div>
+  </div>
+
+  <div class="quiz-card" id="q4">
+    <div class="quiz-q">Q4. The canonical SOP of f(A,B) with minterms {1,3} is:</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQ('q4',this,'wrong')">Ā·B + A·B = B</button>
+      <button class="quiz-opt" onclick="checkQ('q4',this,'correct')">Ā·B + A·B (simplified to B)</button>
+      <button class="quiz-opt" onclick="checkQ('q4',this,'wrong')">A·B̄ + A·B = A</button>
+      <button class="quiz-opt" onclick="checkQ('q4',this,'wrong')">Ā·B̄ + A·B</button>
+    </div>
+    <div class="quiz-explain" id="q4-exp">m₁ = Ā·B (A=0,B=1), m₃ = A·B (A=1,B=1). f = Ā·B + A·B = B·(Ā + A) = B·1 = B.</div>
+  </div>
+
+  <div class="quiz-card" id="q5">
+    <div class="quiz-q">Q5. In a Half Adder, what are the Boolean expressions for Sum (S) and Carry (C)?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQ('q5',this,'wrong')">S = A·B, C = A⊕B</button>
+      <button class="quiz-opt" onclick="checkQ('q5',this,'correct')">S = A⊕B, C = A·B</button>
+      <button class="quiz-opt" onclick="checkQ('q5',this,'wrong')">S = A+B, C = A·B</button>
+      <button class="quiz-opt" onclick="checkQ('q5',this,'wrong')">S = A·B + Ā·B̄, C = A·B</button>
+    </div>
+    <div class="quiz-explain" id="q5-exp">Sum = A XOR B = A⊕B = Ā·B + A·B̄ (output 1 when inputs differ). Carry = A AND B (output 1 only when both inputs are 1).</div>
+  </div>
+
+  <div class="quiz-card" id="q6">
+    <div class="quiz-q">Q6. Which law states: A + A·B = A?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQ('q6',this,'wrong')">Idempotent Law</button>
+      <button class="quiz-opt" onclick="checkQ('q6',this,'wrong')">Distributive Law</button>
+      <button class="quiz-opt" onclick="checkQ('q6',this,'correct')">Absorption Law</button>
+      <button class="quiz-opt" onclick="checkQ('q6',this,'wrong')">Complement Law</button>
+    </div>
+    <div class="quiz-explain" id="q6-exp">A + A·B = A is the Absorption Law. Proof: A·1 + A·B = A·(1+B) = A·1 = A. The "absorbed" term A·B disappears because A alone already captures it.</div>
+  </div>
+
+  <div style="text-align:center;margin-top:2rem;">
+    <button onclick="resetQuiz()" style="background:rgba(124,106,247,0.15);border:1px solid rgba(124,106,247,0.3);color:var(--accent2);padding:10px 28px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;">Reset Quiz</button>
+  </div>
+</section>
+
+<!-- FORMULA CHEATSHEET -->
+<section class="section" id="cheatsheet" style="padding-bottom:1rem;">
+  <div class="section-header">
+    <div class="section-num">⚡</div>
+    <div>
+      <div class="section-title">Master Cheat Sheet</div>
+      <div class="section-sub">All key formulas at a glance — print and revise!</div>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:rgba(124,106,247,0.4);">
+    <h3 style="color:var(--accent2);margin-bottom:1rem;">Boolean Algebra — All Laws in One Place</h3>
+    <div class="law-grid">
+      <div class="law-item"><div class="law-name">Identity</div><div class="law-eq">A+0=A &nbsp; A·1=A</div></div>
+      <div class="law-item"><div class="law-name">Null/Domination</div><div class="law-eq">A+1=1 &nbsp; A·0=0</div></div>
+      <div class="law-item"><div class="law-name">Idempotent</div><div class="law-eq">A+A=A &nbsp; A·A=A</div></div>
+      <div class="law-item"><div class="law-name">Complement</div><div class="law-eq">A+Ā=1 &nbsp; A·Ā=0</div></div>
+      <div class="law-item"><div class="law-name">Involution</div><div class="law-eq">Ā̄ = A</div></div>
+      <div class="law-item"><div class="law-name">Commutative</div><div class="law-eq">A+B=B+A &nbsp; A·B=B·A</div></div>
+      <div class="law-item"><div class="law-name">Associative</div><div class="law-eq">(A+B)+C=A+(B+C)</div></div>
+      <div class="law-item"><div class="law-name">Distributive</div><div class="law-eq">A·(B+C)=A·B+A·C</div></div>
+      <div class="law-item"><div class="law-name">De Morgan 1</div><div class="law-eq" style="color:var(--red);">̄(A·B) = Ā+B̄</div></div>
+      <div class="law-item"><div class="law-name">De Morgan 2</div><div class="law-eq" style="color:var(--red);">̄(A+B) = Ā·B̄</div></div>
+      <div class="law-item"><div class="law-name">Absorption 1</div><div class="law-eq">A+A·B = A</div></div>
+      <div class="law-item"><div class="law-name">Absorption 2</div><div class="law-eq">A·(A+B) = A</div></div>
+      <div class="law-item"><div class="law-name">Implication</div><div class="law-eq">p⇒q ≡ ~p∨q</div></div>
+      <div class="law-item"><div class="law-name">Contrapositive</div><div class="law-eq">p⇒q ≡ ~q⇒~p</div></div>
+      <div class="law-item"><div class="law-name">Biconditional</div><div class="law-eq">p⇔q ≡ (p⇒q)∧(q⇒p)</div></div>
+      <div class="law-item"><div class="law-name">Chain Rule</div><div class="law-eq">p⇒q, q⇒r ⊢ p⇒r</div></div>
+    </div>
+  </div>
+
+  <div class="exam-tip" style="margin-top:1rem;">
+    <div class="note-title">🎯 Top 5 Things That Appear Most in ISC Exams</div>
+    <p>
+      1. <strong>De Morgan's theorem</strong> — simplification problems and truth table proofs<br>
+      2. <strong>K-Map simplification</strong> — always include grouping visualization<br>
+      3. <strong>SOP from truth table</strong> — construct canonical form then simplify<br>
+      4. <strong>Full adder truth table + expressions</strong> — circuit design questions<br>
+      5. <strong>WFF simplification</strong> using equivalence laws step-by-step
+    </p>
+  </div>
+</section>
+
+</div><!-- end max-width wrapper -->
+
+<footer>
+  <p>ISC Computer Science — Boolean Algebra Complete Theory Guide &nbsp;|&nbsp; Best of luck! You've got this! 🚀</p>
+</footer>
+
+<script>
+// NAV HIGHLIGHT
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id; });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+  });
+});
+
+// TABS
+function showTab(group, id) {
+  document.querySelectorAll(`[id^="${group}-"]`).forEach(c => c.classList.remove('active'));
+  document.querySelectorAll(`[onclick*="'${group}'"]`).forEach(b => b.classList.remove('active'));
+  document.getElementById(group + '-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// QUIZ
+let scores = { correct: 0, total: 0 };
+let answered = {};
+
+function checkQ(qId, btn, result) {
+  if (answered[qId]) return;
+  answered[qId] = true;
+  scores.total++;
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    scores.correct++;
+  } else {
+    btn.classList.add('wrong');
+    const opts = btn.parentElement.querySelectorAll('.quiz-opt');
+    opts.forEach(o => { if (o.getAttribute('onclick').includes('correct')) o.classList.add('correct'); });
+  }
+  document.getElementById(qId + '-exp').style.display = 'block';
+  document.getElementById('score-text').textContent = scores.correct + ' / ' + scores.total;
+}
+
+function resetQuiz() {
+  answered = {};
+  scores = { correct: 0, total: 0 };
+  document.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct','wrong'));
+  document.querySelectorAll('.quiz-explain').forEach(e => e.style.display = 'none');
+  document.getElementById('score-text').textContent = '0 / 0';
+}
+</script>
+</body>
+</html>
