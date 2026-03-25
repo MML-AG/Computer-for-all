@@ -5,21 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Computer For All — ISC CS Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 // ── Paste your Firebase config here (same as isc_auth.html) ──
- const firebaseConfig = {
-    apiKey: "AIzaSyDLQswmyCRp_xx0AE5OrwRDOMW5v2Mdy88",
-    authDomain: "computer-for-all-ef511.firebaseapp.com",
-    projectId: "computer-for-all-ef511",
-    storageBucket: "computer-for-all-ef511.firebasestorage.app",
-    messagingSenderId: "520598999745",
-    appId: "1:520598999745:web:6f27a0273cf59cfc2dfa40",
-    measurementId: "G-NSMNF1JGJV"
-  };
-
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
 // Guard: only initialize once (in case both scripts run)
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db_fs = firebase.firestore();
@@ -514,7 +513,7 @@ tr:hover td{background:rgba(34,211,238,.03)}
 .up-features li::before{content:'✓';color:var(--c3);font-weight:700;font-size:.75rem}
 .up-features li.no{opacity:.4}
 .up-features li.no::before{content:'×';color:var(--text3)}
-.up-btn{display:block;width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;transition:all .2s;text-align:center;text-decoration:none}
+.up-btn{display:block;width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;transition:all .2s;text-align:center}
 .up-btn.main{background:var(--c3);color:#000}
 .up-btn.main:hover{background:#22c981;transform:translateY(-1px)}
 .up-btn.sec{background:transparent;border:1px solid var(--border2);color:var(--text2)}
@@ -547,6 +546,7 @@ tr:hover td{background:rgba(34,211,238,.03)}
 
 <div id="progressBar"></div>
 
+<!-- AUTH HEADER BAR -->
 <div id="auth-bar">
   <div class="ab-left">
     <div class="ab-trial" id="trial-badge">
@@ -564,6 +564,7 @@ tr:hover td{background:rgba(34,211,238,.03)}
   </div>
 </div>
 
+<!-- PROFILE DROPDOWN -->
 <div class="profile-dropdown" id="profile-dropdown">
   <div class="pd-user">
     <div class="pd-name" id="pd-name">—</div>
@@ -587,20 +588,20 @@ tr:hover td{background:rgba(34,211,238,.03)}
   </div>
   <nav class="sb-nav">
     <div class="sb-section">Home</div>
-    <a class="sb-item active" onclick="window.show('home')"><span class="icon">🏠</span>Dashboard</a>
+    <a class="sb-item active" onclick="show('home')"><span class="icon">🏠</span>Dashboard</a>
 
     <div class="sb-section">Study Tools</div>
-    <a class="sb-item" onclick="window.show('quiz')"><span class="icon">🎯</span>Quiz Practice</a>
-    <a class="sb-item" onclick="window.show('flashcards')"><span class="icon">🃏</span>Flashcards</a>
-    <a class="sb-item" onclick="window.show('notes')"><span class="icon">📖</span>Quick Notes</a>
+    <a class="sb-item" onclick="show('quiz')"><span class="icon">🎯</span>Quiz Practice</a>
+    <a class="sb-item" onclick="show('flashcards')"><span class="icon">🃏</span>Flashcards</a>
+    <a class="sb-item" onclick="show('notes')"><span class="icon">📖</span>Quick Notes</a>
     <a class="sb-item" onclick="showProtected('programs')"><span class="icon">💻</span>ISC Programs <span style="font-size:.6rem;color:var(--c5);margin-left:2px" id="sb-lock-programs">🔒</span></a>
 
     <div class="sb-section">Interactive Tools</div>
-    <a class="sb-item" onclick="window.show('kmap')"><span class="icon">🗺️</span>K-Map Solver</a>
-    <a class="sb-item" onclick="window.show('gate-sim')"><span class="icon">⚡</span>Logic Gate Sim</a>
-    <a class="sb-item" onclick="window.show('truth-table')"><span class="icon">📊</span>Truth Table Gen</a>
+    <a class="sb-item" onclick="show('kmap')"><span class="icon">🗺️</span>K-Map Solver</a>
+    <a class="sb-item" onclick="show('gate-sim')"><span class="icon">⚡</span>Logic Gate Sim</a>
+    <a class="sb-item" onclick="show('truth-table')"><span class="icon">📊</span>Truth Table Gen</a>
     <a class="sb-item" onclick="showProtected('dsv')"><span class="icon">🌳</span>DS Visualizer <span style="font-size:.6rem;color:var(--c5);margin-left:2px" id="sb-lock-dsv">🔒</span></a>
-    <a class="sb-item" onclick="window.show('infix')"><span class="icon">🔄</span>Infix→Postfix</a>
+    <a class="sb-item" onclick="show('infix')"><span class="icon">🔄</span>Infix→Postfix</a>
   </nav>
   <div class="sb-bottom">
     <div class="exam-countdown">
@@ -624,22 +625,22 @@ tr:hover td{background:rgba(34,211,238,.03)}
     </div>
   </div>
   <div class="tool-grid">
-    <div class="tool-card" onclick="window.show('quiz')">
+    <div class="tool-card" onclick="show('quiz')">
       <div class="tc-icon">🎯</div>
       <div class="tc-name">Quiz Practice</div>
       <div class="tc-desc">100+ MCQs from PYQs across all 5 chapters</div>
     </div>
-    <div class="tool-card" onclick="window.show('kmap')">
+    <div class="tool-card" onclick="show('kmap')">
       <div class="tc-icon">🗺️</div>
       <div class="tc-name">K-Map Solver</div>
       <div class="tc-desc">Interactive 2/3/4-variable K-Map with auto simplification</div>
     </div>
-    <div class="tool-card" onclick="window.show('gate-sim')">
+    <div class="tool-card" onclick="show('gate-sim')">
       <div class="tc-icon">⚡</div>
       <div class="tc-name">Logic Gate Sim</div>
       <div class="tc-desc">Test AND, OR, NOT, NAND, NOR, XOR live</div>
     </div>
-    <div class="tool-card" onclick="window.show('truth-table')">
+    <div class="tool-card" onclick="show('truth-table')">
       <div class="tc-icon">📊</div>
       <div class="tc-name">Truth Table Gen</div>
       <div class="tc-desc">Type any Boolean expression → auto truth table</div>
@@ -649,17 +650,17 @@ tr:hover td{background:rgba(34,211,238,.03)}
       <div class="tc-name">DS Visualizer</div>
       <div class="tc-desc">Stack, Queue, Tree — animated step-by-step</div>
     </div>
-    <div class="tool-card" onclick="window.show('infix')">
+    <div class="tool-card" onclick="show('infix')">
       <div class="tc-icon">🔄</div>
       <div class="tc-name">Infix→Postfix</div>
       <div class="tc-desc">Step-by-step conversion with operator stack trace</div>
     </div>
-    <div class="tool-card" onclick="window.show('flashcards')">
+    <div class="tool-card" onclick="show('flashcards')">
       <div class="tc-icon">🃏</div>
       <div class="tc-name">Flashcards</div>
       <div class="tc-desc">Key definitions and formulas for last-minute revision</div>
     </div>
-    <div class="tool-card" onclick="window.show('notes')">
+    <div class="tool-card" onclick="show('notes')">
       <div class="tc-icon">📖</div>
       <div class="tc-name">Quick Notes</div>
       <div class="tc-desc">Condensed theory for every ISC topic</div>
@@ -671,6 +672,7 @@ tr:hover td{background:rgba(34,211,238,.03)}
     </div>
   </div>
 
+  <!-- STUDY GUIDES SECTION -->
   <div class="guide-banner" style="margin-top:2rem">
     <div class="gb-icon">📚</div>
     <div class="gb-text">
@@ -1272,7 +1274,7 @@ function show(id) {
   }
 
   // 4. Safely add the active class to the corresponding sidebar item
-  const activeSidebarItem = document.querySelector(`.sb-item[onclick*="'${id}'"]`);
+  const activeSidebarItem = document.querySelector(`.sb-item[onclick="show('${id}')"]`);
   if (activeSidebarItem) {
     activeSidebarItem.classList.add('active');
   }
@@ -2402,6 +2404,9 @@ programs.forEach((p,i) => {
 });
 </script>
 
+<!-- ════════════════════════════════════════════
+     UPGRADE MODAL
+════════════════════════════════════════════ -->
 <div id="upgrade-modal">
   <div class="upgrade-box">
     <div class="ub-head">
@@ -2446,7 +2451,7 @@ programs.forEach((p,i) => {
     </div>
     <div class="pay-instructions" id="pay-instructions">
       <p>To pay, send the amount via <strong>UPI / GPay / PhonePe</strong> and email your <strong>Transaction ID + your registered Google email</strong> to:</p>
-      <a href="mailto:computerforall24@gmail.com" class="pay-email">computerforall24@gmail.com</a>
+      <a href="/cdn-cgi/l/email-protection#bdded2d0cdc8c9d8cfdbd2cfdcd1d18f89fddad0dcd4d193ded2d0" class="pay-email"><span class="__cf_email__" data-cfemail="1b7874766b6e6f7e697d74697a7777292f5b7c767a727735787476">[email&#160;protected]</span></a>
       <div class="pay-note">Access is activated manually within 24 hours after payment verification.</div>
     </div>
     <div style="text-align:center">
@@ -2455,14 +2460,32 @@ programs.forEach((p,i) => {
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════
+     AUTH / SESSION / TRIAL JS  (Firebase-powered)
+════════════════════════════════════════════ -->
 <script>
-// ─── SAFE SESSION INIT ───
-const sessRaw = localStorage.getItem('cfa_session');
-if(!sessRaw) {
-  window.location.href = 'isc_auth.html';
-}
-const sess = JSON.parse(sessRaw || '{}');
-if (sess.uid && sess.uid !== 'dev-bypass-uid') {
+// ══════════════════════════════════════════════════════
+//  PLAN LOGIC
+//  plan === "free"  → no timer, all tools unlocked
+//  plan === "pro"   → no timer, all tools unlocked
+//  plan === "trial" → 1hr countdown, pro tools locked after expiry
+// ══════════════════════════════════════════════════════
+
+const PRO_TOOLS = ['dsv', 'programs'];
+let sess = {};
+let isPro = false;
+let isFree = false;
+let trialExpired = false;
+let trialInterval = null;
+
+async function initPlatform() {
+  const sessRaw = localStorage.getItem('cfa_session');
+  if (!sessRaw) { window.location.href = 'isc_auth.html'; return; }
+  sess = JSON.parse(sessRaw);
+
+  // Re-fetch plan AND trialStartedAt live from Firestore
+  // so Firebase Console upgrades apply instantly and timer is never reset
+  if (sess.uid && sess.uid !== 'dev-bypass-uid') {
     try {
       const snap = await db_fs.collection('users').doc(sess.uid).get();
       if (snap.exists) {
@@ -2514,55 +2537,6 @@ function applyPlanToUI() {
   }
 }
 
-
-// ─── PLAN STATE ───
-const PRO_TOOLS = ['dsv', 'programs'];
-let isPro = sess.plan === 'pro';
-let isFree = sess.plan === 'free';
-let trialExpired = false;
-let trialInterval = null;
-
-// ─── SAFELY OVERRIDE NAVIGATION ───
-const _originalShow = window.show;
-window.show = function(id) {
-  if (PRO_TOOLS.includes(id) && !isPro && !isFree) {
-    const elapsed = Date.now() - loginTime;
-    if (elapsed >= trialDuration || trialExpired) { 
-      openUpgrade(); 
-      return; 
-    }
-  }
-  if (_originalShow) _originalShow(id);
-};
-
-// ─── POPULATE PROFILE ───
-function initAuth() {
-  const name = sess.name || 'Student';
-  const email = sess.email || '';
-  const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-
-  document.getElementById('profile-name').textContent = name.split(' ')[0];
-  document.getElementById('pd-name').textContent = name;
-  document.getElementById('pd-email').textContent = email;
-  document.getElementById('home-user-badge').textContent = '👋 ' + name;
-
-  const avatar = document.getElementById('profile-avatar');
-  if(sess.picture) {
-    avatar.innerHTML = `<img src="${sess.picture}" alt="${name}">`;
-  } else {
-    avatar.textContent = initials;
-  }
-
-  if(isPro || isFree) {
-    document.getElementById('pd-plan').textContent = '100/100 PRO';
-    document.getElementById('pd-plan').className = 'pd-plan pro';
-    document.getElementById('home-plan-badge').textContent = '⭐ Pro';
-    unlockProTools();
-    document.getElementById('trial-badge').style.display = 'none';
-  }
-}
-initAuth();
-
 // ─── TRIAL TIMER ───
 function startTrialTimer() {
   updateTrialTimer();
@@ -2599,7 +2573,7 @@ function lockProTools() {
   document.getElementById('tc-programs')?.classList.add('locked');
   ['programs','dsv'].forEach(id => {
     const lock = document.getElementById('sb-lock-' + id);
-    if(lock) lock.style.display = 'inline';
+    if (lock) lock.style.display = 'inline';
   });
 }
 
@@ -2608,30 +2582,27 @@ function unlockProTools() {
   document.getElementById('tc-programs')?.classList.remove('locked');
   ['programs','dsv'].forEach(id => {
     const lock = document.getElementById('sb-lock-' + id);
-    if(lock) lock.style.display = 'none';
+    if (lock) lock.style.display = 'none';
   });
-  
-  const tcDsv = document.getElementById('tc-dsv');
-  if(tcDsv) tcDsv.onclick = () => window.show('dsv');
-  
-  const tcPrograms = document.getElementById('tc-programs');
-  if(tcPrograms) tcPrograms.onclick = () => window.show('programs');
+  const dsvCard  = document.getElementById('tc-dsv');
+  const progCard = document.getElementById('tc-programs');
+  if (dsvCard)  dsvCard.onclick  = () => _originalShow('dsv');
+  if (progCard) progCard.onclick = () => _originalShow('programs');
 }
 
-if(!isPro && !isFree) lockProTools(); else unlockProTools();
-
-// ─── PROTECTED TOOL NAVIGATION ───
+// ─── PROTECTED NAV ───
 function showProtected(id) {
-  if(isPro || isFree) { window.show(id); return; }
-  if(!trialExpired) {
-    const elapsed = Date.now() - loginTime;
-    if(elapsed < trialDuration) { window.show(id); return; }
+  if (isPro || isFree) { _originalShow(id); return; }
+  if (!trialExpired) {
+    const elapsed = Date.now() - (sess.trialStartedAt || Date.now());
+    if (elapsed < (sess.trialDuration || 3600000)) { _originalShow(id); return; }
   }
   openUpgrade();
 }
 
 // ─── UPGRADE MODAL ───
 function openUpgrade() {
+  if (isPro || isFree) return;
   document.getElementById('upgrade-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -2640,15 +2611,12 @@ function scrollPayInstructions(plan, price) {
   const el = document.getElementById('pay-instructions');
   el.style.borderColor = 'rgba(52,211,153,.5)';
   el.querySelector('.pay-email').textContent = 'computerforall24@gmail.com';
-  el.querySelector('p').innerHTML = `To get the <strong>${plan} (${price})</strong> plan, send payment via <strong>UPI / GPay / PhonePe</strong> and email your <strong>Transaction ID + your registered Google email</strong> to:`;
-  el.scrollIntoView({behavior:'smooth'});
+  el.querySelector('p').innerHTML = `For the <strong>${plan} (${price})</strong> plan, send via <strong>UPI / GPay / PhonePe</strong> and email your <strong>Transaction ID + registered Google email</strong> to:`;
+  el.scrollIntoView({ behavior: 'smooth' });
 }
 
 document.getElementById('upgrade-modal').addEventListener('click', function(e) {
-  if(e.target === this) {
-    this.classList.remove('open');
-    document.body.style.overflow = '';
-  }
+  if (e.target === this) { this.classList.remove('open'); document.body.style.overflow = ''; }
 });
 
 // ─── PROFILE DROPDOWN ───
@@ -2656,36 +2624,37 @@ function toggleProfile() {
   document.getElementById('profile-dropdown').classList.toggle('open');
 }
 document.addEventListener('click', (e) => {
-  const pBtn = document.getElementById('profile-btn');
-  const pDrop = document.getElementById('profile-dropdown');
-  if(pBtn && pDrop && !pBtn.contains(e.target) && !pDrop.contains(e.target)) {
-    pDrop.classList.remove('open');
+  if (!document.getElementById('profile-btn').contains(e.target) &&
+      !document.getElementById('profile-dropdown').contains(e.target)) {
+    document.getElementById('profile-dropdown').classList.remove('open');
   }
 });
 
 // ─── LOGOUT ───
 function doLogout() {
-  // 1. Stop background timers
-  if (typeof trialInterval !== 'undefined' && trialInterval) {
-    clearInterval(trialInterval);
-  }
-  
-  // 2. Sign out of Firebase safely
-  if (typeof auth_fb !== 'undefined' && auth_fb) {
-    auth_fb.signOut().catch(() => {});
-  }
-  
-  // 3. Wipe the session from the browser
+  if (trialInterval) clearInterval(trialInterval);
+  auth_fb.signOut().catch(() => {});
   localStorage.removeItem('cfa_session');
-  
-  // 4. Redirect the user strictly to the home page
-  window.location.href = 'index.html'; 
+  window.location.href = 'isc_auth.html';
 }
+
 // ─── GUIDES TOGGLE ───
 function toggleGuides() {
-  const d = document.getElementById('guides-dropdown');
-  if(d) d.classList.toggle('open');
+  document.getElementById('guides-dropdown').classList.toggle('open');
 }
+
+// ─── OVERRIDE show() TO CHECK PLAN ───
+const _originalShow = show;
+function show(id) {
+  if (PRO_TOOLS.includes(id) && !isPro && !isFree) {
+    const elapsed = Date.now() - (sess.trialStartedAt || Date.now());
+    if (elapsed >= (sess.trialDuration || 3600000)) { openUpgrade(); return; }
+  }
+  _originalShow(id);
+}
+
+// ─── BOOT ───
+initPlatform();
 </script>
 </body>
 </html>
