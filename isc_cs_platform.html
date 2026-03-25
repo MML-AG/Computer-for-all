@@ -2446,7 +2446,7 @@ programs.forEach((p,i) => {
     </div>
     <div class="pay-instructions" id="pay-instructions">
       <p>To pay, send the amount via <strong>UPI / GPay / PhonePe</strong> and email your <strong>Transaction ID + your registered Google email</strong> to:</p>
-      <a href="mailto:computerforall24@gmail.com" class="pay-email">computerforall24@gmail.com</a>
+      <a href="/cdn-cgi/l/email-protection#d6b5b9bba6a3a2b3a4b0b9a4b7babae4e296b1bbb7bfbaf8b5b9bb" class="pay-email"><span class="__cf_email__" data-cfemail="9cfff3f1ece9e8f9eefaf3eefdf0f0aea8dcfbf1fdf5f0b2fff3f1">[email&#160;protected]</span></a>
       <div class="pay-note">Access is activated manually within 24 hours after payment verification.</div>
     </div>
     <div style="text-align:center">
@@ -2455,7 +2455,7 @@ programs.forEach((p,i) => {
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ─── SAFE SESSION INIT ───
 const sessRaw = localStorage.getItem('cfa_session');
 if(!sessRaw) {
@@ -2463,7 +2463,7 @@ if(!sessRaw) {
 }
 const sess = JSON.parse(sessRaw || '{}');
 const trialDuration = sess.trialDuration || 3600000; // 1 Hour
-const loginTime = sess.loginTime || Date.now();
+const loginTime = sess.trialStartedAt || sess.loginTime || Date.now();
 
 // ─── PLAN STATE ───
 const PRO_TOOLS = ['dsv', 'programs'];
@@ -2628,14 +2628,4 @@ function doLogout() {
   // 3. Wipe the session from the browser
   localStorage.removeItem('cfa_session');
   
-  // 4. Redirect the user strictly to the home page
-  window.location.href = 'index.html'; 
-}
-// ─── GUIDES TOGGLE ───
-function toggleGuides() {
-  const d = document.getElementById('guides-dropdown');
-  if(d) d.classList.toggle('open');
-}
-</script>
-</body>
-</html>
+  // 4. Redirect th

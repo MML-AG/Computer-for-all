@@ -10,9 +10,6 @@
      STEP 1: Replace these values with yours
      See FIREBASE SETUP GUIDE at bottom of this file
 ═══════════════════════════════════════════════ -->
-<meta name="google-signin-client_id" content="620297356458-bksjrttl48qgg58bpabqpcknvaogp2pn.apps.googleusercontent.com">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <!-- Firebase SDK (v9 compat mode — works in plain HTML) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -151,13 +148,6 @@ input::placeholder{color:var(--t3)}
 <div class="orb orb2"></div>
 
 <a href="index.html" class="back-link">← Back to Home</a>
-
-<!-- GOOGLE ONE TAP (hidden, handles callback) -->
-<div id="g_id_onload"
-  data-client_id="620297356458-bksjrttl48qgg58bpabqpcknvaogp2pn.apps.googleusercontent.com"
-  data-callback="handleGoogleCredential"
-  data-auto_prompt="false">
-</div>
 
 <!-- LOADING -->
 <div class="loading-overlay" id="loadingOverlay">
@@ -312,72 +302,43 @@ function showMsg(id, text, type) {
 }
 
 // ══════════════════════════════════════════════════════
-//  GOOGLE SIGN-IN (GIS → Firebase credential)
+//  GOOGLE SIGN-IN — Firebase signInWithPopup
+//  Works on any domain (GitHub Pages, Netlify, etc.)
+//  No GIS/origin registration needed beyond Firebase authDomain
 // ══════════════════════════════════════════════════════
-function triggerGoogleSignIn() {
+async function triggerGoogleSignIn() {
   showLoading('Connecting to Google...');
   try {
-    google.accounts.id.initialize({
-      client_id: document.querySelector('[data-client_id]')?.getAttribute('data-client_id') || '',
-      callback:  handleGoogleCredential,
-      auto_select: false,
-      cancel_on_tap_outside: true
-    });
-    google.accounts.id.prompt((notification) => {
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        hideLoading();
-        googlePopupFallback();
-      }
-    });
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    const result = await auth.signInWithPopup(provider);
+    await handleFirebaseUser(result.user);
   } catch(e) {
     hideLoading();
+    console.error('Google sign-in error:', e);
     const activeMsg = document.getElementById('loginSection').classList.contains('active') ? 'loginMsg' : 'signupMsg';
-    showMsg(activeMsg, '⚠️ Google Auth needs a hosted domain. Use Dev Bypass for local testing.', 'error');
+    if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
+      showMsg(activeMsg, 'Sign-in cancelled. Please try again.', 'error');
+    } else {
+      showMsg(activeMsg, 'Sign-in failed: ' + (e.message || 'Please try again.'), 'error');
+    }
   }
 }
 
-function googlePopupFallback() {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2000;display:flex;align-items:center;justify-content:center';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:#0c1120;border:1px solid #243060;border-radius:16px;padding:32px;text-align:center;max-width:360px;width:90%';
-  box.innerHTML = `<p style="margin-bottom:20px;font-family:DM Sans,sans-serif;color:#8899bb">Sign in with your Google account</p>
-    <div id="googleBtnMount"></div>
-    <button onclick="this.closest('div[style]').remove()" style="margin-top:16px;background:transparent;border:1px solid #243060;color:#8899bb;padding:8px 20px;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif">Cancel</button>`;
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-  google.accounts.id.renderButton(document.getElementById('googleBtnMount'), { theme:'filled_black', size:'large', width:280 });
-}
-
-// Called by Google GIS after user selects account
-async function handleGoogleCredential(response) {
-  showLoading('Signing in with Google...');
-  try {
-    // Exchange GIS credential for Firebase credential
-    const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
-    const result     = await auth.signInWithCredential(credential);
-    const fbUser     = result.user;
-
-    showLoading('Fetching your profile...');
-    const userData = await syncUserWithFirestore(fbUser);
-
-    startSession({
-      uid:            fbUser.uid,
-      name:           userData.name    || fbUser.displayName,
-      email:          userData.email   || fbUser.email,
-      picture:        userData.picture || fbUser.photoURL || '',
-      plan:           userData.plan    || 'trial',
-      trialStartedAt: userData.trialStartedAt || Date.now()
-    });
-
-    hideLoading();
-    window.location.href = 'isc_cs_platform.html';
-  } catch(e) {
-    hideLoading();
-    console.error('Google auth error:', e);
-    const activeMsg = document.getElementById('loginSection').classList.contains('active') ? 'loginMsg' : 'signupMsg';
-    showMsg(activeMsg, 'Sign-in failed: ' + (e.message || 'Please try again.'), 'error');
-  }
+// Shared handler after any Google sign-in method
+async function handleFirebaseUser(fbUser) {
+  showLoading('Fetching your profile...');
+  const userData = await syncUserWithFirestore(fbUser);
+  startSession({
+    uid:            fbUser.uid,
+    name:           userData.name    || fbUser.displayName,
+    email:          userData.email   || fbUser.email,
+    picture:        userData.picture || fbUser.photoURL || '',
+    plan:           userData.plan    || 'trial',
+    trialStartedAt: userData.trialStartedAt || Date.now()
+  });
+  hideLoading();
+  window.location.href = 'isc_cs_platform.html';
 }
 
 // ══════════════════════════════════════════════════════
@@ -471,23 +432,13 @@ function switchTab(tab) {
 // ══════════════════════════════════════════════════════
 auth.onAuthStateChanged(async (firebaseUser) => {
   if (firebaseUser) {
-    // User is already signed in to Firebase — re-sync and redirect
     const sess = localStorage.getItem('cfa_session');
     if (sess) {
-      // Session already set by a previous login, just redirect
+      // Valid session already in localStorage — just redirect
       window.location.href = 'isc_cs_platform.html';
     } else {
-      // Firebase session exists but localStorage cleared — re-fetch Firestore doc
-      const userData = await syncUserWithFirestore(firebaseUser);
-      startSession({
-        uid:            firebaseUser.uid,
-        name:           userData.name,
-        email:          userData.email,
-        picture:        userData.picture || '',
-        plan:           userData.plan || 'trial',
-        trialStartedAt: userData.trialStartedAt || Date.now()
-      });
-      window.location.href = 'isc_cs_platform.html';
+      // Firebase still logged in but localStorage was cleared — re-sync
+      await handleFirebaseUser(firebaseUser);
     }
   }
 });
