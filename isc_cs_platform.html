@@ -2446,7 +2446,7 @@ programs.forEach((p,i) => {
     </div>
     <div class="pay-instructions" id="pay-instructions">
       <p>To pay, send the amount via <strong>UPI / GPay / PhonePe</strong> and email your <strong>Transaction ID + your registered Google email</strong> to:</p>
-      <a href="/cdn-cgi/l/email-protection#d6b5b9bba6a3a2b3a4b0b9a4b7babae4e296b1bbb7bfbaf8b5b9bb" class="pay-email"><span class="__cf_email__" data-cfemail="9cfff3f1ece9e8f9eefaf3eefdf0f0aea8dcfbf1fdf5f0b2fff3f1">[email&#160;protected]</span></a>
+      <a href="/cdn-cgi/l/email-protection#2f4c40425f5a5b4a5d49405d4e43431d1b6f48424e4643014c4042" class="pay-email"><span class="__cf_email__" data-cfemail="a8cbc7c5d8dddccddacec7dac9c4c49a9ce8cfc5c9c1c486cbc7c5">[email&#160;protected]</span></a>
       <div class="pay-note">Access is activated manually within 24 hours after payment verification.</div>
     </div>
     <div style="text-align:center">
@@ -2486,29 +2486,71 @@ window.show = function(id) {
 };
 
 // ─── POPULATE PROFILE ───
-function initAuth() {
-  const name = sess.name || 'Student';
-  const email = sess.email || '';
+function renderProfile() {
+  const name     = sess.name  || 'Student';
+  const email    = sess.email || '';
   const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
 
   document.getElementById('profile-name').textContent = name.split(' ')[0];
-  document.getElementById('pd-name').textContent = name;
+  document.getElementById('pd-name').textContent  = name;
   document.getElementById('pd-email').textContent = email;
   document.getElementById('home-user-badge').textContent = '👋 ' + name;
 
   const avatar = document.getElementById('profile-avatar');
-  if(sess.picture) {
-    avatar.innerHTML = `<img src="${sess.picture}" alt="${name}">`;
+  if (sess.picture) {
+    avatar.innerHTML = `<img src="${sess.picture}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
   } else {
     avatar.textContent = initials;
   }
 
-  if(isPro || isFree) {
-    document.getElementById('pd-plan').textContent = '100/100 PRO';
-    document.getElementById('pd-plan').className = 'pd-plan pro';
-    document.getElementById('home-plan-badge').textContent = '⭐ Pro';
+  // Re-read isPro/isFree from the (possibly refreshed) sess
+  const planNow = sess.plan || 'trial';
+  if (planNow === 'pro' || planNow === 'free') {
+    const label = planNow === 'pro' ? '⭐ 100/100 Pro' : '✅ Free — All Access';
+    document.getElementById('pd-plan').textContent      = label;
+    document.getElementById('pd-plan').className        = 'pd-plan pro';
+    document.getElementById('home-plan-badge').textContent = label;
+    document.getElementById('trial-badge').style.display   = 'none';
     unlockProTools();
-    document.getElementById('trial-badge').style.display = 'none';
+  } else {
+    document.getElementById('pd-plan').textContent      = '⏱ Free Trial';
+    document.getElementById('pd-plan').className        = 'pd-plan trial';
+    document.getElementById('home-plan-badge').textContent = '⏱ Trial';
+  }
+}
+
+async function initAuth() {
+  // 1. Render immediately from localStorage so UI isn't "Loading..."
+  renderProfile();
+
+  // 2. If real user (not dev bypass), fetch fresh plan + trialStartedAt from Firestore
+  if (sess.uid && sess.uid !== 'dev-bypass-uid') {
+    try {
+      const snap = await db_fs.collection('users').doc(sess.uid).get();
+      if (snap.exists) {
+        const data = snap.data();
+        // Update local session with fresh values
+        if (data.plan)           sess.plan           = data.plan;
+        if (data.trialStartedAt) sess.trialStartedAt = data.trialStartedAt;
+        if (data.name)           sess.name           = data.name;
+        if (data.picture)        sess.picture        = data.picture;
+        localStorage.setItem('cfa_session', JSON.stringify(sess));
+
+        // Update flags
+        isPro  = sess.plan === 'pro';
+        isFree = sess.plan === 'free';
+
+        // Re-render with fresh data
+        renderProfile();
+
+        // If plan changed to pro/free, stop the trial timer
+        if (isPro || isFree) {
+          clearInterval(trialInterval);
+        }
+      }
+    } catch(e) {
+      console.warn('Firestore refresh failed, using cached data:', e.message);
+    }
   }
 }
 initAuth();
@@ -2628,4 +2670,9 @@ function doLogout() {
   // 3. Wipe the session from the browser
   localStorage.removeItem('cfa_session');
   
-  // 4. Redirect th
+  // 4. Redirect to login
+  window.location.href = 'isc_auth.html';
+}
+</script>
+</body>
+</html>
