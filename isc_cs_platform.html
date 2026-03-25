@@ -2462,58 +2462,8 @@ if(!sessRaw) {
   window.location.href = 'isc_auth.html';
 }
 const sess = JSON.parse(sessRaw || '{}');
-if (sess.uid && sess.uid !== 'dev-bypass-uid') {
-    try {
-      const snap = await db_fs.collection('users').doc(sess.uid).get();
-      if (snap.exists) {
-        const data        = snap.data();
-        sess.plan           = data.plan           || sess.plan;
-        sess.trialStartedAt = data.trialStartedAt || sess.trialStartedAt || Date.now();
-        localStorage.setItem('cfa_session', JSON.stringify(sess));
-      }
-    } catch(e) {
-      console.warn('Firestore fetch failed, using cached values:', e.message);
-    }
-  }
-
-  isPro  = sess.plan === 'pro';
-  isFree = sess.plan === 'free';
-  applyPlanToUI();
-}
-
-function applyPlanToUI() {
-  const name     = sess.name  || 'Student';
-  const email    = sess.email || '';
-  const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-
-  document.getElementById('profile-name').textContent = name.split(' ')[0];
-  document.getElementById('pd-name').textContent  = name;
-  document.getElementById('pd-email').textContent = email;
-  document.getElementById('home-user-badge').textContent = '👋 ' + name;
-
-  const avatar = document.getElementById('profile-avatar');
-  if (sess.picture) {
-    avatar.innerHTML = `<img src="${sess.picture}" alt="${name}">`;
-  } else {
-    avatar.textContent = initials;
-  }
-
-  if (isPro || isFree) {
-    const label = isPro ? '⭐ 100/100 Pro' : '✅ Free — All Access';
-    document.getElementById('pd-plan').textContent = label;
-    document.getElementById('pd-plan').className   = 'pd-plan pro';
-    document.getElementById('home-plan-badge').textContent = label;
-    document.getElementById('trial-badge').style.display   = 'none';
-    unlockProTools();
-  } else {
-    document.getElementById('pd-plan').textContent = '⏱ Free Trial';
-    document.getElementById('pd-plan').className   = 'pd-plan trial';
-    document.getElementById('home-plan-badge').textContent = '⏱ Trial';
-    lockProTools();
-    startTrialTimer();
-  }
-}
-
+const trialDuration = sess.trialDuration || 3600000; // 1 Hour
+const loginTime = sess.loginTime || Date.now();
 
 // ─── PLAN STATE ───
 const PRO_TOOLS = ['dsv', 'programs'];
@@ -2564,34 +2514,34 @@ function initAuth() {
 initAuth();
 
 // ─── TRIAL TIMER ───
-function startTrialTimer() {
-  updateTrialTimer();
-  trialInterval = setInterval(updateTrialTimer, 1000);
-}
-
 function updateTrialTimer() {
-  const elapsed   = Date.now() - (sess.trialStartedAt || Date.now());
-  const remaining = Math.max(0, (sess.trialDuration || 3600000) - elapsed);
-  const badge = document.getElementById('trial-badge');
-  const text  = document.getElementById('trial-text');
+  if (isPro || isFree) return;
 
-  if (remaining <= 0) {
+  const elapsed = Date.now() - loginTime;
+  const remaining = Math.max(0, trialDuration - elapsed);
+  const mins = Math.floor(remaining / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+  const badge = document.getElementById('trial-badge');
+  const text = document.getElementById('trial-text');
+
+  if(remaining <= 0) {
     trialExpired = true;
-    clearInterval(trialInterval);
-    badge.className  = 'ab-trial trial-expired';
+    badge.className = 'ab-trial trial-expired';
     text.textContent = '⏰ Trial Expired';
     lockProTools();
     return;
   }
-  const mins = Math.floor(remaining / 60000);
-  const secs = Math.floor((remaining % 60000) / 1000);
-  if (remaining < 300000) {
-    badge.style.background  = 'rgba(244,114,182,.12)';
+
+  if(remaining < 300000) { // last 5 mins
+    badge.style.background = 'rgba(244,114,182,.12)';
     badge.style.borderColor = 'rgba(244,114,182,.3)';
-    text.style.color        = 'var(--c5)';
+    text.style.color = 'var(--c5)';
   }
+
   text.textContent = `⏱ Free Trial: ${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
 }
+updateTrialTimer();
+trialInterval = setInterval(updateTrialTimer, 1000);
 
 // ─── LOCK / UNLOCK ───
 function lockProTools() {
