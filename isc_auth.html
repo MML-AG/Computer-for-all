@@ -252,15 +252,16 @@ input::placeholder{color:var(--t3)}
 // ══════════════════════════════════════════════════════
 
 // ─── Save session to localStorage (used by platform page) ───
+// trialStartedAt is a fixed timestamp from Firestore — never changes after first login
 function startSession(user) {
   const session = {
-    uid:           user.uid   || '',
-    name:          user.name  || 'Student',
-    email:         user.email || '',
-    picture:       user.picture || '',
-    plan:          user.plan  || 'trial',   // "trial" | "free" | "pro"
-    loginTime:     Date.now(),
-    trialDuration: 3600000   // 1 hour — only used when plan === "trial"
+    uid:             user.uid            || '',
+    name:            user.name           || 'Student',
+    email:           user.email          || '',
+    picture:         user.picture        || '',
+    plan:            user.plan           || 'trial',
+    trialStartedAt:  user.trialStartedAt || Date.now(), // ← persisted, never reset
+    trialDuration:   3600000  // 1 hour in ms
   };
   localStorage.setItem('cfa_session', JSON.stringify(session));
 }
@@ -272,20 +273,28 @@ async function syncUserWithFirestore(firebaseUser) {
   const snap = await ref.get();
 
   if (!snap.exists) {
-    // New user — create doc with plan = "trial"
+    // Brand new user — record trialStartedAt once, permanently
+    const now = Date.now();
     const newDoc = {
       uid,
-      name:      firebaseUser.displayName || 'Student',
-      email:     firebaseUser.email,
-      picture:   firebaseUser.photoURL || '',
-      plan:      'trial',   // default: trial
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      name:           firebaseUser.displayName || 'Student',
+      email:          firebaseUser.email,
+      picture:        firebaseUser.photoURL || '',
+      plan:           'trial',
+      trialStartedAt: now,   // ← set once, never overwritten
+      createdAt:      firebase.firestore.FieldValue.serverTimestamp()
     };
     await ref.set(newDoc);
-    return newDoc;
+    return { ...newDoc };
   } else {
-    // Existing user — return stored data (plan may have been upgraded by you)
-    return snap.data();
+    const data = snap.data();
+    // If somehow trialStartedAt is missing (legacy doc), add it now
+    if (!data.trialStartedAt) {
+      const now = Date.now();
+      await ref.update({ trialStartedAt: now });
+      return { ...data, trialStartedAt: now };
+    }
+    return data;
   }
 }
 
@@ -353,11 +362,12 @@ async function handleGoogleCredential(response) {
     const userData = await syncUserWithFirestore(fbUser);
 
     startSession({
-      uid:     fbUser.uid,
-      name:    userData.name    || fbUser.displayName,
-      email:   userData.email   || fbUser.email,
-      picture: userData.picture || fbUser.photoURL || '',
-      plan:    userData.plan    || 'trial'
+      uid:            fbUser.uid,
+      name:           userData.name    || fbUser.displayName,
+      email:          userData.email   || fbUser.email,
+      picture:        userData.picture || fbUser.photoURL || '',
+      plan:           userData.plan    || 'trial',
+      trialStartedAt: userData.trialStartedAt || Date.now()
     });
 
     hideLoading();
@@ -400,11 +410,12 @@ async function doLogin() {
     const result = await auth.signInWithEmailAndPassword(email, pass);
     const userData = await syncUserWithFirestore(result.user);
     startSession({
-      uid:     result.user.uid,
-      name:    userData.name,
-      email:   userData.email,
-      picture: userData.picture || '',
-      plan:    userData.plan || 'trial'
+      uid:            result.user.uid,
+      name:           userData.name,
+      email:          userData.email,
+      picture:        userData.picture || '',
+      plan:           userData.plan || 'trial',
+      trialStartedAt: userData.trialStartedAt || Date.now()
     });
     hideLoading();
     window.location.href = 'isc_cs_platform.html';
@@ -426,15 +437,17 @@ async function doSignup() {
     const result = await auth.createUserWithEmailAndPassword(email, pass);
     await result.user.updateProfile({ displayName: name });
     // Create Firestore doc manually since displayName isn't set before syncUser
+    const trialStartedAt = Date.now();
     await db.collection('users').doc(result.user.uid).set({
-      uid:       result.user.uid,
+      uid:            result.user.uid,
       name,
       email,
-      picture:   '',
-      plan:      'trial',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      picture:        '',
+      plan:           'trial',
+      trialStartedAt,
+      createdAt:      firebase.firestore.FieldValue.serverTimestamp()
     });
-    startSession({ uid: result.user.uid, name, email, picture: '', plan: 'trial' });
+    startSession({ uid: result.user.uid, name, email, picture: '', plan: 'trial', trialStartedAt });
     hideLoading();
     window.location.href = 'isc_cs_platform.html';
   } catch(e) {
@@ -467,11 +480,12 @@ auth.onAuthStateChanged(async (firebaseUser) => {
       // Firebase session exists but localStorage cleared — re-fetch Firestore doc
       const userData = await syncUserWithFirestore(firebaseUser);
       startSession({
-        uid:     firebaseUser.uid,
-        name:    userData.name,
-        email:   userData.email,
-        picture: userData.picture || '',
-        plan:    userData.plan || 'trial'
+        uid:            firebaseUser.uid,
+        name:           userData.name,
+        email:          userData.email,
+        picture:        userData.picture || '',
+        plan:           userData.plan || 'trial',
+        trialStartedAt: userData.trialStartedAt || Date.now()
       });
       window.location.href = 'isc_cs_platform.html';
     }
